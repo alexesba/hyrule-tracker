@@ -16,8 +16,10 @@ const isDev = !app.isPackaged;
 const appDir = app.getAppPath();
 
 // Prefer X11 for overlay placement and global shortcuts when DISPLAY is set.
-// In a Wayland-only session, let Electron select its native backend.
-if (process.platform === 'linux' && useX11(process.env)) app.commandLine.appendSwitch('ozone-platform', 'x11');
+// In a Wayland-only session, or a Wayland session on NVIDIA's driver, let Electron select its native backend.
+if (process.platform === 'linux' && useX11(process.env, fs.existsSync('/proc/driver/nvidia/version'))) {
+  app.commandLine.appendSwitch('ozone-platform', 'x11');
+}
 
 // Development/testing only: run against a scratch settings folder and save folder.
 if (isDev && process.env.OOT_USER_DATA) app.setPath('userData', process.env.OOT_USER_DATA);

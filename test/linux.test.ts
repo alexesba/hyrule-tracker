@@ -114,4 +114,9 @@ describe('X11 or Wayland', () => {
   it('can be forced to X11', () => {
     expect(useX11({ WAYLAND_DISPLAY: 'wayland-0', HYRULE_TRACKER_X11: '1' })).toBe(true);
   });
+  it("uses native Wayland in a Wayland session on NVIDIA's driver, where XWayland showed an invisible window", () => {
+    expect(useX11({ DISPLAY: ':0', WAYLAND_DISPLAY: 'wayland-0' }, true)).toBe(false);
+    expect(useX11({ DISPLAY: ':0' }, true)).toBe(true); // a plain X11 session
+    expect(useX11({ DISPLAY: ':0', WAYLAND_DISPLAY: 'wayland-0', HYRULE_TRACKER_X11: '1' }, true)).toBe(true);
+  });
 });

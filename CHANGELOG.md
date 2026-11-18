@@ -4,10 +4,13 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
-## [Unreleased]
+## [1.4.4] - 2026-11-18
 
 ### New
-- **macOS (build it yourself).** `npm run dist:mac` builds an app for Apple silicon that finds saves, including nxnative's Ocarina of Time port. Live reading is not available on macOS.
+- **macOS (build it yourself).** `npm run dist:mac` builds an app for Apple silicon that finds saves, including nxnative's Ocarina of Time port. Live reading is not available on macOS. Thanks to Pedro Nascimento for building this. [#9](https://github.com/jv-prado/hyrule-tracker/pull/9)
+
+### Fixed
+- **Invisible window on Linux with NVIDIA.** In a Wayland session with NVIDIA's driver, the app now opens natively in Wayland, where before XWayland showed an invisible window. If the window still opens invisible, start the app with `HYRULE_TRACKER_WAYLAND=1`. In native Wayland, overlay placement and global shortcuts may be limited. Thanks to BroOtti for reporting this and testing the workarounds. [#10](https://github.com/jv-prado/hyrule-tracker/issues/10)
 
 ## [1.4.3] - 2026-11-18
 
