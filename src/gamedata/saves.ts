@@ -9,6 +9,7 @@ import { parseGameData, GameDataFile, MAGIC } from './parser.js';
 import { isWindowsPath, prefixUsers, steamLibraries, toUnixPath, userAppData, winePrefixes } from './wine.js';
 
 const isLinux = process.platform === 'linux';
+const isMac = process.platform === 'darwin';
 
 export interface SlotInfo {
   name: string; // "slot_03"
@@ -149,6 +150,11 @@ function baseDirs() {
     const storage = [roaming, local, path.join(home, 'Games'), path.join(home, 'Applications'), path.join(home, 'opt'), '/opt'];
     return { home, roaming, local, storage };
   }
+  if (isMac) {
+    // macOS: ~/Library/Application Support holds the native ports' data (e.g. nxnative/<title id>/save).
+    const roaming = path.join(home, 'Library', 'Application Support');
+    return { home, roaming, local: roaming, storage: [roaming, path.join(home, 'Games'), '/Applications', path.join(home, 'Applications')] };
+  }
   const roaming = process.env.APPDATA ?? path.join(home, 'AppData', 'Roaming');
   const local = process.env.LOCALAPPDATA ?? path.join(home, 'AppData', 'Local');
   const storage = [roaming, local, path.join(local, 'Programs'), path.join(home, 'Games')];
@@ -176,7 +182,8 @@ function otherBases(home: string): Bases[] {
 }
 
 function foldersIn({ roaming, local, storage, prefix }: Bases): string[] {
-  const native = ['Hookshot', 'Longshot', 'Triforce', 'NX2navi', 'NX2Saria', 'Ocarina Reborn', 'OcarinaReborn', 'ReLink'];
+  const native = ['Hookshot', 'Longshot', 'Triforce', 'NX2navi', 'NX2Saria', 'Ocarina Reborn', 'OcarinaReborn', 'ReLink',
+    ...(isMac ? [`nxnative/${OOT_TITLE_ID}`] : [])];
   return [...emulatorDataDirs(roaming), ...emulatorDataDirs(local),
     ...storage.flatMap(base => native.map(name => path.join(base, name))),
     ...configPaths(local, 'Ocarina Reborn/Config/settings.json', ['game_dir'], prefix),

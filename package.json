@@ -17,7 +17,8 @@
     "dist": "npm run build && electron-builder --win nsis",
     "dist:publish": "node scripts/ensure-release.mjs && npm run build && electron-builder --win nsis --publish always",
     "dist:linux": "node scripts/dist-linux.mjs",
-    "dist:linux:publish": "node scripts/dist-linux.mjs --publish"
+    "dist:linux:publish": "node scripts/dist-linux.mjs --publish",
+    "dist:mac": "sh scripts/build-mac.sh"
   },
   "devDependencies": {
     "@types/node": "^24.19.2",
