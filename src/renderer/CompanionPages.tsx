@@ -100,7 +100,7 @@ function liveTracking(state: AppState, player: PlayerState | undefined): { tone:
   const live = state.live;
   if (player?.source === 'live') return { tone: 'on', label: 'Rastreio ao vivo', detail: t('Link no mapa em tempo real') };
   if (live.status === 'unavailable') return { tone: 'off', label: 'Rastreio ao vivo indisponível', detail: live.detail ? tv(live.detail, live.detailValues) : undefined };
-  if (live.status === 'off' || live.status === 'no-game') return { tone: 'wait', label: 'Ao vivo: aguardando o jogo', detail: t('Abra o jogo para o rastreio ao vivo começar.') };
+  if (live.status === 'off' || live.status === 'no-game') return { tone: 'wait', label: 'Ao vivo: aguardando o jogo', detail: live.detail ? tv(live.detail, live.detailValues) : t('Abra o jogo para o rastreio ao vivo começar.') };
   return { tone: 'wait', label: 'Ao vivo: procurando o Link', detail: live.detail ? tv(live.detail, live.detailValues) : t('Carregue seu arquivo no jogo.') };
 }
 
@@ -481,11 +481,16 @@ function usePlayer(state: AppState): PlayerState | undefined {
   return player;
 }
 
-/** Link on a map: a dot with a cone pointing where he faces. */
+/** Shown on the map while Link's arrow comes from the save, not from the running game. */
+const SAVE_POSITION_NOTE = 'Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.';
+
+/** Link on a map: a red arrow pointing where he faces (it pulses when it appears live). */
 function PlayerPin({ at, yaw, live }: { at: { x: number; y: number }; yaw: number; live: boolean }) {
   const label = live ? t('Link (ao vivo)') : t('Link (último save)');
   return <div className={live ? 'player-pin live' : 'player-pin'} style={{ left: `${at.x * 100}%`, top: `${at.y * 100}%` }} title={label} aria-label={label} role="img">
-    <i className="player-heading" style={{ transform: `rotate(${yaw}deg)` }} /><b />
+    <svg className="player-heading" viewBox="-15 -15 30 30" style={{ transform: `rotate(${yaw}deg)` }} aria-hidden="true">
+      <path d="M0,-13 L10,11 L0,5 L-10,11 Z" />
+    </svg>
   </div>;
 }
 
@@ -684,6 +689,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
       <label><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} />{t("Ocultar regiões não vistas")}</label>
       <label><input type="checkbox" checked={follow} onChange={e => { setFollow(e.target.checked); setActive(undefined); }} />{t("Seguir Link")}</label>
     </div>
+    {player?.source === 'save' && <p className="map-note">{t(SAVE_POSITION_NOTE)}</p>}
     <div className={panelOpen ? 'map-stage' : 'map-stage no-panel'}>
       <section className="map-main">
         {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={showPanel}>

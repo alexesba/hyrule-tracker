@@ -87,6 +87,33 @@ describe('live player reader', () => {
     let got = null;
     for (let i = 0; i < 20 && !got; i++) got = reader.read(i);
     expect(got).toEqual({ pos: { x: 55.27, y: 102.47, z: 23.14, yaw: 0 }, scene: 'ZoraFountain_Child' });
+    expect(reader.stage).toBe('ok');
+  });
+
+  it('finds the main module inside one huge readable block (Linux builds)', () => {
+    // The whole guest code window is one readable mapping, zeros except what was put there.
+    const lo = GUEST_BASE + 0x0800_0000n, hi = GUEST_BASE + 0x1_8000_0000n;
+    const sparse: Mem = {
+      read(addr, len) {
+        if (addr < lo || addr + BigInt(len) > hi) return mem.read(addr, len);
+        const out = Buffer.alloc(len);
+        for (const [at, buf] of pages) {
+          const from = addr > at ? addr : at, to = addr + BigInt(len) < at + BigInt(buf.length) ? addr + BigInt(len) : at + BigInt(buf.length);
+          if (from < to) buf.copy(out, Number(from - addr), Number(from - at), Number(to - at));
+        }
+        return out;
+      },
+    };
+    const reader = new PlayerReader(sparse, () => [{ base: lo, size: hi - lo }]);
+    let got = null;
+    for (let i = 0; i < 20 && !got; i++) got = reader.read(i);
+    expect(got?.scene).toBe('ZoraFountain_Child');
+  });
+
+  it('says it found no main module after a full search', () => {
+    const reader = new PlayerReader(mem, () => []);
+    expect(reader.read(0)).toBeNull();
+    expect(reader.stage).toBe('no-module');
   });
 
   it('extracts scene names from Banc paths', () => {

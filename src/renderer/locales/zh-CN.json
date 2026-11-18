@@ -1758,5 +1758,7 @@
   "Mais": "更多",
   "Início": "首页",
   "Mapa": "地图",
-  "Checklist": "清单"
+  "Checklist": "清单",
+  "Couldn't connect to the game: {error}": "无法连接到游戏：{error}",
+  "Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.": "在重编译版中，林克的位置实时显示。在模拟器中，只在存档时更新。"
 }

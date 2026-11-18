@@ -101,10 +101,11 @@ export class WindowsProcessMemory implements GameProcess {
 
 /** Process ids of running programs with this image name (e.g. "hookshot.exe"). */
 export function findWindowsProcesses(image: string): Promise<number[]> {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     if (process.platform !== 'win32') return resolve([]);
+    // tasklist exits 0 when nothing matches, so an error here means the lookup itself failed.
     execFile('tasklist.exe', ['/FI', `IMAGENAME eq ${image}`, '/FO', 'CSV', '/NH'], { windowsHide: true, timeout: 5000 }, (err, out) => {
-      if (err) return resolve([]);
+      if (err) return reject(new Error(`tasklist failed: ${err.message}`));
       const pids = String(out).split(/\r?\n/).map(l => l.match(/^"[^"]+","(\d+)"/)?.[1]).filter((x): x is string => !!x).map(Number);
       resolve(pids);
     });

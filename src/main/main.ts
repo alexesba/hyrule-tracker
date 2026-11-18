@@ -10,6 +10,7 @@ import { SettingsStore } from './settings.js';
 import { boundsVisible, cleanBounds, isLocale, isString, isStringArray, parseHotkeys, parseOverlayPatch, sanitizeUiPrefs, type MainLocale, type Rect } from './validate.js';
 import { useX11 } from './x11.js';
 import { findPublicNetworks, lanUrls, startLanServer, type LanServer } from './lan.js';
+import { logError as writeErrorLog } from './errorlog.js';
 
 const isDev = !app.isPackaged;
 const appDir = app.getAppPath();
@@ -215,12 +216,7 @@ function debounce<T extends (...a: never[]) => void>(fn: T, ms: number) {
 }
 
 // Never crash on an unexpected error: log it and keep running.
-const logFile = () => path.join(app.getPath('userData'), 'error.log');
-function logError(where: string, e: unknown) {
-  const line = `[${new Date().toISOString()}] ${where}: ${e instanceof Error ? e.stack ?? e.message : String(e)}\n`;
-  try { fs.appendFileSync(logFile(), line); } catch { /* ignore */ }
-  console.error(line);
-}
+const logError = (where: string, e: unknown) => writeErrorLog(app.getPath('userData'), where, e);
 
 process.on('uncaughtException', e => logError('uncaughtException', e));
 process.on('unhandledRejection', e => logError('unhandledRejection', e));

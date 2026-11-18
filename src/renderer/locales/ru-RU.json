@@ -1758,5 +1758,7 @@
   "Mais": "Ещё",
   "Início": "Главная",
   "Mapa": "Карта",
-  "Checklist": "Чек-лист"
+  "Checklist": "Чек-лист",
+  "Couldn't connect to the game: {error}": "Не удалось подключиться к игре: {error}",
+  "Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.": "В рекомпах позиция Линка обновляется вживую. В эмуляторах — только при сохранении."
 }

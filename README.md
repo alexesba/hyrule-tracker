@@ -52,7 +52,7 @@ The Linux build is new and hasn't been tested on many systems yet. **Please tell
 | | Screen | What you can track |
 | :-: | --- | --- |
 | 📊 | **Overview** | Checklist %, hearts, Gold Skulltulas, opened chests, rupees and recent activity. |
-| 🗺️ | **Hyrule Map** | 32 regions, per-floor maps, location photos and filters by Link's age, collectible type and completion. A pin shows **where Link is**, live while playing, and **Follow Link** keeps his region and dungeon floor on screen. Maps fit the window, even fullscreen. |
+| 🗺️ | **Hyrule Map** | 32 regions, per-floor maps, location photos and filters by Link's age, collectible type and completion. A red arrow shows **where Link is** and which way he faces: live in recomps; in emulators it only updates when you save ([why](#-compatibility)). **Follow Link** keeps his region and dungeon floor on screen. Maps fit the window, even fullscreen. |
 | ✅ | **100% Checklist** | Hearts, 100 Gold Skulltulas, songs, equipment, trades, dungeons, Big Poes and more. Done items are struck through. **Available now** shows what you can get with known requirements. |
 | ⏳ | **Threads of Time+** | Chapters, story steps and seven expandable side quests with guidance and progress from the save. |
 | 🎯 | **Minigames** | 18 activities with wins, prizes and scores: shooting galleries, Bombchu Bowling, fishing, races. Deku Theater and expert modes accept manual marking. |
@@ -72,7 +72,7 @@ The overall percentage uses the **100% Checklist** objectives. Minigame prizes t
 
 | Mode | Behavior |
 | --- | --- |
-| ⚡ **Live** | Always on: as soon as the game is open, Link's position moves on the map in real time and progress is polled about every half second once the tracker links the running session to the recent save. The sidebar shows the live tracking status. |
+| ⚡ **Live** | Always on: as soon as the game is open, progress is polled about every half second once the tracker links the running session to the recent save. In the recomps, Link's position also moves on the map in real time. The sidebar shows the live tracking status. |
 | 💾 **Save connected** | Follows the next save or autosave, watching the folder and periodically checking slots. |
 | 🔁 **Refresh now** | Forces an immediate read, retrying if the save is being written. |
 | 📌 **Follow latest save** | Uses live reading. Pinning a slot shows the on-disk reading of that save. |
@@ -91,6 +91,7 @@ Turn on **Show in-game overlay** in Settings. It can show counters, remaining ob
 - 🖥️ Desktop app for **Windows x64** and **Linux x86_64** (experimental), using the save format of the **Nintendo Switch 2 remake**.
 - 🔎 Search recognizes installations and saves from **Triforce / NX2navi**, **Hookshot**, **Longshot**, **ReLink**, **Ocarina Reborn**, **Fritchii** and **Lichii**.
 - ⚡ Live reading depends on the game version and the memory layout of the port or emulator. See the [live mode documentation](docs/live-memory.md).
+- 🧭 **Link's live position works only in recomps.** A recomp always keeps the game in the same place in memory, so the tracker knows where to find Link. An emulator moves it every time the game starts, so there the arrow only updates when you save.
 - 🗂️ Saves from other environments can be selected manually if they expose the same format.
 - ❌ Nintendo 64, Ocarina of Time 3D and original-game port saves use different formats and are **not** supported.
 

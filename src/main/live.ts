@@ -39,8 +39,12 @@ export interface LiveOptions {
   onGame?(exe: string | undefined, appData?: string): Promise<void>;
   onChange(): void;
   onStatus(): void;
+  /** Attaching to (or reading) the game failed; called once per distinct error, not on every retry. */
+  onError?(e: unknown): void;
   /** Link moved (or changed scene). Read it with player(). */
   onPlayer?(): void;
+  /** Reading Link's position got further or fell back (a line for the error log, to tell why there's no pin). */
+  onPlayerStage?(line: string): void;
 }
 
 export class LiveSource {
@@ -59,6 +63,7 @@ export class LiveSource {
   private inFlight?: Promise<void>;
   private playerReader?: PlayerReader;
   private playerNow?: LivePlayer & { atMs: number };
+  private playerStage?: string;
   watchInts = new Set<number>();
 
   constructor(private opts: LiveOptions) {}
@@ -114,14 +119,16 @@ export class LiveSource {
     this.sweep = undefined;
     this.sweepPausedUntil = 0;
     this.playerReader = undefined;
+    this.playerStage = undefined;
     if (this.playerNow) { this.playerNow = undefined; this.opts.onPlayer?.(); }
   }
 
   private tick() {
     this.inFlight ??= this.step().catch(e => {
-      console.error('live', e);
       this.detach();
-      this.set({ status: 'no-game', detail: String((e as Error).message ?? e) });
+      const error = String((e as Error)?.message ?? e);
+      if (this.info.detailValues?.error !== error) this.opts.onError?.(e);
+      this.set({ status: 'no-game', detail: "Couldn't connect to the game: {error}", detailValues: { error } });
     }).finally(() => {
       this.inFlight = undefined;
     });
@@ -175,7 +182,13 @@ export class LiveSource {
   }
 
   private readPlayer() {
-    const p = this.playerReader?.read();
+    const reader = this.playerReader;
+    const p = reader?.read();
+    // 'scanning' comes back every rescan: only the outcomes are worth a log line.
+    if (reader && reader.stage !== 'scanning' && reader.stage !== this.playerStage) {
+      this.playerStage = reader.stage;
+      this.opts.onPlayerStage?.(`Link's position: ${reader.stage} (guest base 0x${reader.base.toString(16)}${reader.stage === 'no-module' ? `; ${reader.scanInfo}` : ''})`);
+    }
     if (!p) return;
     const prev = this.playerNow;
     const moved = !prev || prev.scene !== p.scene || Math.abs(prev.pos.x - p.pos.x) > 0.05 ||
@@ -228,6 +241,14 @@ export class LiveSource {
   private found(t: LiveTables): boolean {
     this.tables = t;
     this.sweep = undefined;
+    // The tables showed guest memory somewhere other than the usual base (e.g. under Wine): read Link there too.
+    const base = t.location?.checked ? t.location.base : undefined;
+    const reader = this.playerReader;
+    if (reader && base !== undefined && base !== reader.base && reader.stage !== 'ok') {
+      const mem = this.mem!;
+      this.playerReader = new PlayerReader(mem, () => mem.regions(), base);
+      this.playerStage = undefined;
+    }
     const hint = t.records[0].start.toString(16);
     if (hint !== this.opts.hints[0]) { this.opts.hints = [hint, ...this.opts.hints.filter(h => h !== hint)].slice(0, 4); this.opts.onHint(hint); }
     return true;

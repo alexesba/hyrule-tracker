@@ -63,7 +63,11 @@ export function sceneFromBuffer(buf: Buffer | null): string | null {
 
 export interface LivePlayer { pos: PlayerPosition; scene: string | null }
 
+/** How far the last read got: still searching for the main module, didn't find it, found it but not Link, or reading him. */
+export type PlayerReaderStage = 'scanning' | 'no-module' | 'no-player' | 'ok';
+
 export class PlayerReader {
+  stage: PlayerReaderStage = 'scanning';
   private mainBase = 0n;
   private sub36 = 0n;
   private pObj = 0n;
@@ -71,14 +75,16 @@ export class PlayerReader {
   private scene: string | null = null;
   private lastScan = -Infinity;
   private lastYaw = 0;
-  private scan?: { blocks: { start: bigint; end: bigint }[]; i: number; at: bigint; spent: number };
+  private scan?: { blocks: { start: bigint; end: bigint }[]; i: number; at: bigint; spent: number; failed: number };
+  /** The last search for the main module, for the log. */
+  scanInfo = '';
 
   /**
    * @param mem the game process
    * @param regions its committed memory blocks (host addresses), for finding the main module
    * @param base host address of guest 0
    */
-  constructor(private mem: Mem, private regions: () => Region[], private base = GUEST_BASE) {}
+  constructor(private mem: Mem, private regions: () => Region[], readonly base = GUEST_BASE) {}
 
   private guest(addr: bigint, len: number) { return this.mem.read(this.base + addr, len); }
   private u64(addr: bigint) { const b = this.guest(addr, 8); return b ? b.readBigUInt64LE(0) : 0n; }
@@ -87,7 +93,7 @@ export class PlayerReader {
   read(now = Date.now()): LivePlayer | null {
     if (!this.mainBase) {
       this.mainBase = this.findMainBase(now);
-      if (!this.mainBase) return null;
+      if (!this.mainBase) { this.stage = this.scan ? 'scanning' : 'no-module'; return null; }
     }
     const vt1 = this.mainBase + SUB36_VT1, vt2 = this.mainBase + SUB36_VT2;
     let pos = this.sub36 ? parsePlayerStruct(this.guest(this.sub36, 0x40), vt1, vt2) : null;
@@ -98,8 +104,10 @@ export class PlayerReader {
     if (!pos) {
       // The module itself may have moved (game restarted in the same process is unlikely, but cheap to recheck).
       if (!isMainHeader(this.guest(this.mainBase, 8))) this.mainBase = 0n;
+      this.stage = 'no-player';
       return null;
     }
+    this.stage = 'ok';
     // Standing still: the direction vector is zero; keep the last heading.
     if (pos.yaw === 0) pos.yaw = this.lastYaw; else this.lastYaw = pos.yaw;
     return { pos, scene: this.readScene() };
@@ -145,11 +153,15 @@ export class PlayerReader {
     if (!this.scan) {
       if (now - this.lastScan < RESCAN_MS) return 0n;
       const lo = this.base + CODE_LO, hi = this.base + CODE_HI, near = this.base + CODE_NEAR;
+      // A block holding `near` is split there, so the search starts at the usual code base instead of
+      // spending the budget from the block's start (Linux builds reserve the guest space as one big block).
       const blocks = this.regions()
         .map(r => ({ start: r.base > lo ? r.base : lo, end: r.base + r.size < hi ? r.base + r.size : hi }))
         .filter(r => r.end > r.start)
-        .sort((a, b) => Number(abs(a.start - near) - abs(b.start - near)));
-      this.scan = { blocks, i: 0, at: blocks[0]?.start ?? 0n, spent: 0 };
+        .flatMap(r => r.start < near && near < r.end ? [{ start: near, end: r.end }, { start: r.start, end: near }] : [r])
+        .sort((a, b) => Number(distance(a, near) - distance(b, near)));
+      this.scan = { blocks, i: 0, at: blocks[0]?.start ?? 0n, spent: 0, failed: 0 };
+      this.scanInfo = `${blocks.length} blocks, ${mib(blocks.reduce((n, b) => n + (b.end - b.start), 0n))} in the code window`;
     }
     const s = this.scan;
     let budget = TICK_BUDGET;
@@ -162,7 +174,7 @@ export class PlayerReader {
       budget -= len;
       s.spent += len;
       const buf = this.mem.read(at, len);
-      if (!buf) continue;
+      if (!buf) { s.failed++; continue; }
       for (const [pattern, adjust] of [[MAIN_MOD0_PATTERN, 0n], [OWL_MOD0_PATTERN, 8n]] as const) {
         for (let i = buf.indexOf(pattern); i >= 0; i = buf.indexOf(pattern, i + 1)) {
           const mainBase = at + BigInt(i) + adjust - this.base - MAIN_MOD0_OFFSET;
@@ -170,9 +182,15 @@ export class PlayerReader {
         }
       }
     }
-    if (s.i >= s.blocks.length || s.spent >= SCAN_BUDGET) { this.scan = undefined; this.lastScan = now; }
+    if (s.i >= s.blocks.length || s.spent >= SCAN_BUDGET) {
+      this.scanInfo += `; searched ${mib(BigInt(s.spent))}, ${s.failed} unreadable chunks${s.spent >= SCAN_BUDGET ? ', budget used up' : ''}`;
+      this.scan = undefined; this.lastScan = now;
+    }
     return 0n;
   }
 }
 
 const abs = (v: bigint) => (v < 0n ? -v : v);
+/** How far a block is from `at` (0 if it holds it). */
+const distance = (b: { start: bigint; end: bigint }, at: bigint) => (at < b.start ? b.start - at : at >= b.end ? at - b.end + 1n : 0n);
+const mib = (v: bigint) => `${v >> 20n} MiB`;

@@ -1758,5 +1758,7 @@
   "Mais": "Plus",
   "Início": "Accueil",
   "Mapa": "Carte",
-  "Checklist": "Checklist"
+  "Checklist": "Checklist",
+  "Couldn't connect to the game: {error}": "Impossible de se connecter au jeu : {error}",
+  "Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.": "Dans les recomps, la position de Link est en direct. Dans les émulateurs, elle n'est mise à jour qu'à la sauvegarde."
 }

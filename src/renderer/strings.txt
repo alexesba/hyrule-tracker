@@ -950,3 +950,5 @@ Mais||More|Más
 Início||Home|Inicio
 Mapa||Map|Mapa
 Checklist||Checklist|Lista
+Couldn't connect to the game: {error}|Não foi possível conectar ao jogo: {error}|Couldn't connect to the game: {error}|No se pudo conectar al juego: {error}
+Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.||In recomps, Link's position is live. In emulators, it only updates when you save.|En los recomps, la posición de Link es en vivo. En los emuladores, solo se actualiza al guardar.

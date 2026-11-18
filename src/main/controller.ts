@@ -12,6 +12,7 @@ import type { AvailableEntry } from '../shared/types.js';
 import { SaveWatcher } from './watcher.js';
 import { LiveSource } from './live.js';
 import { ChangeLog } from './changelog.js';
+import { logError } from './errorlog.js';
 import { STAGE_KEY, LOCATION_KEY, areaFrom } from '../gamedata/live.js';
 import { keyOf } from '../gamedata/detect.js';
 import { SettingsStore } from './settings.js';
@@ -281,6 +282,8 @@ export class Controller {
       onGame: (exe, appData) => this.followGame(exe, appData),
       onChange: () => void this.refresh(true),
       onPlayer: () => this.emitPlayer(),
+      onError: e => logError(this.paths.userData, 'live', e),
+      onPlayerStage: line => logError(this.paths.userData, 'player', line),
       onStatus: () => {
         const i = this.live?.info;
         if (i && (i.status === 'live') !== this.state.live.using) this.log.write({ kind: 'source', status: i.status, detail: i.detail });

@@ -4,6 +4,15 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [1.4.3] - 2026-11-18
+
+### Improved
+- **Link on the map.** Link is now a red arrow with a halo that points where he faces, easier to spot on the map. Thanks to csomi for suggesting the new look.
+- **Live position in emulators.** The map now says that in emulators Link's position only updates when you save. Live position works in recomps.
+
+### Fixed
+- **Live position on Linux.** Link's live position works with the native Linux build of Hookshot. Before, the map only moved him when the game saved. Thanks to csomi for reporting this on Discord and testing the fix.
+
 ## [1.4.2] - 2026-11-17
 
 ### Improved
