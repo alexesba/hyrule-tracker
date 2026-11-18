@@ -12,6 +12,7 @@ Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 ### Improved
 - **Link on the map.** Link is now a red arrow with a halo that points where he faces, easier to spot on the map. Thanks to csomi for suggesting the new look.
 - **Live position in emulators.** The map now says that in emulators Link's position only updates when you save. Live position works in recomps.
+- **Connection problems.** When the tracker can't connect to the running game, the sidebar says why. The error is also written to `error.log` in the app's data folder, so you can send it with a report.
 
 ### Fixed
 - **Live position on Linux.** Link's live position works with the native Linux build of Hookshot. Before, the map only moved him when the game saved. Thanks to csomi for reporting this on Discord and testing the fix.
