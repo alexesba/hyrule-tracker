@@ -14,7 +14,7 @@ A desktop app for Windows and Linux that **reads your local save** and updates t
 
 👤 Created by **João Victor Prado**.
 
-[🚀 First use](#-first-use) · [🐧 Linux](#-linux-experimental) · [✨ Features](#-features) · [🎮 Compatibility](#-compatibility) · [🔒 Local data](#-local-data) · [🛠️ Development](#️-development) · [🤝 Contributing](#-contributing)
+[🚀 First use](#-first-use) · [🐧 Linux](#-linux-experimental) · [🍎 macOS](#-macos-saves-only) · [✨ Features](#-features) · [🎮 Compatibility](#-compatibility) · [🔒 Local data](#-local-data) · [🛠️ Development](#️-development) · [🤝 Contributing](#-contributing)
 
 </div>
 
@@ -46,6 +46,18 @@ The Linux build is new and hasn't been tested on many systems yet. **Please tell
    This lets programs of your user read each other's memory, as on Windows. Without it the tracker still follows your saves.
 4. In a Wayland-only session, Electron can open the app natively without an environment override. When `DISPLAY` is set, the app requests X11 (XWayland on Wayland) for overlay placement and global shortcuts. Set `HYRULE_TRACKER_WAYLAND=1` to leave the decision to Electron. On a Wayland desktop with XWayland, pass `--ozone-platform=x11` on launch to select X11 explicitly. Overlay placement and global shortcuts may be limited in native Wayland. The overlay requires windowed or borderless mode outside Gamescope.
 5. If the AppImage closes right away on Ubuntu 24.04+ with a sandbox error, start it with `--no-sandbox`. Older distros may need `libfuse2`.
+
+## 🍎 macOS (saves only)
+
+There is no macOS release. You can build the app yourself on Apple silicon; it finds saves on disk (nxnative's Ocarina of Time port keeps them in `~/Library/Application Support/nxnative/0400486024DEC000`) but **cannot follow the running game live**: reading another program's memory needs `task_for_pid`, which is not implemented. The status stays **Save connected**, so save in the game or click **Refresh now**. The in-game overlay is untested.
+
+```sh
+npm ci
+npm run dist:mac    # fetches the missing images, builds, signs ad hoc: release/mac-arm64/Hyrule Tracker.app
+```
+
+- Needs Node.js 22+ and an `ffmpeg` with libwebp for the item images (Homebrew's default `ffmpeg` has none; check with `ffmpeg -encoders | grep libwebp`). If npm skipped Electron's install script, the script runs it.
+- The app is signed ad hoc, not notarized. Build it on the Mac that runs it, or clear the quarantine flag after copying it: `xattr -dr com.apple.quarantine "Hyrule Tracker.app"`. Automatic updates do not apply to it; build again for a new version.
 
 ## ✨ Features
 
@@ -130,6 +142,7 @@ npm run dev
 | `npm test` | 🧪 Runs the test suite (tests needing private fixtures are skipped in public clones). |
 | `npm run dist` | 📦 Builds the Windows x64 installer (`Hyrule-Tracker-Setup-<version>.exe`) in `release/`. |
 | `npm run dist:linux` | 🐧 Builds the Linux AppImage in Docker (works from Windows with Docker Desktop). |
+| `npm run dist:mac` | 🍎 Builds an ad-hoc signed macOS arm64 app on a Mac, fetching the images it lacks (see [macOS](#-macos-saves-only)). |
 | `npm run dist:publish` | 🚀 Creates the draft GitHub release from `CHANGELOG.md` and uploads the installer (needs `GH_TOKEN`). |
 
 ### 🚀 Releasing a version

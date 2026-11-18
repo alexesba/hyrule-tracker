@@ -4,6 +4,11 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [Unreleased]
+
+### New
+- **macOS (build it yourself).** `npm run dist:mac` builds an app for Apple silicon that finds saves, including nxnative's Ocarina of Time port. Live reading is not available on macOS.
+
 ## [1.4.3] - 2026-11-18
 
 ### New
