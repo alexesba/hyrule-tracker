@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { describe, it, expect, afterAll } from 'vitest';
+import { describe, it, expect, afterAll, vi } from 'vitest';
 import { installationLabel, userFolderForExe, resolveUserFolders, listSlots, mostRecentSlot, OOT_TITLE_ID } from '../src/gamedata/saves.js';
 
 // Made-up game folders in a temp directory (no real saves involved).
@@ -111,5 +111,26 @@ describe("an emulator's save folders", () => {
     const later = new Date(Date.now() + 60_000);
     fs.utimesSync(path.join(portable, 'slot_00', 'progress.sav'), later, later);
     expect(userFolderForExe(exe, appData)).toBe(portable); // the most recently played one
+  });
+});
+
+describe('macOS', () => {
+  it("lists nxnative's Ocarina of Time folders (a home without them is fine), and only on macOS", async () => {
+    const home = path.join(root, 'mac-home');
+    vi.spyOn(os, 'homedir').mockReturnValue(home);
+    const platform = Object.getOwnPropertyDescriptor(process, 'platform')!;
+    try {
+      for (const [name, expected] of [['darwin', true], ['win32', false]] as const) {
+        Object.defineProperty(process, 'platform', { value: name });
+        vi.resetModules();
+        const { knownGameFolders } = await import('../src/gamedata/saves.js');
+        const nx = path.join(home, 'Library', 'Application Support', 'nxnative', OOT_TITLE_ID);
+        expect(knownGameFolders().includes(nx)).toBe(expected);
+        if (expected) expect(knownGameFolders()).toContain(path.join(home, 'Games', 'nxnative', OOT_TITLE_ID));
+      }
+    } finally {
+      Object.defineProperty(process, 'platform', platform);
+      vi.restoreAllMocks();
+    }
   });
 });
