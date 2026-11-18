@@ -1760,5 +1760,6 @@
   "Mapa": "マップ",
   "Checklist": "チェックリスト",
   "Couldn't connect to the game: {error}": "ゲームに接続できませんでした: {error}",
-  "Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.": "リコンプ版ではリンクの位置がリアルタイムで表示されます。エミュレーターではセーブしたときだけ更新されます。"
+  "Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.": "リコンプ版ではリンクの位置がリアルタイムで表示されます。エミュレーターではセーブしたときだけ更新されます。",
+  "NX2Saria's tracker API doesn't read this game version's progress.": "NX2Saria のトラッカー API はこのゲームバージョンの進行状況を読み取れません。"
 }

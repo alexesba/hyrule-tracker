@@ -1760,5 +1760,6 @@
   "Mapa": "Карта",
   "Checklist": "Чек-лист",
   "Couldn't connect to the game: {error}": "Не удалось подключиться к игре: {error}",
-  "Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.": "В рекомпах позиция Линка обновляется вживую. В эмуляторах — только при сохранении."
+  "Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.": "В рекомпах позиция Линка обновляется вживую. В эмуляторах — только при сохранении.",
+  "NX2Saria's tracker API doesn't read this game version's progress.": "API трекера NX2Saria не читает прогресс этой версии игры."
 }

@@ -34,7 +34,9 @@ export function resolveUserFolders(start: string): string[] {
   if (!fs.existsSync(start)) return [];
   if (isUserFolder(start)) return [start];
   if (/^slot_\d+$/i.test(path.basename(start)) && isUserFolder(path.dirname(start))) return [path.dirname(start)];
-  const tries = [start, path.join(start, 'save'), path.join(start, 'user', 'save')];
+  // NX2Saria keeps its saves in <game>\profile\save (the launcher's game folder is <install>\game).
+  const tries = [start, path.join(start, 'save'), path.join(start, 'user', 'save'), path.join(start, 'profile', 'save'),
+    path.join(start, 'game', 'profile', 'save')];
   const out: string[] = [];
   for (const t of tries) {
     if (t !== start && isUserFolder(t)) out.push(t);
@@ -82,16 +84,22 @@ function emulatorDataDirs(appData = baseDirs().roaming): string[] {
 
 export const NATIVE_EXES = ['Triforce.exe', 'hookshot.exe', 'Longshot.exe', 'nx2navi.exe', 'relink-game.exe',
   'ocarina-reborn-game.exe', 'ocarina-reborn.exe', 'OcarinaReborn.exe'];
-const GAME_NAMES = /zelda|ocarina|hookshot|longshot|triforce|nx2navi|relink|fritchii|lichii|eden|orchid|eglantine|pokedinner/i;
+/**
+ * NX2Saria's game (ocarina from its launcher, nx2saria from a source build; .exe on Windows). It answers through its
+ * tracker API (nx2saria.ts), so it is not in NATIVE_EXES: its memory is not laid out as theirs.
+ */
+export const NX2SARIA_EXES = ['ocarina.exe', 'nx2saria.exe'];
+const GAME_NAMES = /zelda|ocarina|hookshot|longshot|triforce|nx2navi|nx2saria|relink|fritchii|lichii|eden|orchid|eglantine|pokedinner/i;
 /** A program's name without ".exe" (or a Linux build's ".AppImage" / ".x86_64"), lowercase. */
 export const programName = (file: string) => file.toLowerCase().replace(/\.(exe|appimage|x86_64)$/, '');
-const GAME_FILES = new Set([...NATIVE_EXES, ...EMULATOR_EXES, 'ReLink.exe'].map(programName));
+const GAME_FILES = new Set([...NATIVE_EXES, ...EMULATOR_EXES, ...NX2SARIA_EXES, 'ReLink.exe'].map(programName));
+const NX2SARIA_PROGRAMS = new Set(NX2SARIA_EXES.map(programName));
 /** A file that runs the game: the Windows exe, or a Linux build of the same name. */
 export const isGameFile = (file: string) => GAME_FILES.has(programName(file));
 const installations: Record<string, string> = {
   fritchii: 'Fritchii', lichii: 'Lichii', eden: 'Eden', orchid: 'Orchid', eglantine: 'Eglantine',
   pokedinner: 'PokeDinner', triforce: 'Triforce', longshot: 'Longshot', hookshot: 'Hookshot',
-  nx2navi: 'NX2navi', 'ocarina reborn': 'Ocarina Reborn', 'ocarina-reborn': 'Ocarina Reborn',
+  nx2navi: 'NX2navi', nx2saria: 'NX2Saria', 'ocarina reborn': 'Ocarina Reborn', 'ocarina-reborn': 'Ocarina Reborn',
   ocarinareborn: 'Ocarina Reborn', 'ocarina-reborn-game': 'Ocarina Reborn', relink: 'ReLink', 'relink-game': 'ReLink',
 };
 export function installationLabel(saveDir: string): string | undefined {
@@ -107,7 +115,8 @@ export function installationLabel(saveDir: string): string | undefined {
       if (!isGameFile(file)) return false;
       try { return fs.statSync(path.join(dir, file)).isFile(); } catch { return false; }
     });
-    if (game) return installations[programName(game)];
+    // NX2Saria's "ocarina" is named by its file only: a folder called Ocarina is no install of it.
+    if (game) return NX2SARIA_PROGRAMS.has(programName(game)) ? 'NX2Saria' : installations[programName(game)];
   }
 }
 const SEARCH_GROUPS = /^(apps?|programs?|games?|jogos|emulators?|emuladores|downloads|desktop|documents|gamesbuilds?|builds?|ports?|steamapps|common|quiverlauncher)$/i;
@@ -167,7 +176,7 @@ function otherBases(home: string): Bases[] {
 }
 
 function foldersIn({ roaming, local, storage, prefix }: Bases): string[] {
-  const native = ['Hookshot', 'Longshot', 'Triforce', 'NX2navi', 'Ocarina Reborn', 'OcarinaReborn', 'ReLink'];
+  const native = ['Hookshot', 'Longshot', 'Triforce', 'NX2navi', 'NX2Saria', 'Ocarina Reborn', 'OcarinaReborn', 'ReLink'];
   return [...emulatorDataDirs(roaming), ...emulatorDataDirs(local),
     ...storage.flatMap(base => native.map(name => path.join(base, name))),
     ...configPaths(local, 'Ocarina Reborn/Config/settings.json', ['game_dir'], prefix),

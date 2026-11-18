@@ -1,11 +1,13 @@
 // Live source: attaches (read-only) to a running game (Hookshot, Longshot, NX2navi or the
 // Fritchii emulator), keeps the progress tables located, and reports when tracked values
-// change. Falls back to nothing (the save files) whenever the game isn't running or isn't
+// change. NX2Saria answers through its tracker API instead (gamedata/nx2saria.ts), on any
+// system. Falls back to nothing (the save files) whenever the game isn't running or isn't
 // in the same playthrough.
 import type { GameDataFile } from '../gamedata/parser.js';
 import { locate, readTables, buildLive, fingerprint, matchesReference, sweepRanges, LiveTables, Agreement } from '../gamedata/live.js';
 import { MemoryAccessDenied, findProcesses, initMemoryAccess, openProcess, type GameProcess } from './procmem.js';
 import { ptraceScope } from './procmem-linux.js';
+import { ApiSession } from '../gamedata/nx2saria.js';
 import { NATIVE_EXES, EMULATOR_EXES } from '../gamedata/saves.js';
 import type { LiveInfo } from '../shared/types.js';
 import { PlayerReader, type LivePlayer } from '../gamedata/player.js';
@@ -35,8 +37,11 @@ export interface LiveOptions {
   /** Table addresses found before (hex), newest first. */
   hints: string[];
   onHint(hex: string): void;
-  /** A game was attached to: the full path of its exe if the system gave it, and its %APPDATA% when it runs in a Wine/Proton prefix. */
-  onGame?(exe: string | undefined, appData?: string): Promise<void>;
+  /**
+   * A game was attached to: the full path of its exe if the system gave it, and its %APPDATA% when it runs in a
+   * Wine/Proton prefix; or, for a game that says it (NX2Saria), the folder of the save it uses.
+   */
+  onGame?(exe: string | undefined, appData?: string, saveDir?: string): Promise<void>;
   onChange(): void;
   onStatus(): void;
   /** Attaching to (or reading) the game failed; called once per distinct error, not on every retry. */
@@ -64,12 +69,19 @@ export class LiveSource {
   private playerReader?: PlayerReader;
   private playerNow?: LivePlayer & { atMs: number };
   private playerStage?: string;
+  /** NX2Saria's tracker API, while it answers (instead of reading a process). */
+  private api?: ApiSession;
+  /** Reading another process's memory works on this system (Windows). */
+  private memoryAccess = false;
+  /** Ticks in a row the API gave no data while live: a few are a save being written or loaded. */
+  private apiMisses = 0;
   watchInts = new Set<number>();
 
   constructor(private opts: LiveOptions) {}
 
   async start() {
-    if (!(await initMemoryAccess())) return this.set({ status: 'unavailable', detail: 'Reading game memory is not available on this system.' });
+    // Without memory access (koffi missing on Windows), NX2Saria's tracker API is still read.
+    this.memoryAccess = await initMemoryAccess();
     this.set({ status: 'no-game' });
     this.timer = setInterval(() => void this.tick(), TICK_MS);
     void this.tick();
@@ -91,7 +103,7 @@ export class LiveSource {
   }
 
   /** Link's latest live position, while a game is attached and it could be read. */
-  player() { return this.mem ? this.playerNow : undefined; }
+  player() { return this.mem || this.api ? this.playerNow : undefined; }
 
   /** Live data, only while it matches the reference save. */
   current() { return this.info.status === 'live' ? this.snapshot : undefined; }
@@ -113,6 +125,8 @@ export class LiveSource {
   private detach() {
     this.mem?.close();
     this.mem = undefined;
+    this.api?.close();
+    this.api = undefined;
     this.tables = undefined;
     this.snapshot = undefined;
     this.lastPrint = undefined;
@@ -125,6 +139,7 @@ export class LiveSource {
 
   private tick() {
     this.inFlight ??= this.step().catch(e => {
+      if (!this.timer) return; // stopped while a request was out
       this.detach();
       const error = String((e as Error)?.message ?? e);
       if (this.info.detailValues?.error !== error) this.opts.onError?.(e);
@@ -136,12 +151,27 @@ export class LiveSource {
   }
 
   private async step() {
+    if (this.api && !this.api.alive) { this.detach(); this.set({ status: 'no-game' }); }
+    if (this.api) return this.apiStep();
     if (this.mem && !this.mem.alive()) { this.detach(); this.set({ status: 'no-game' }); }
     if (!this.mem) {
       if (Date.now() - this.lastFind < FIND_EVERY_MS) return;
       this.lastFind = Date.now();
-      const game = await findGame();
-      if (!this.timer) return;
+      // NX2Saria answers for itself and needs no memory reading: asked beside the process search, preferred.
+      // A failed process search (tasklist) must neither leak the API connection nor keep NX2Saria from being read.
+      const [api, found] = await Promise.all([ApiSession.open(),
+        this.memoryAccess ? findGame().then(game => ({ game }), (error: unknown) => ({ error })) : undefined]);
+      if (!this.timer) { api?.close(); return; }
+      if (api) {
+        this.api = api;
+        this.apiMisses = 0;
+        await this.opts.onGame?.(undefined, undefined, api.saveDir); // follow its saves, not another install's
+        if (!this.timer || this.api !== api) return;
+        return this.apiStep();
+      }
+      if (!this.memoryAccess) return this.set({ status: 'unavailable', detail: 'Reading game memory is not available on this system.' });
+      if (found && 'error' in found) throw found.error;
+      const game = found?.game;
       if (!game) return this.set({ status: 'no-game' });
       try {
         this.mem = openProcess(game.pid);
@@ -166,7 +196,32 @@ export class LiveSource {
     const print = fingerprint(this.tables!, raw, this.watchInts);
     // Nothing tracked changed: skip rebuilding (most ticks).
     if (print === this.lastPrint && this.info.status === 'live') return;
-    const live = buildLive(this.tables!, raw, this.ref);
+    this.publish(print, buildLive(this.tables!, raw, this.ref));
+  }
+
+  /** NX2Saria: Link's place and the game data, from its tracker API. A failed call drops the connection. */
+  private async apiStep() {
+    const api = this.api!;
+    const p = await api.player();
+    if (!this.timer || this.api !== api) return;
+    if (p) this.setPlayer(p);
+    if (!this.ref) return this.set({ status: 'searching', detail: 'Waiting for a save to compare with.' });
+    const live = await api.read(this.ref, this.watchInts);
+    if (!this.timer || this.api !== api) return;
+    if ('none' in live) {
+      if (live.none === 'unsupported')
+        return this.set({ status: 'waiting', detail: "NX2Saria's tracker API doesn't read this game version's progress." });
+      // A save being written or loaded refuses for a moment: stay live a few ticks before saying so.
+      if (this.info.status === 'live' && ++this.apiMisses <= 6) return;
+      return this.set({ status: 'waiting', detail: "Couldn't find the progress tables yet. Load your file in the game." });
+    }
+    this.apiMisses = 0;
+    if (live.print === this.lastPrint && this.info.status === 'live') return;
+    this.publish(live.print, live);
+  }
+
+  /** Use a fresh read when it is the same playthrough as the reference save. */
+  private publish(print: string, live: { data: GameDataFile; agreement: Agreement[]; resettable: Set<bigint> }) {
     if (!matchesReference(live.agreement)) {
       this.snapshot = undefined;
       this.lastPrint = undefined;
@@ -189,7 +244,10 @@ export class LiveSource {
       this.playerStage = reader.stage;
       this.opts.onPlayerStage?.(`Link's position: ${reader.stage} (guest base 0x${reader.base.toString(16)}${reader.stage === 'no-module' ? `; ${reader.scanInfo}` : ''})`);
     }
-    if (!p) return;
+    if (p) this.setPlayer(p);
+  }
+
+  private setPlayer(p: LivePlayer) {
     const prev = this.playerNow;
     const moved = !prev || prev.scene !== p.scene || Math.abs(prev.pos.x - p.pos.x) > 0.05 ||
       Math.abs(prev.pos.y - p.pos.y) > 0.05 || Math.abs(prev.pos.z - p.pos.z) > 0.05 || Math.abs(prev.pos.yaw - p.pos.yaw) > 2;

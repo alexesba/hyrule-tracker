@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseGameData, GameDataFile, GameDataError } from '../gamedata/parser.js';
-import { candidateGameFoldersAsync, detectInFolders, installationLabel, latestSaveFoldersByProgram, latestUserFolder, resolvePickedFolder, resolveUserFolders, listSlots, mostRecentSlot, readSaveStable, userFolderForExe, SlotInfo } from '../gamedata/saves.js';
+import { candidateGameFoldersAsync, detectInFolders, installationLabel, isUserFolder, latestSaveFoldersByProgram, latestUserFolder, resolvePickedFolder, resolveUserFolders, listSlots, mostRecentSlot, readSaveStable, userFolderForExe, SlotInfo } from '../gamedata/saves.js';
 import { loadNames } from '../gamedata/names.js';
 import { Tracker, ChecklistFile, MappingFile, DescriptionsFile, applyDescriptions } from '../core/tracker.js';
 import { regionsForArea } from '../core/areas.js';
@@ -279,7 +279,7 @@ export class Controller {
         s.live.hints = [...new Set([h, ...prev])].slice(0, 4);
         s.live.hint = h;
       }),
-      onGame: (exe, appData) => this.followGame(exe, appData),
+      onGame: (exe, appData, saveDir) => this.followGame(exe, appData, saveDir),
       onChange: () => void this.refresh(true),
       onPlayer: () => this.emitPlayer(),
       onError: e => logError(this.paths.userData, 'live', e),
@@ -356,12 +356,13 @@ export class Controller {
    * When a game starts, follow its saves: Hookshot, Longshot, NX2navi, ReLink and Fritchii each keep their
    * own. Not while a slot is pinned (that's a choice of save), and only if it has saves.
    */
-  private async followGame(exe: string | undefined, appData?: string) {
+  private async followGame(exe: string | undefined, appData?: string, saveDir?: string) {
     // A folder picked by hand is a choice too (like a pinned slot).
-    if (!exe || this.settings.data.pinnedSlot || (this.settings.data.manualSaveDir && this.userDir)) return;
-    const dir = userFolderForExe(exe, appData);
+    if ((!exe && !saveDir) || this.settings.data.pinnedSlot || (this.settings.data.manualSaveDir && this.userDir)) return;
+    // NX2Saria says which save folder it uses; the other games' folders are found from their exe.
+    const dir = saveDir && isUserFolder(saveDir) ? saveDir : exe ? userFolderForExe(exe, appData) : null;
     if (!dir || path.resolve(dir).toLowerCase() === path.resolve(this.userDir ?? '').toLowerCase()) return;
-    const game = path.dirname(exe).replace(/[\\/]bin$/i, '');
+    const game = exe ? path.dirname(exe).replace(/[\\/]bin$/i, '') : 'NX2Saria';
     this.log.write({ kind: 'source', status: 'switched', detail: `Following the running game: ${game}` });
     this.toast("Switched to the saves of the game that's running ({game}).", 8000, { game });
     await this.useFolder(dir);

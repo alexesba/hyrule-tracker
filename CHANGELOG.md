@@ -6,6 +6,9 @@ Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
 ## [1.4.3] - 2026-11-18
 
+### New
+- **NX2Saria.** The tracker finds NX2Saria's saves and follows it live on Windows and Linux. Turn on its tracker API (`tracker_api = 1` under `[tracker]` in `nx2saria.ini`, NX2Saria 0.17.0 or later) and the game sends its progress and Link's position to the tracker, without memory reading. Thanks to Larbaco for building this. [#8](https://github.com/jv-prado/hyrule-tracker/pull/8)
+
 ### Improved
 - **Link on the map.** Link is now a red arrow with a halo that points where he faces, easier to spot on the map. Thanks to csomi for suggesting the new look.
 - **Live position in emulators.** The map now says that in emulators Link's position only updates when you save. Live position works in recomps.
