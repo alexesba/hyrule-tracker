@@ -9,8 +9,14 @@ cd "$(dirname "$0")/.."
 # npm skips install scripts for some setups, which leaves Electron without its binary.
 [ -d node_modules/electron/dist ] || node node_modules/electron/install.js
 
-# fetch-atlas.mjs rewrites tracked files (data/atlas.json, docs/atlas-license.txt): put them back.
-[ -d src/renderer/public/images/atlas ] || { node scripts/fetch-atlas.mjs; git checkout -- data/atlas.json docs/atlas-license.txt; }
+# fetch-atlas.mjs rewrites tracked files (data/atlas.json, docs/atlas-license.txt): put them back,
+# so refuse to start while they hold local changes that would be lost.
+if [ ! -d src/renderer/public/images/atlas ]; then
+  git diff --quiet -- data/atlas.json docs/atlas-license.txt ||
+    { echo "data/atlas.json or docs/atlas-license.txt has local changes: commit or stash them first." >&2; exit 1; }
+  node scripts/fetch-atlas.mjs
+  git checkout -- data/atlas.json docs/atlas-license.txt
+fi
 [ -d src/renderer/public/images/reference ] || node scripts/fetch-reference-images.mjs
 if [ -z "$(ls src/renderer/public/images/items 2>/dev/null)" ]; then
   # fetch-item-images.mjs writes WebP through ffmpeg; Homebrew's default ffmpeg is built without libwebp.

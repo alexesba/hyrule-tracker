@@ -293,6 +293,8 @@ function startUpdater() {
   if (isDev) return; // nothing to update when running from source
   // Linux: only the AppImage can replace itself (an unpacked or distro-packaged copy can't).
   if (process.platform === 'linux' && !process.env.APPIMAGE) return;
+  // macOS: built locally and signed ad hoc (scripts/build-mac.sh); no release carries a macOS build to update to.
+  if (process.platform === 'darwin') return;
   // electron-updater is CommonJS and defines `autoUpdater` as a lazy getter, which Node's import() does not
   // expose as a named export: it only exists on `default`. Destructuring it directly yields undefined.
   void import('electron-updater').then(mod => {
