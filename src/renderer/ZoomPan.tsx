@@ -9,7 +9,7 @@ const MAX_ZOOM = 6;
  * Resize the layer when zooming so percentage positions track the map and markers keep their size.
  * The overlay stays anchored to the viewport.
  */
-export function ZoomPan({ ratio, className = '', children, overlay }: { ratio: number; className?: string; children: ReactNode; overlay?: ReactNode }) {
+export function ZoomPan({ ratio, className = '', children, overlay, controls }: { ratio: number; className?: string; children: ReactNode; overlay?: ReactNode; controls?: ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
   const layer = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<View>({ z: 1, x: 0, y: 0 });
@@ -188,6 +188,7 @@ export function ZoomPan({ ratio, className = '', children, overlay }: { ratio: n
       dragged.current = false;
       e.stopPropagation();
     }}>
+      {controls}
       <button type="button" aria-label={t('Ampliar')} title={t('Ampliar')} disabled={view.z >= MAX_ZOOM} onClick={() => zoomAt(1.5)}>+</button>
       <button type="button" aria-label={t('Reduzir')} title={t('Reduzir')} disabled={view.z <= MIN_ZOOM} onClick={() => zoomAt(1 / 1.5)}>−</button>
       <button type="button" aria-label={t('Reiniciar zoom')} title={t('Reiniciar zoom')} disabled={view.z <= MIN_ZOOM && !view.x && !view.y} onClick={() => setView({ z: 1, x: 0, y: 0 })}>⌖</button>
