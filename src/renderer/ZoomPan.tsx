@@ -13,6 +13,10 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
   const box = useRef<HTMLDivElement>(null);
   const layer = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<View>({ z: 1, x: 0, y: 0 });
+  // At rest, shift the art into the space left of the progress panel.
+  const [bias, setBias] = useState(0);
+  const biasRef = useRef(0);
+  biasRef.current = bias;
   const dragged = useRef(false);
   const gesture = useRef<AbortController | null>(null);
   // Zoom the layer is drawn at right now: its size in the DOM includes it.
@@ -35,7 +39,8 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
     setView(v => {
       const z = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, v.z * factor));
       const k = z / v.z;
-      return clamp({ z, x: qx - (qx - v.x) * k, y: qy - (qy - v.y) * k });
+      const originX = v.x + biasRef.current;
+      return clamp({ z, x: qx - (qx - originX) * k - biasRef.current, y: qy - (qy - v.y) * k });
     });
   }, [clamp]);
 
@@ -44,6 +49,8 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
     const el = box.current;
     if (!el) return;
     const wheel = (e: WheelEvent) => {
+      // Scrolling a card or the progress list on the map should move that list, not zoom.
+      if (e.target instanceof Element && e.target.closest('.map-side, .marker-card')) return;
       if (e.deltaY > 0 && drawnZoom.current <= MIN_ZOOM) return;
       e.preventDefault();
       const r = el.getBoundingClientRect();
@@ -57,9 +64,22 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
   useEffect(() => {
     const el = box.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
-    const observer = new ResizeObserver(() => setView(v => clamp(v)));
+    const measure = () => {
+      const panel = el.querySelector('.map-side');
+      const narrow = matchMedia('(max-width: 760px)').matches;
+      const shift = !panel || narrow ? 0 : (panel.getBoundingClientRect().left - el.getBoundingClientRect().left) / 2 - el.clientWidth / 2;
+      setBias(current => Math.abs(current - shift) < 0.5 ? current : shift);
+      setView(v => {
+        const kept = clamp(v);
+        return kept.z === v.z && kept.x === v.x && kept.y === v.y ? v : kept;
+      });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
     observer.observe(el);
-    return () => observer.disconnect();
+    const mutations = new MutationObserver(measure);
+    mutations.observe(el, { childList: true, subtree: true });
+    return () => { observer.disconnect(); mutations.disconnect(); };
   }, [clamp]);
 
   useEffect(() => () => gesture.current?.abort(), []);
@@ -149,8 +169,9 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
   }, [clamp, zoomAt]);
 
   function startDrag(e: PointerEvent<HTMLDivElement>) {
-    // Fingers are handled by the touch listeners above.
+    // Fingers are handled by the touch listeners above. Controls drawn on the map are not the map.
     if (e.pointerType === 'touch' || !e.isPrimary || e.button !== 0) return;
+    if (e.target instanceof Element && e.target.closest('.zoom-controls, .map-side, .marker-filter, .marker-card, .map-panel-show, .map-back')) return;
     gesture.current?.abort();
     dragged.current = false;
     if (view.z <= MIN_ZOOM) return;
@@ -181,7 +202,7 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
   }
 
   const style = { '--ratio': ratio } as CSSProperties;
-  const layerStyle = { '--zoom': view.z, transform: `translate(-50%, -50%) translate(${view.x}px, ${view.y}px)` } as CSSProperties;
+  const layerStyle = { '--zoom': view.z, transform: `translate(-50%, -50%) translate(${view.x + bias}px, ${view.y}px)` } as CSSProperties;
   return <div ref={box} className={view.z > MIN_ZOOM ? 'zoom-viewport zoomed' : 'zoom-viewport'} style={style} onPointerDown={startDrag} onClickCapture={swallowDragClick}>
     <div ref={layer} className={`zoom-layer ${className}`} style={layerStyle}>{children}</div>
     <div className="zoom-controls" onPointerDown={e => {

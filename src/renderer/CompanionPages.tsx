@@ -677,7 +677,6 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
     return map.set(r.cat.id, entry);
   }, new Map<string, { cat: TrackedCategory; icon: string; done: number; total: number }>()).values()];
   const showLocation = !hideUnknown || seen.has(selected);
-  const photo = inRegion && showLocation ? regionPhoto(selected) : undefined;
   const place = atlas.places.find(p => atlasStages[p.id] === selected);
   // Rows with an atlas marker are drawn by that marker (with its photos), not a second time.
   const tracked: TrackedPin[] = place ? local.filter(r => !markerOf.has(r.item.id)).flatMap(r => r.fixes
@@ -706,38 +705,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const rate = (key: string) => { const r = progress.byKey.get(key); return r ? percent(r.done, r.total) : 0; };
   const listed = progress.regions.filter(r => !hideUnknown || seen.has(r.key));
   const unknownRate = progress.byKey.get('unknown');
-
-  return <div ref={mapView} className={mapOnly ? 'map-view map-only' : 'map-view'}>
-    <div className="filter-bar map-filter-bar">
-      <label>{t("Região")}{' '}<select value={selected} onChange={e => open(e.target.value)}><option value="">{t("Mapa de Hyrule")}</option>{Object.entries(LOCAL_NAMES).filter(([key]) => !hideUnknown || seen.has(key) || key === selected).map(([key, name]) => <option key={key} value={key}>{t(name)}</option>)}{!hideUnknown && <option value="unknown">{t("Baús sem posição mapeada")}</option>}</select></label>
-      <label><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} />{t("Ocultar regiões não vistas")}</label>
-      <label><input type="checkbox" checked={follow} onChange={e => { setFollow(e.target.checked); setActive(undefined); }} />{t("Seguir Link")}</label>
-    </div>
-    {player?.source === 'save' && <p className="map-note">{t(SAVE_POSITION_NOTE)}</p>}
-    <div className={panelOpen ? 'map-stage' : 'map-stage no-panel'}>
-      <section className="map-main">
-        {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={showPanel} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
-          <img className="map-art" src={atlas.map.image} alt={t("Mapa de Hyrule")} draggable={false} />
-          {atlas.places.filter(p => !hideUnknown || seen.has(atlasStages[p.id])).map(p => {
-            const key = atlasStages[p.id];
-            const label = t(LOCAL_NAMES[key] ?? p.name);
-            const entry = progress.byKey.get(key);
-            const title = entry ? `${label} · ${rate(key)}%` : label;
-            const state = key === inGame ? ' in-game' : entry && entry.done === entry.total ? ' complete' : '';
-            return <button key={key} className={`map-node ${p.kind}${state}`} style={{ left: `${p.pin.x * 100}%`, top: `${p.pin.y * 100}%` }} title={title} aria-label={title} onClick={() => open(key)}><span>{label}</span></button>;
-          })}
-          {player && <PlayerPin at={player.world} yaw={player.yaw} live={player.source === 'live'} />}
-        </ZoomPan> : <>
-          <div className="map-toolbar">
-            <button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={back}>←</button>
-            <h2>{regionName}</h2>
-          </div>
-          {showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} filter={filter} hideDone={hideDone} player={player} follow={follow} overlay={showPanel} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
-            focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
-            : <p className="quiet">{showLocation ? t('Esta região não tem mapa próprio.') : t('Visite a região para ver os itens.')}</p>}
-        </>}
-      </section>
-      {panelOpen && <aside className="map-side" aria-label={inRegion ? t('Conclusão da área') : t('Progresso de conclusão')}>
+      const sideChrome = panelOpen ? <aside className="map-side" aria-label={inRegion ? t('Conclusão da área') : t('Progresso de conclusão')}>
         <div className="map-side-head">
           <button type="button" className="map-side-collapse" aria-label={t('Recolher painel')} title={t('Recolher painel')} aria-expanded="true" onClick={() => setPanelOpen(false)}>⌄</button>
           <b>{inRegion ? t('Conclusão da área') : t('Progresso de conclusão')}</b>
@@ -757,7 +725,6 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
             </button>}
           </div>
         </div> : <div className="map-side-body">
-          {photo && <img className="region-photo" src={photo.file} alt={regionName} />}
           <div className="side-score"><span className="side-region">{regionName}</span></div>
           {showLocation && <SplitScore rows={local} />}
           <div className="era-tabs" role="radiogroup" aria-label={t('Era')}>{eras.map(([id, label]) =>
@@ -777,7 +744,37 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
                 </div></div>}</Fragment>)}</div> : <p className="quiet">{t("Nenhum item para este filtro.")}</p>}
           </>}
         </div>}
-      </aside>}
+      </aside> : showPanel;
+
+
+  return <div ref={mapView} className={mapOnly ? 'map-view map-only' : 'map-view'}>
+    <div className="filter-bar map-filter-bar">
+      <label>{t("Região")}{' '}<select value={selected} onChange={e => open(e.target.value)}><option value="">{t("Mapa de Hyrule")}</option>{Object.entries(LOCAL_NAMES).filter(([key]) => !hideUnknown || seen.has(key) || key === selected).map(([key, name]) => <option key={key} value={key}>{t(name)}</option>)}{!hideUnknown && <option value="unknown">{t("Baús sem posição mapeada")}</option>}</select></label>
+      <label><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} />{t("Ocultar regiões não vistas")}</label>
+      <label><input type="checkbox" checked={follow} onChange={e => { setFollow(e.target.checked); setActive(undefined); }} />{t("Seguir Link")}</label>
+    </div>
+    {player?.source === 'save' && <p className="map-note">{t(SAVE_POSITION_NOTE)}</p>}
+    <div className={panelOpen ? 'map-stage' : 'map-stage no-panel'}>
+      <section className="map-main">
+        {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={sideChrome} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
+          <img className="map-art" src={atlas.map.image} alt={t("Mapa de Hyrule")} draggable={false} />
+          {atlas.places.filter(p => !hideUnknown || seen.has(atlasStages[p.id])).map(p => {
+            const key = atlasStages[p.id];
+            const label = t(LOCAL_NAMES[key] ?? p.name);
+            const entry = progress.byKey.get(key);
+            const title = entry ? `${label} · ${rate(key)}%` : label;
+            const state = key === inGame ? ' in-game' : entry && entry.done === entry.total ? ' complete' : '';
+            return <button key={key} className={`map-node ${p.kind}${state}`} style={{ left: `${p.pin.x * 100}%`, top: `${p.pin.y * 100}%` }} title={title} aria-label={title} onClick={() => open(key)}><span>{label}</span></button>;
+          })}
+          {player && <PlayerPin at={player.world} yaw={player.yaw} live={player.source === 'live'} />}
+        </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} filter={filter} hideDone={hideDone} player={player} follow={follow} overlay={sideChrome} onBack={back} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
+            focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
+          : <><div className="map-toolbar">
+            <button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={back}>←</button>
+            <h2>{regionName}</h2>
+          </div>
+          <p className="quiet">{showLocation ? t('Esta região não tem mapa próprio.') : t('Visite a região para ver os itens.')}</p></>}
+      </section>
     </div>
   </div>;
 }
@@ -850,8 +847,8 @@ type AtlasPlace = (typeof atlas.places)[number];
 /** One marker on a floor map: an atlas location or a tracked collectible. */
 interface Pin { id: string; filter?: string; icon?: string; kind: string; name: string; at?: { map: string; x: number; y: number }; status: 'done' | 'todo' | 'unknown'; images: string[]; item?: TrackedItem; tick?: { id: string; on: boolean } }
 
-function RegionAtlas({ place, state, era, filter, hideDone, player, follow, overlay, controls, tracked, focusItem, onPickItem, onShowInChecklist }: {
-  place: AtlasPlace; state: AppState; era: string; filter: string; hideDone: boolean; player?: PlayerState; follow: boolean; overlay?: ReactNode; controls?: ReactNode; tracked: TrackedPin[];
+function RegionAtlas({ place, state, era, filter, hideDone, player, follow, overlay, onBack, controls, tracked, focusItem, onPickItem, onShowInChecklist }: {
+  place: AtlasPlace; state: AppState; era: string; filter: string; hideDone: boolean; player?: PlayerState; follow: boolean; overlay?: ReactNode; onBack?: () => void; controls?: ReactNode; tracked: TrackedPin[];
   /** Checklist row picked outside the map (side list, "View on map"): its marker gets selected. */
   focusItem?: string; onPickItem?: (item: TrackedItem) => void; onShowInChecklist?: (id: string) => void;
 }) {
@@ -911,7 +908,7 @@ function RegionAtlas({ place, state, era, filter, hideDone, player, follow, over
   const docked = useMatches(DOCKED_CARD);
   // Beside its marker on a large screen. On phones and touch screens it docks to the map's edge away from the marker,
   // outside the zoom layer, so it stays on screen at any zoom and scrolls with a finger.
-  const card = selected?.at?.map === currentFloor?.id && selected?.at && <div role="dialog" aria-label={t(selected.name)} className={docked ? 'marker-card docked' : 'marker-card'}
+  const card = selected?.at?.map === currentFloor?.id && selected?.at && <div role="dialog" aria-label={t(selected.name)} className={docked ? `marker-card docked ${selected.at.y > 0.5 ? 'docked-top' : 'docked-bottom'}` : 'marker-card'}
     style={docked ? (selected.at.y > 0.5 ? { top: 8 } : { bottom: 8 }) : {
       transformOrigin: `${selected.at.x > 0.5 ? 'right' : 'left'} ${selected.at.y > 0.5 ? 'bottom' : 'top'}`,
       ...(selected.at.x > 0.5 ? { right: `calc(${(1 - selected.at.x) * 100}% + 16px)` } : { left: `calc(${selected.at.x * 100}% + 16px)` }),
@@ -937,15 +934,19 @@ function RegionAtlas({ place, state, era, filter, hideDone, player, follow, over
       </>}
     </div>}
   </div>;
+  const markerFilter = !!pool.length && <div className="marker-filter" role="radiogroup" aria-label={t("Mostrar no mapa")}>
+    {([['all', 'Todos', pool.length], ['todo', 'Faltam', pool.length - doneCount], ['done', 'Coletados', doneCount]] as const).map(([id, label, n]) =>
+      <button key={id} role="radio" aria-checked={show === id} className={`filter-${id}`} onClick={() => { setShow(id); setActive(''); }}>{t(label)} <b>{n}</b></button>)}
+  </div>;
+  const mapTools = (onBack || markerFilter) && <div className="map-float-tools">
+    {onBack && <button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={onBack}>←</button>}
+    {markerFilter}
+  </div>;
   return <div className="region-atlas">
-    <div className="atlas-controls">
-      {place.maps.length > 1 && <label className="inline-field">{t("Andar / era")}<select value={currentFloor.id} onChange={e => { setFloor(e.target.value); select(''); }}>{place.maps.map(m => <option key={m.id} value={m.id}>{t(m.label)}</option>)}</select></label>}
-      {!!pool.length && <div className="marker-filter" role="radiogroup" aria-label={t("Mostrar no mapa")}>
-        {([['all', 'Todos', pool.length], ['todo', 'Faltam', pool.length - doneCount], ['done', 'Coletados', doneCount]] as const).map(([id, label, n]) =>
-          <button key={id} role="radio" aria-checked={show === id} className={`filter-${id}`} onClick={() => { setShow(id); setActive(''); }}>{t(label)} <b>{n}</b></button>)}
-      </div>}
-    </div>
-    {currentFloor && <ZoomPan key={currentFloor.id} ratio={currentFloor.aspect ?? 1.6} className="floor-map" controls={controls} overlay={<>{overlay}{docked && card}</>}>
+    {place.maps.length > 1 && <div className="atlas-controls">
+      <label className="inline-field">{t("Andar / era")}<select value={currentFloor.id} onChange={e => { setFloor(e.target.value); select(''); }}>{place.maps.map(m => <option key={m.id} value={m.id}>{t(m.label)}</option>)}</select></label>
+    </div>}
+    {currentFloor && <ZoomPan key={currentFloor.id} ratio={currentFloor.aspect ?? 1.6} className="floor-map" controls={controls} overlay={<>{mapTools}{overlay}{docked && card}</>}>
       <div className="floor-fill" aria-label={t("Mapa da região")}
         onClick={e => { if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('map-art')) setActive(''); }}>
         <img className="map-art" src={currentFloor.image} alt="" draggable={false} />

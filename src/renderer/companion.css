@@ -200,9 +200,8 @@
 .filter-bar label { display: flex; align-items: center; gap: 6px; }
 .filter-bar.compact { margin-bottom: 10px; }
 .map-note { margin: -4px 0 10px; font-size: 12.5px; color: var(--hyrule-muted); max-width: 72ch; }
-/* Map page: the map fills the window, the progress panel sits on its right and can be folded away. */
-.map-stage { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr) 330px; align-items: start; }
-.map-stage.no-panel { grid-template-columns: minmax(0, 1fr); }
+/* Map page: the map fills the width. Progress and filters sit on the map itself. */
+.map-stage { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; }
 .map-main { min-width: 0; }
 .map-toolbar { display: flex; align-items: center; gap: 12px; margin: 0 0 8px; }
 .map-toolbar h2 { margin: 0; font-size: 19px; letter-spacing: -.018em; }
@@ -210,7 +209,7 @@
 .map-back:hover { border-color: var(--hyrule-accent); color: var(--hyrule-accent); }
 /* The box holds a zoomable layer: the box fits the window height, the layer fits the box. */
 /* Touch: one finger scrolls the page past an unzoomed map; pinching and panning are handled by ZoomPan, not the browser. */
-.zoom-viewport { --map-h: max(340px, calc(100dvh - 260px)); position: relative; overflow: hidden; width: 100%; aspect-ratio: var(--ratio, 1.6); max-height: var(--map-h); background: #1f1a15; border: 1px solid #494038; border-radius: 10px; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.zoom-viewport { --map-h: max(380px, calc(100dvh - 216px)); position: relative; overflow: hidden; width: 100%; aspect-ratio: var(--ratio, 1.6); max-height: var(--map-h); background: #1f1a15; border: 1px solid #494038; border-radius: 10px; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 .zoom-viewport:has(.floor-map) { background: #e9d9a6; }
 .zoom-viewport.zoomed { cursor: grab; }
 /* Zoomed, a finger on the map pans it. The overlay (docked marker card) keeps pan-y so it can scroll. */
@@ -219,12 +218,16 @@
 .zoom-viewport.zoomed:active { cursor: grabbing; }
 .zoom-layer { position: absolute; left: 50%; top: 50%; width: calc(min(100%, calc(var(--map-h) * var(--ratio, 1.6))) * var(--zoom, 1)); aspect-ratio: var(--ratio, 1.6); }
 .floor-fill { position: absolute; inset: 0; }
-.zoom-controls { position: absolute; right: 12px; bottom: 12px; z-index: 10; display: grid; gap: 8px; }
+.zoom-controls { position: absolute; left: 12px; bottom: 12px; z-index: 12; display: grid; gap: 8px; }
 .zoom-controls button { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid #5a4d3e; border-radius: 50%; background: #1a1714e6; color: #f3ece2; font-size: 18px; line-height: 1; cursor: pointer; }
 .zoom-controls button:hover:not(:disabled) { border-color: var(--hyrule-accent); color: var(--hyrule-accent); }
 .zoom-controls button:disabled { opacity: .4; cursor: default; }
-@media (any-pointer: coarse) { .zoom-controls button { width: 44px; height: 44px; } }
-.zoom-hint { position: absolute; left: 10px; bottom: 8px; z-index: 10; padding: 2px 7px; border-radius: 5px; background: #1a1714b8; color: #e8dcc6; font-size: 10.5px; pointer-events: none; }
+@media (any-pointer: coarse) {
+  .zoom-controls button { width: 44px; height: 44px; }
+  .zoom-hint { left: 66px; }
+  .marker-card.docked.docked-bottom { left: 68px; width: min(360px, calc(100% - 80px)); }
+}
+.zoom-hint { position: absolute; left: 56px; bottom: 16px; z-index: 10; padding: 2px 7px; border-radius: 5px; background: #1a1714b8; color: #e8dcc6; font-size: 10.5px; pointer-events: none; }
 .map-panel-show { position: absolute; top: 10px; right: 10px; z-index: 10; padding: 6px 11px; border: 1px solid #5a4d3e; border-radius: 8px; background: #1a1714e6; color: #f3ece2; font-size: 12px; cursor: pointer; }
 .map-panel-show:hover { border-color: var(--hyrule-accent); }
 /* Full screen sits in the map's zoom cluster, just above + and −. */
@@ -236,21 +239,23 @@
 .map-view.map-only { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); background: var(--hyrule-bg); }
 .map-only .map-filter-bar { flex: none; margin-bottom: 8px; }
 .map-only .map-note { flex: none; margin: 0 0 8px; }
-/* The progress panel stays beside the map (region percentages on the world map, what is left in a region) and scrolls on its own. */
-.map-only .map-stage { flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) 330px; grid-template-rows: minmax(0, 1fr); align-items: stretch; }
-.map-only .map-stage.no-panel { grid-template-columns: minmax(0, 1fr); }
-.map-only .map-side { max-height: none; min-height: 0; }
+/* Full screen keeps the same on-map panel; the map itself fills the window. */
+.map-only .map-stage { flex: 1; min-height: 0; grid-template-rows: minmax(0, 1fr); align-items: stretch; }
 .map-only :is(.map-main, .region-atlas) { display: flex; flex-direction: column; align-items: stretch; flex: 1; min-width: 0; min-height: 0; }
 .map-only .map-toolbar, .map-only .atlas-controls { flex: none; }
 .map-only .marker-pick { display: none; }
 /* The box fills the space left, and the layer fits the box through its container height (100cqh). */
 .map-only .zoom-viewport { flex: 1; min-height: 0; aspect-ratio: auto; max-height: none; container-type: size; --map-h: 100cqh; }
-/* Phone portrait: the panel goes under the map and keeps most of the height for the map. */
+/* Progress panel docks to the map's right edge. Zoom controls sit on the opposite corner. */
+.zoom-viewport .map-side { position: absolute; top: 10px; right: 10px; bottom: 10px; width: min(320px, calc(100% - 80px)); z-index: 8; max-height: none; box-shadow: 0 12px 32px #000a; }
+.zoom-viewport .map-float-tools { position: absolute; top: 10px; left: 10px; z-index: 9; display: flex; align-items: center; gap: 8px; max-width: calc(100% - 24px); }
+.zoom-viewport .map-float-tools .marker-filter { position: static; margin: 0; background: #1c1a18f2; }
 @media (max-width: 760px) {
-  .map-only .map-stage:not(.no-panel) { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 38%); }
+  .zoom-viewport .map-side { top: auto; left: 10px; right: 10px; width: auto; max-height: min(46%, 320px); }
+  .zoom-viewport .map-float-tools { max-width: calc(100% - 20px); }
 }
 /* Progress panel (world: rate per region; region: score, era tabs, counters, list). */
-.map-side { max-height: max(440px, calc(100dvh - 215px)); overflow-y: auto; scrollbar-width: thin; border: 1px solid var(--hyrule-line); border-radius: var(--hyrule-radius); background: #141211; }
+.map-side { overflow-y: auto; scrollbar-width: thin; border: 1px solid var(--hyrule-line); border-radius: var(--hyrule-radius); background: #141211; }
 .map-side-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: #141211; border-bottom: 1px solid var(--hyrule-line); font-size: 13px; }
 .map-side-collapse { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--hyrule-muted); font-size: 16px; cursor: pointer; }
 .map-side-collapse:hover { color: var(--hyrule-text); background: #26221e; }
@@ -281,7 +286,6 @@
 .side-list-head h3 { margin: 0; font-size: 13px; }
 .side-list-head small { color: var(--hyrule-muted); }
 .side-list-head label { display: flex; align-items: center; gap: 6px; margin-left: auto; }
-.map-side .region-photo { margin-top: 10px; }
 .map-art { position: absolute; width: 100%; height: 100%; inset: 0; -webkit-user-drag: none; }
 .atlas-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; margin: 0 0 8px; }
 .atlas-controls .inline-field, .atlas-controls .marker-filter { margin: 0; }
@@ -357,7 +361,8 @@
 .photo-nav:hover { background: #000d; }
 .photo-count { position: absolute; right: 8px; bottom: 6px; padding: 1px 6px; border-radius: 9px; background: #000a; font-size: 11px; }
 /* Docked card (phones, touch screens): pinned to the map's top or bottom edge, clear of the zoom buttons. */
-.marker-card.docked { left: 8px; width: min(360px, calc(100% - 72px)); max-height: min(70%, calc(100% - 16px)); overscroll-behavior: contain; }
+.marker-card.docked { left: 8px; width: min(360px, calc(100% - 16px)); max-height: min(70%, calc(100% - 16px)); overscroll-behavior: contain; }
+.marker-card.docked.docked-bottom { left: 62px; width: min(360px, calc(100% - 74px)); }
 .marker-card.docked .marker-photo img { max-height: 180px; object-fit: cover; }
 .zoom-viewport:has(.marker-card.docked) .zoom-hint { display: none; }
 
@@ -448,7 +453,6 @@
   .hall-row > span:not(.story-dot) { grid-column: -2 / -1; align-self: start; }
   .enemy-focus { gap: 12px; padding: 10px; }
 }
-.region-photo { width: 100%; height: 130px; object-fit: cover; margin-bottom: 10px; border-radius: 8px; }
 .story-chapter { border-top: 1px solid #373437; padding: 9px 0; }
 .story-chapter summary { display: flex; gap: 9px; align-items: center; cursor: pointer; min-height: 31px; }
 .story-chapter summary small { margin-left: auto; color: var(--hyrule-muted); text-align: end; }
@@ -564,7 +568,6 @@
 @media (max-width: 1090px) {
   .tracker-shell { grid-template-columns: 186px minmax(0, 1fr); }
   .map-stage { grid-template-columns: 1fr; }
-  .map-side { max-height: none; }
 }
 @media (max-width: 890px) {
   .tracker-shell { grid-template-columns: 64px minmax(0, 1fr); }
