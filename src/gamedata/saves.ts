@@ -83,14 +83,15 @@ function emulatorDataDirs(appData = baseDirs().roaming): string[] {
   return EMULATOR_DIRS.map(n => path.join(appData, n));
 }
 
-export const NATIVE_EXES = ['Triforce.exe', 'hookshot.exe', 'Longshot.exe', 'nx2navi.exe', 'relink-game.exe',
+// HeyListen (a Hookshot fork) runs the game as bin\HeyListen.exe on Windows and bin/hookshot on Linux.
+export const NATIVE_EXES = ['Triforce.exe', 'hookshot.exe', 'HeyListen.exe', 'Longshot.exe', 'nx2navi.exe', 'relink-game.exe',
   'ocarina-reborn-game.exe', 'ocarina-reborn.exe', 'OcarinaReborn.exe'];
 /**
  * NX2Saria's game (ocarina from its launcher, nx2saria from a source build; .exe on Windows). It answers through its
  * tracker API (nx2saria.ts), so it is not in NATIVE_EXES: its memory is not laid out as theirs.
  */
 export const NX2SARIA_EXES = ['ocarina.exe', 'nx2saria.exe'];
-const GAME_NAMES = /zelda|ocarina|hookshot|longshot|triforce|nx2navi|nx2saria|relink|fritchii|lichii|eden|orchid|eglantine|pokedinner/i;
+const GAME_NAMES = /zelda|ocarina|hookshot|heylisten|longshot|triforce|nx2navi|nx2saria|relink|fritchii|lichii|eden|orchid|eglantine|pokedinner/i;
 /** A program's name without ".exe" (or a Linux build's ".AppImage" / ".x86_64"), lowercase. */
 export const programName = (file: string) => file.toLowerCase().replace(/\.(exe|appimage|x86_64)$/, '');
 const GAME_FILES = new Set([...NATIVE_EXES, ...EMULATOR_EXES, ...NX2SARIA_EXES, 'ReLink.exe'].map(programName));
@@ -99,7 +100,7 @@ const NX2SARIA_PROGRAMS = new Set(NX2SARIA_EXES.map(programName));
 export const isGameFile = (file: string) => GAME_FILES.has(programName(file));
 const installations: Record<string, string> = {
   fritchii: 'Fritchii', lichii: 'Lichii', eden: 'Eden', orchid: 'Orchid', eglantine: 'Eglantine',
-  pokedinner: 'PokeDinner', triforce: 'Triforce', longshot: 'Longshot', hookshot: 'Hookshot',
+  pokedinner: 'PokeDinner', triforce: 'Triforce', longshot: 'Longshot', hookshot: 'Hookshot', heylisten: 'HeyListen',
   nx2navi: 'NX2navi', nx2saria: 'NX2Saria', 'ocarina reborn': 'Ocarina Reborn', 'ocarina-reborn': 'Ocarina Reborn',
   ocarinareborn: 'Ocarina Reborn', 'ocarina-reborn-game': 'Ocarina Reborn', relink: 'ReLink', 'relink-game': 'ReLink',
 };
@@ -182,7 +183,8 @@ function otherBases(home: string): Bases[] {
 }
 
 function foldersIn({ roaming, local, storage, prefix }: Bases): string[] {
-  const native = ['Hookshot', 'Longshot', 'Triforce', 'NX2navi', 'NX2Saria', 'Ocarina Reborn', 'OcarinaReborn', 'ReLink',
+  const native = ['Hookshot', 'HeyListen', 'Longshot', 'Triforce', 'NX2navi', 'NX2Saria', 'Ocarina Reborn', 'OcarinaReborn', 'ReLink',
+    ...(isLinux ? ['heylisten'] : []), // HeyListen's Linux saves: ~/.local/share/heylisten/save
     ...(isMac ? [`nxnative/${OOT_TITLE_ID}`] : [])];
   return [...emulatorDataDirs(roaming), ...emulatorDataDirs(local),
     ...storage.flatMap(base => native.map(name => path.join(base, name))),
@@ -336,8 +338,9 @@ export function userFolderForExe(exe: string, appData?: string): string | null {
       latestUserFolder(emulatorRoots.flatMap(resolveUserFolders));
   }
   const roaming = appData ?? baseDirs().roaming;
+  // HeyListen's Linux build is bin/hookshot inside its folder and keeps its saves in ~/.local/share/heylisten.
   const brand = /longshot/i.test(exe) ? 'Longshot' : /ocarina[ -]?reborn/i.test(exe) ? 'Ocarina Reborn' :
-    /hookshot/i.test(dir) ? 'Hookshot' : undefined;
+    /heylisten/i.test(exe) ? (isLinux ? 'heylisten' : 'HeyListen') : /hookshot/i.test(dir) ? 'Hookshot' : undefined;
   return brand ? latestUserFolder(resolveUserFolders(path.join(roaming, brand))) : null;
 }
 

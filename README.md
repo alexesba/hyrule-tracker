@@ -101,7 +101,7 @@ Turn on **Show in-game overlay** in Settings. It can show counters, remaining ob
 ## 🎮 Compatibility
 
 - 🖥️ Desktop app for **Windows x64** and **Linux x86_64** (experimental), using the save format of the **Nintendo Switch 2 remake**.
-- 🔎 Search recognizes installations and saves from **Triforce / NX2navi**, **NX2Saria**, **Hookshot**, **Longshot**, **ReLink**, **Ocarina Reborn**, **Fritchii** and **Lichii**.
+- 🔎 Search recognizes installations and saves from **Triforce / NX2navi**, **NX2Saria**, **Hookshot**, **HeyListen**, **Longshot**, **ReLink**, **Ocarina Reborn**, **Fritchii** and **Lichii**.
 - ⚡ Live reading depends on the game version and the memory layout of the port or emulator. See the [live mode documentation](docs/live-memory.md).
 - 🧭 **Link's live position works only in recomps.** A recomp always keeps the game in the same place in memory, so the tracker knows where to find Link. An emulator moves it every time the game starts, so there the arrow only updates when you save.
 - ⚡ **NX2Saria** answers live reading itself, on Windows and Linux: turn on its tracker API (`tracker_api = 1` under `[tracker]` in `nx2saria.ini`) and the tracker reads the running game through `127.0.0.1:6545`, read-only, without reading the game's memory. Its saves are found in `<game folder>/profile/save`.

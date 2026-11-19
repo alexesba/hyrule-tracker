@@ -4,6 +4,14 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [1.4.7] - 2026-11-19
+
+### New
+- **HeyListen.** The tracker finds HeyListen (a Hookshot fork) and follows it live, like Hookshot. On Windows it reads the game (`bin\HeyListen.exe`) and not its launcher, which has the same name. On Linux it follows the saves in `~/.local/share/heylisten`. Thanks to rrafito for requesting this. [#13](https://github.com/jv-prado/hyrule-tracker/issues/13)
+
+### Known
+- **HeyListen live reading is untested.** It hasn't been tried with the game running yet. If live doesn't start, please share the tracker's error log in [#13](https://github.com/jv-prado/hyrule-tracker/issues/13).
+
 ## [1.4.6] - 2026-11-19
 
 ### New

@@ -13,7 +13,8 @@ import type { LiveInfo } from '../shared/types.js';
 import { PlayerReader, type LivePlayer } from '../gamedata/player.js';
 
 /**
- * Programs that run the game. Hookshot and its fork Longshot run it as hookshot.exe;
+ * Programs that run the game. Hookshot and its fork Longshot run it as hookshot.exe, its fork HeyListen
+ * as bin\HeyListen.exe (bin/hookshot on Linux);
  * NX2navi builds it as Triforce.exe and Project ReLink as bin\relink-game.exe. They map the game
  * at a fixed place. The Fritchii
  * emulator (lichii.exe) puts it somewhere new every run, so it's found by sweeping.
@@ -316,10 +317,28 @@ export class LiveSource {
 /** The first running game, in the order of GAMES. */
 async function findGame(): Promise<{ pid: number; emulator?: boolean } | undefined> {
   for (const g of GAMES) {
-    const [pid] = await findProcesses(g.image);
+    const pids = await findProcesses(g.image);
+    const pid = pids.length > 1 ? largest(pids) : pids[0];
     if (pid) return { pid, emulator: g.emulator };
   }
   return undefined;
+}
+
+/**
+ * Several processes with the same name: HeyListen's launcher and its game are both HeyListen.exe.
+ * The game is the one holding gigabytes of memory. One that can't be opened counts as empty.
+ */
+function largest(pids: number[]): number {
+  let best = pids[0], most = -1n;
+  for (const pid of pids) {
+    let p: GameProcess | undefined;
+    try {
+      p = openProcess(pid);
+      const size = p.regions().reduce((sum, r) => sum + r.size, 0n);
+      if (size > most) { most = size; best = pid; }
+    } catch { /* not readable: keep looking */ } finally { p?.close(); }
+  }
+  return best;
 }
 
 /** A translatable key (source text) plus its values; the window translates it. */
