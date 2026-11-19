@@ -4,6 +4,8 @@
 
 - **koffi** by Niels Martignène, MIT License (https://github.com/Koromix/koffi). Used to
   read the running game's memory through Windows' `ReadProcessMemory` (read-only).
+- **qrcode-generator** by Kazuhiko Arase, MIT License (https://github.com/kazuhikoarase/qrcode-generator).
+  Draws the Second Screen QR code in the app, offline. "QR Code" is a registered trademark of DENSO WAVE INCORPORATED.
 - Electron, React and the build tools listed in `package.json`, under their own licenses.
 
 ## Application and images

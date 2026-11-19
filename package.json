@@ -1,6 +1,6 @@
 {
   "name": "hyrule-tracker",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "private": true,
   "description": "Ocarina of Time remake companion for Windows and Linux.",
   "author": "João Victor Prado",
@@ -36,6 +36,7 @@
   "dependencies": {
     "electron-updater": "^6.8.11",
     "koffi": "3.3.7",
+    "qrcode-generator": "2.0.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

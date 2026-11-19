@@ -4,6 +4,12 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [1.4.6] - 2026-11-19
+
+### New
+- **Full screen map.** The "Full screen" button on the map page shows the map alone, for a second monitor. Link's live position, the markers, the filters and "Follow Link" keep working. The progress panel stays beside the map: the percentage of each region on the Hyrule map, and what is left to do in a region. Press Esc or the button again to leave.
+- **QR code for the Second Screen.** Scan the code on the Second Screen page with a phone or tablet camera to open the tracker, without typing the address. If the PC has more than one address, pick one to see its code. The code is made on your PC, with no outside service.
+
 ## [1.4.5] - 2026-11-19
 
 ### New

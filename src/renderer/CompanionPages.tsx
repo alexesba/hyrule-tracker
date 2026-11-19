@@ -1,4 +1,4 @@
-import { Fragment, lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Fragment, lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import type { Activity, AppState, PlayerState, SaveFolderChoice, TrackedCategory, TrackedItem } from '../shared/types';
 import { LOCAL_NAMES, MASK_SALE_NAMES } from '../core/companion';
 import { api, isRemote } from './api';
@@ -10,6 +10,7 @@ import { GameItemIcon, trackedItemIcon } from './GameItemIcon';
 import { Minigames } from './Minigames';
 import { PageProgress } from './PageProgress';
 import { PageSkeleton } from './PageSkeleton';
+import { qrPath, qrTarget } from './qr';
 import { ZoomPan } from './ZoomPan';
 import { locatePlacement, type AtlasPlace as PositionPlace, type PlayerFix } from '../core/position';
 import atlas from '../../data/atlas.json';
@@ -318,6 +319,10 @@ function SecondScreen({ state }: { state: AppState }) {
   const lan = state.lan;
   const on = !!lan?.enabled && !lan.error;
   const [busy, setBusy] = useState(false);
+  // Address the QR encodes when the PC has more than one; falls back to the first if it goes away.
+  const [chosen, setChosen] = useState<string>();
+  const urls = on ? lan!.urls : [];
+  const target = qrTarget(urls, chosen);
   async function toggle(next: boolean) {
     setBusy(true);
     try { await api.setLan(next); } finally { setBusy(false); }
@@ -337,11 +342,16 @@ function SecondScreen({ state }: { state: AppState }) {
       <p>{t('Abra o Hyrule Tracker no celular, tablet ou em outro computador da sua casa. Mapa, checklist e o que fazer agora ficam sempre à mão, sem sair do jogo.')}</p>
       <label className="inline-field second-toggle"><input type="checkbox" checked={!!lan?.enabled} disabled={busy} onChange={e => void toggle(e.target.checked)} />{t('Ativar a segunda tela na rede local')}</label>
       {lan?.error && <p className="notice" role="alert">{tv('Não foi possível usar a porta {port}. Feche o programa que a usa e tente de novo.', { port: lan.port })}</p>}
-      {on && (lan!.urls.length
-        ? <div className="second-urls">
-            <span className="quiet">{t('Digite no navegador do aparelho:')}</span>
-            {lan!.urls.map(u => <code className="second-url" key={u}>{u}</code>)}
-            {lan!.urls.length > 1 && <span className="quiet">{t('Mais de um endereço? Use o da rede em que o aparelho está (normalmente começa com 192.168).')}</span>}
+      {on && (target
+        ? <div className="second-connect">
+            <AddressQr url={target} />
+            <div className="second-urls">
+              <span className="quiet">{t('Digite no navegador do aparelho:')}</span>
+              {urls.length > 1
+                ? urls.map(u => <button type="button" className="second-url" key={u} aria-pressed={u === target} onClick={() => setChosen(u)}><code>{u}</code></button>)
+                : <code className="second-url">{target}</code>}
+              {urls.length > 1 && <span className="quiet">{t('Mais de um endereço? Use o da rede em que o aparelho está (normalmente começa com 192.168).')} {t('Escolha um endereço para ver o código dele.')}</span>}
+            </div>
           </div>
         : <p className="notice">{t('Este PC não está conectado a uma rede local.')}</p>)}
       {publicNets.length > 0 && <div className="notice with-action" role="alert">
@@ -360,6 +370,18 @@ function SecondScreen({ state }: { state: AppState }) {
       </ul>
     </section>
   </div>;
+}
+
+/** QR code of a tracker address: dark modules on a light square, so phone cameras read it on the dark page. */
+function AddressQr({ url }: { url: string }) {
+  const { size, d } = useMemo(() => qrPath(url), [url]);
+  return <figure className="second-qr">
+    <svg viewBox={`0 0 ${size} ${size}`} role="img" aria-label={tv('Código QR de {url}', { url })} shapeRendering="crispEdges">
+      <rect width={size} height={size} />
+      <path d={d} />
+    </svg>
+    <figcaption className="quiet">{t('Aponte a câmera do aparelho para o código.')}</figcaption>
+  </figure>;
 }
 
 function Overview({ state, onPage, onScan, scanning }: { state: AppState; onPage: (p: Page) => void; onScan: () => void; scanning: boolean }) {
@@ -613,6 +635,8 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const [follow, setFollow] = useStored('map.follow', true);
   const [panelOpen, setPanelOpen] = useStored('map.panel', true);
   const [active, setActive] = useState<TrackedItem>();
+  const mapView = useRef<HTMLDivElement>(null);
+  const [mapOnly, toggleMapOnly] = useMapOnlyView(mapView);
   const inGame = (player && atlasStages[player.placeId]) || findRegion(state.summary?.area?.replace(/ \(.+\)$/, '') ?? '');
   const selected = follow && inGame ? inGame : picked;
   const inRegion = selected !== '';
@@ -678,16 +702,17 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const back = () => open('');
   const selectItem = (item: TrackedItem) => setActive(item.id === active?.id ? undefined : item);
   const activeItem = local.find(({ item }) => active?.id === item.id)?.item;
-  const showPanel = !panelOpen ? <button type="button" className="map-panel-show" aria-expanded="false" onClick={() => setPanelOpen(true)}>{t('Mostrar painel')}</button> : undefined;
+  const showPanel = !panelOpen ?<button type="button" className="map-panel-show" aria-expanded="false" onClick={() => setPanelOpen(true)}>{t('Mostrar painel')}</button> : undefined;
   const rate = (key: string) => { const r = progress.byKey.get(key); return r ? percent(r.done, r.total) : 0; };
   const listed = progress.regions.filter(r => !hideUnknown || seen.has(r.key));
   const unknownRate = progress.byKey.get('unknown');
 
-  return <>
+  return <div ref={mapView} className={mapOnly ? 'map-view map-only' : 'map-view'}>
     <div className="filter-bar map-filter-bar">
       <label>{t("Região")}{' '}<select value={selected} onChange={e => open(e.target.value)}><option value="">{t("Mapa de Hyrule")}</option>{Object.entries(LOCAL_NAMES).filter(([key]) => !hideUnknown || seen.has(key) || key === selected).map(([key, name]) => <option key={key} value={key}>{t(name)}</option>)}{!hideUnknown && <option value="unknown">{t("Baús sem posição mapeada")}</option>}</select></label>
       <label><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} />{t("Ocultar regiões não vistas")}</label>
       <label><input type="checkbox" checked={follow} onChange={e => { setFollow(e.target.checked); setActive(undefined); }} />{t("Seguir Link")}</label>
+      <button type="button" className="map-only-toggle" aria-keyshortcuts={mapOnly ? 'Escape' : undefined} title={mapOnly ? `${t('Sair da tela cheia')} (Esc)` : undefined} onClick={toggleMapOnly}>{mapOnly ? t('Sair da tela cheia') : t('Tela cheia')}</button>
     </div>
     {player?.source === 'save' && <p className="map-note">{t(SAVE_POSITION_NOTE)}</p>}
     <div className={panelOpen ? 'map-stage' : 'map-stage no-panel'}>
@@ -755,7 +780,45 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
         </div>}
       </aside>}
     </div>
-  </>;
+  </div>;
+}
+
+/**
+ * Map alone, for a dedicated monitor: the map view covers the window and the browser goes fullscreen where it allows it.
+ * iPhone Safari only grants fullscreen to videos, so there the view just covers the page. Leaving browser fullscreen
+ * (Esc, F11) leaves the view too. The rest of the app turns inert meanwhile, so Tab stays on the map.
+ */
+function useMapOnlyView(view: RefObject<HTMLElement | null>) {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = view.current;
+    if (!on || !el) return;
+    const hidden: Element[] = [];
+    for (let node: Element = el; node.parentElement && node !== document.body; node = node.parentElement) {
+      for (const sibling of Array.from(node.parentElement.children)) {
+        if (sibling !== node && !sibling.hasAttribute('inert')) { sibling.setAttribute('inert', ''); hidden.push(sibling); }
+      }
+    }
+    const left = () => { if (!document.fullscreenElement) setOn(false); };
+    // On window, after the document listeners: Escape that closed a marker card first is already handled.
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape' && !e.defaultPrevented) setOn(false); };
+    document.addEventListener('fullscreenchange', left);
+    window.addEventListener('keydown', key);
+    return () => {
+      for (const sibling of hidden) sibling.removeAttribute('inert');
+      document.removeEventListener('fullscreenchange', left);
+      window.removeEventListener('keydown', key);
+      if (document.fullscreenElement === document.documentElement) document.exitFullscreen().catch(() => undefined);
+    };
+  }, [on, view]);
+  function toggle() {
+    if (on) return setOn(false);
+    setOn(true);
+    // Asked from the click itself: browsers only grant fullscreen during a user gesture.
+    const root = document.documentElement;
+    if (!document.fullscreenElement && root.requestFullscreen) root.requestFullscreen().catch(() => undefined);
+  }
+  return [on, toggle] as const;
 }
 
 /** Screens where the marker card docks to the map's edge instead of floating beside its marker. */
@@ -791,7 +854,7 @@ function RegionAtlas({ place, state, era, filter, hideDone, player, follow, over
   // Close the marker card with Escape.
   useEffect(() => {
     if (!active) return;
-    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') setActive(''); };
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.preventDefault(); setActive(''); } };
     document.addEventListener('keydown', key);
     return () => document.removeEventListener('keydown', key);
   }, [active]);
@@ -892,7 +955,7 @@ function RegionAtlas({ place, state, era, filter, hideDone, player, follow, over
         {!docked && card}
       </div>
     </ZoomPan>}
-    {!!markers.length && <label className="inline-field">{t("Mostrar local")}<select value={selected ? active : ''} onChange={e => {
+    {!!markers.length && <label className="inline-field marker-pick">{t("Mostrar local")}<select value={selected ? active : ''} onChange={e => {
       const next = markers.find(m => m.id === e.target.value);
       if (next?.at?.map) setFloor(next.at.map);
       select(e.target.value);

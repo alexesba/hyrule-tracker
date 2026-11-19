@@ -882,6 +882,8 @@ Taxa de conclusão por região||Completion rate by region|Tasa de finalización 
 Voltar ao mapa de Hyrule||Back to the Hyrule map|Volver al mapa de Hyrule
 Mostrar painel||Show panel|Mostrar panel
 Recolher painel||Hide panel|Ocultar panel
+Tela cheia||Full screen|Pantalla completa
+Sair da tela cheia||Exit full screen|Salir de pantalla completa
 Ampliar||Zoom in|Acercar
 Reduzir||Zoom out|Alejar
 Reiniciar zoom||Reset zoom|Restablecer zoom
@@ -938,6 +940,9 @@ Ativar a segunda tela na rede local||Turn on the second screen on the local netw
 Não foi possível usar a porta {port}. Feche o programa que a usa e tente de novo.||Couldn't use port {port}. Close the program using it and try again.|No se pudo usar el puerto {port}. Cierra el programa que lo usa y vuelve a intentarlo.
 Digite no navegador do aparelho:||Type in the device’s browser:|Escribe en el navegador del dispositivo:
 Mais de um endereço? Use o da rede em que o aparelho está (normalmente começa com 192.168).||More than one address? Use the one for the network the device is on (usually starting with 192.168).|¿Más de una dirección? Usa la de la red en la que está el dispositivo (normalmente empieza por 192.168).
+Escolha um endereço para ver o código dele.||Pick an address to show its code.|Elige una dirección para ver su código.
+Aponte a câmera do aparelho para o código.||Point the device’s camera at the code.|Apunta la cámara del dispositivo al código.
+Código QR de {url}||QR code for {url}|Código QR de {url}
 Este PC não está conectado a uma rede local.||This PC isn't connected to a local network.|Este PC no está conectado a una red local.
 Como conectar||How to connect|Cómo conectarse
 Se não abrir||If it doesn't open|Si no se abre
