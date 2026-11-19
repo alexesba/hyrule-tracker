@@ -24,7 +24,11 @@
   font: inherit;
   text-align: start;
 }
-.easter-region-card:hover { border-color: #a28051; background: #242019; }
+@media (hover: hover) {
+  .easter-region-card:hover { border-color: #a28051; background: #242019; }
+  .easter-mark:hover { background: #232b24; }
+  .easter-solution summary:hover { text-decoration: underline; }
+}
 .easter-region-card:active { border-color: var(--hyrule-gold); }
 .easter-photo { display: block; overflow: hidden; aspect-ratio: 20 / 9; background: #2b231b; }
 .easter-photo img { width: 100%; height: 100%; object-fit: cover; }
@@ -34,7 +38,7 @@
 .easter-region-preview strong { font-size: 15px; }
 .easter-region-meter { display: block; color: var(--hyrule-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
 .easter-area { margin-top: 18px; }
-.easter-area .easter-back { min-height: 44px; margin-bottom: 12px; }
+.easter-area .action.easter-back { min-height: 44px; margin-bottom: 12px; }
 .easter-area-banner { display: grid; grid-template-columns: minmax(150px, 32%) minmax(0, 1fr); align-items: center; overflow: hidden; }
 .easter-area-banner .easter-photo { height: 100%; }
 .easter-area-body { min-width: 0; }
@@ -63,7 +67,6 @@
   color: var(--hyrule-text);
   font-size: 13px;
 }
-.easter-mark:hover { background: #232b24; }
 .easter-mark:has(input:checked) { color: var(--hyrule-accent); }
 .easter-mark:has(input[aria-disabled="true"]) { opacity: .68; cursor: default; }
 .easter-mark input { width: 16px; height: 16px; margin: 0; }
@@ -79,7 +82,6 @@
   font-size: 13px;
   line-height: 24px;
 }
-.easter-solution summary:hover { text-decoration: underline; }
 .easter-solution p { margin: 0 0 8px; }
 .easter-sources { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; padding: 0; list-style: none; }
 .easter-sources a { display: inline-flex; align-items: center; min-height: 44px; color: var(--hyrule-muted); font-size: 13px; }
@@ -88,10 +90,19 @@
   .easter-entry { padding-inline: 12px; }
   .easter-mark { gap: 5px; padding-inline: 4px; }
 }
+/* Phones: secondary copy reads at 14px and the found checkbox is thumb-sized. */
+@media (max-width: 640px), (max-height: 500px) and (pointer: coarse) {
+  .easter-metadata, .easter-mark, .easter-solution summary, .easter-sources a,
+  .easter-region-meter, .easter-area .action.easter-back { font-size: 14px; }
+}
+@media (pointer: coarse) {
+  .easter-mark { gap: 8px; padding-inline: 8px; margin-inline-end: -8px; }
+  .easter-mark input { width: 20px; height: 20px; }
+}
 @media (max-width: 440px) {
   .easter-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .easter-region-preview { padding: 9px; }
   .easter-region-preview strong { overflow-wrap: anywhere; }
   .easter-area-banner { grid-template-columns: minmax(0, 1fr); }
-  .easter-area-banner .easter-photo { max-height: 138px; }
+  .easter-area-banner .easter-photo { height: 138px; aspect-ratio: auto; }
 }

@@ -18,6 +18,8 @@ export function ZoomPan({ ratio, className = '', children, overlay }: { ratio: n
   // Zoom the layer is drawn at right now: its size in the DOM includes it.
   const drawnZoom = useRef(1);
   drawnZoom.current = view.z;
+  const viewRef = useRef(view);
+  viewRef.current = view;
 
   const clamp = useCallback((v: View): View => {
     const z = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, v.z));
@@ -62,8 +64,93 @@ export function ZoomPan({ ratio, className = '', children, overlay }: { ratio: n
 
   useEffect(() => () => gesture.current?.abort(), []);
 
+  // Touch: two fingers zoom around their midpoint and pan together, one finger pans a zoomed map and a double tap
+  // zooms in. One finger on an unzoomed map is left to the browser (touch-action: pan-y) so the page still scrolls.
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    let mode: 'none' | 'pan' | 'pinch' = 'none';
+    let start = { x: 0, y: 0, d: 1, v: { z: 1, x: 0, y: 0 } };
+    let press = { t: 0, x: 0, y: 0 };
+    let lastTap = { t: 0, x: 0, y: 0 };
+    let moved = false;
+    /** A touch point (or the midpoint of two) relative to the box center. */
+    const local = (a: Touch, b?: Touch) => {
+      const r = el.getBoundingClientRect();
+      const x = b ? (a.clientX + b.clientX) / 2 : a.clientX, y = b ? (a.clientY + b.clientY) / 2 : a.clientY;
+      return { x: x - r.left - r.width / 2, y: y - r.top - r.height / 2 };
+    };
+    const onChrome = (e: TouchEvent) => e.target instanceof Element && !!e.target.closest('.zoom-controls, .zoom-overlay');
+    const begin = (touches: TouchList) => {
+      const [a, b] = [touches[0], touches[1]];
+      const v = viewRef.current;
+      if (a && b) start = { ...local(a, b), d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) || 1, v };
+      else if (a && v.z > MIN_ZOOM) start = { ...local(a), d: 1, v };
+      mode = a && b ? 'pinch' : a && v.z > MIN_ZOOM ? 'pan' : 'none';
+    };
+    const touchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        moved = false;
+        dragged.current = false;
+        if (onChrome(e)) { mode = 'none'; return; }
+        const t = e.touches[0];
+        press = { t: e.timeStamp, x: t.clientX, y: t.clientY };
+      } else {
+        // A pinch ends in no click.
+        moved = dragged.current = true;
+        if (e.cancelable) e.preventDefault();
+      }
+      begin(e.touches);
+    };
+    const touchMove = (e: TouchEvent) => {
+      // Not cancelable: the page is already scrolling with this gesture.
+      if (mode === 'none' || !e.cancelable) return;
+      e.preventDefault();
+      const [a, b] = [e.touches[0], e.touches[1]];
+      if (mode === 'pinch' && a && b) {
+        const m = local(a, b), s = start;
+        const z = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, s.v.z * Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) / s.d));
+        const k = z / s.v.z;
+        setView(clamp({ z, x: m.x - (s.x - s.v.x) * k, y: m.y - (s.y - s.v.y) * k }));
+      } else if (mode === 'pan' && a) {
+        const m = local(a), dx = m.x - start.x, dy = m.y - start.y;
+        if (!moved && Math.hypot(dx, dy) < 6) return;
+        moved = dragged.current = true;
+        setView(v => clamp({ z: v.z, x: start.v.x + dx, y: start.v.y + dy }));
+      }
+    };
+    const touchEnd = (e: TouchEvent) => {
+      // One finger lifted from a pinch: the other one keeps panning.
+      if (e.touches.length) { if (mode !== 'none') begin(e.touches); return; }
+      mode = 'none';
+      const t = e.changedTouches[0];
+      const tap = t && e.type === 'touchend' && !moved && e.timeStamp - press.t < 350 && Math.hypot(t.clientX - press.x, t.clientY - press.y) < 10;
+      // Double tap on the map itself (not a marker or a card) zooms in, and back out at the limit.
+      if (!tap || onChrome(e) || (e.target instanceof Element && e.target.closest('button, a, select, input, [role="dialog"]'))) { lastTap.t = 0; return; }
+      if (e.timeStamp - lastTap.t < 320 && Math.hypot(t.clientX - lastTap.x, t.clientY - lastTap.y) < 30) {
+        lastTap.t = 0;
+        if (e.cancelable) e.preventDefault();
+        const q = local(t);
+        if (viewRef.current.z >= MAX_ZOOM) setView({ z: 1, x: 0, y: 0 });
+        else zoomAt(2, q.x, q.y);
+      } else lastTap = { t: e.timeStamp, x: t.clientX, y: t.clientY };
+    };
+    const options = { passive: false };
+    el.addEventListener('touchstart', touchStart, options);
+    el.addEventListener('touchmove', touchMove, options);
+    el.addEventListener('touchend', touchEnd, options);
+    el.addEventListener('touchcancel', touchEnd, options);
+    return () => {
+      el.removeEventListener('touchstart', touchStart);
+      el.removeEventListener('touchmove', touchMove);
+      el.removeEventListener('touchend', touchEnd);
+      el.removeEventListener('touchcancel', touchEnd);
+    };
+  }, [clamp, zoomAt]);
+
   function startDrag(e: PointerEvent<HTMLDivElement>) {
-    if (!e.isPrimary || e.button !== 0) return;
+    // Fingers are handled by the touch listeners above.
+    if (e.pointerType === 'touch' || !e.isPrimary || e.button !== 0) return;
     gesture.current?.abort();
     dragged.current = false;
     if (view.z <= MIN_ZOOM) return;
@@ -105,7 +192,8 @@ export function ZoomPan({ ratio, className = '', children, overlay }: { ratio: n
       <button type="button" aria-label={t('Reduzir')} title={t('Reduzir')} disabled={view.z <= MIN_ZOOM} onClick={() => zoomAt(1 / 1.5)}>−</button>
       <button type="button" aria-label={t('Reiniciar zoom')} title={t('Reiniciar zoom')} disabled={view.z <= MIN_ZOOM && !view.x && !view.y} onClick={() => setView({ z: 1, x: 0, y: 0 })}>⌖</button>
     </div>
-    <span className="zoom-hint">{Math.round(view.z * 100)}% · {t('Role para ampliar · Arraste para mover')}</span>
-    {overlay}
+    {/* The wheel and drag hint is hidden on touch screens, where pinching is the expected gesture. */}
+    <span className="zoom-hint">{Math.round(view.z * 100)}%<span className="zoom-hint-how"> · {t('Role para ampliar · Arraste para mover')}</span></span>
+    <div className="zoom-overlay">{overlay}</div>
   </div>;
 }

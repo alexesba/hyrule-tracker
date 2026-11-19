@@ -7,14 +7,24 @@
  * Loaded after styles.css and companion.css.
  */
 
+/* The shell scrolls inside .companion-page, never the document: no rubber-band of the whole
+   layout on iOS and no accidental pull-to-refresh on Android (the header has its own refresh). */
+html, body { overscroll-behavior: none; }
+
 /* Hidden on large screens. */
 .mobile-tabs { display: none; }
+
+/* Touch screens of any width (phones, tablets on the sidebar layout): 44px targets in the shell. */
+@media (pointer: coarse) {
+  .tracker-sidebar :is(.nav-group button, .sidebar-source), .page-header-actions .action, .page-header-actions .language-switch { min-height: 44px; }
+  .language-list li { min-height: 44px; }
+}
 .tracker-shell .tile, .tracker-shell button, .mobile-tabs button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 
 /* ---------- Tablet portrait: rail with labels ---------- */
 @media (min-width: 641px) and (max-width: 890px) and (min-height: 501px) {
   .tracker-shell { grid-template-columns: 84px minmax(0, 1fr); }
-  .tracker-sidebar { padding: 14px 6px 8px; }
+  .tracker-sidebar { padding: 14px 6px max(8px, env(safe-area-inset-bottom)); }
   .nav-group button { flex-direction: column; gap: 4px; min-height: 54px; padding: 7px 2px; }
   .nav-group button span { position: static; width: auto; height: auto; clip-path: none; overflow: visible; font-size: 10px; line-height: 1.15; text-align: center; font-weight: 600; }
   .nav-group button[aria-current] { background: #1b2b21; }
@@ -23,16 +33,17 @@
 
 /* ---------- Phone landscape / short screens ---------- */
 @media (max-height: 500px) and (min-width: 641px) {
-  .tracker-shell { grid-template-columns: 64px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
-  .tracker-sidebar { padding: 8px 7px; }
+  /* Landscape phones put the notch and home indicator at the sides and bottom: the rail grows by the left inset. */
+  .tracker-shell { grid-template-columns: calc(64px + env(safe-area-inset-left)) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  .tracker-sidebar { padding: 8px 7px max(8px, env(safe-area-inset-bottom)) calc(7px + env(safe-area-inset-left)); }
   .tracker-brand, .sidebar-live, .sidebar-footer { display: none; }
   .sidebar-source { grid-template-columns: 1fr; grid-template-areas: "dot"; justify-items: center; min-height: 30px; padding: 6px 0; margin-bottom: 4px; }
   .sidebar-source :is(b, small), .nav-group button span { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
   .nav-group { padding: 3px 0; }
   .nav-group button { justify-content: center; min-height: 40px; }
   .tracker-footer { display: none; }
-  .companion-page { padding: 12px 18px 20px; }
-  .tracker-shell .app { padding: 12px 14px 8px; }
+  .companion-page { padding: 12px max(18px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) 18px; }
+  .tracker-shell .app { padding: 12px max(14px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) 14px; }
   .page-header { margin-bottom: 12px; }
   .page-header h1 { font-size: 22px; }
   .page-description { display: none; }
@@ -47,10 +58,42 @@
   .tracker-shell .app .side .legend { display: none; }
   .tracker-shell .toolbar { padding: 10px; gap: 8px 12px; }
   .tracker-shell .toolbar .spacer { display: none; }
-  .tracker-shell .toolbar .checklist-search { flex: 1 1 100%; min-height: 42px; font-size: 16px; }
+  /* Search and save slot share a row once both fit (phone landscape, tablet portrait), stack on phones. */
+  .tracker-shell .toolbar .checklist-search { flex: 1 1 240px; min-height: 44px; font-size: 16px; }
   .tracker-shell .todo-link { margin-bottom: 10px; }
-  .tracker-shell .toolbar > label:has(select) { display: flex; align-items: center; gap: 8px; flex: 1 1 100%; min-width: 0; }
-  .tracker-shell .toolbar > label:has(select) select { flex: 1; min-width: 0; }
+  .tracker-shell .toolbar > label:has(select) { display: flex; align-items: center; gap: 8px; flex: 1 1 260px; min-width: 0; }
+  .tracker-shell .toolbar > label:has(select) select { flex: 1; min-width: 0; min-height: 44px; font-size: 16px; }
+  /* The category list opens inside the toolbar instead of floating: it scrolls with the page,
+     never hides under the tab bar and has no scroll box of its own. */
+  .tracker-shell .toolbar .categories:has(.dropdown-menu) { flex: 1 1 100%; }
+  .tracker-shell .toolbar .dropdown-menu { position: static; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0 12px; width: auto; max-width: none; max-height: none; margin-top: 6px; overflow: visible; box-shadow: none; }
+}
+
+/* Checklist tiles on phones and tablets: they fill the card width in even columns and grow
+   to fit their whole caption instead of cutting it at two lines. */
+@media (max-width: 900px), (max-height: 500px), (pointer: coarse) {
+  .tracker-shell .app .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 7px; }
+  .tracker-shell .app .tiles:has(> .tile.small) { grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); }
+  .tracker-shell .app .tiles:has(> .tile.major) { grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); }
+  .tracker-shell .app .tiles > :not(.tile) { grid-column: 1 / -1; }
+  .tracker-shell .app .tiles > .tile { width: auto; height: auto; min-height: 70px; padding: 7px 3px 6px; justify-content: flex-start; }
+  .tracker-shell .app .tiles > .tile.small { min-height: 46px; justify-content: center; }
+  .tracker-shell .app .tiles > .tile.major { min-height: 82px; }
+  .tracker-shell .app .tiles > .tile .glyph { flex: none; }
+  .tracker-shell .app .tiles > .tile .tile-label { max-height: none; font-size: 10.5px; line-height: 1.15; overflow-wrap: break-word; hyphens: auto; }
+  .tracker-shell .app .tiles > .tile.stack .pips { flex-wrap: wrap; justify-content: center; }
+}
+
+/* Touch: toolbar controls and the category list get finger-sized targets. */
+@media (pointer: coarse) {
+  .tracker-shell .toolbar button, .tracker-shell .toolbar select, .tracker-shell .toolbar .checklist-search { min-height: 44px; }
+  .tracker-shell .app button.card-head { min-height: 44px; align-items: center; margin-block: -6px; }
+  .tracker-shell .toolbar button { padding-inline: 14px; }
+  .tracker-shell .toolbar label.check, .tracker-shell .toolbar .dropdown-menu label { min-height: 44px; gap: 10px; }
+  .tracker-shell .toolbar input[type="checkbox"] { flex: none; width: 20px; height: 20px; margin: 0; }
+  .tracker-shell .toolbar .dropdown-menu .dot { flex: none; }
+  .tracker-shell .toolbar .dropdown-menu { row-gap: 0; padding: 4px 12px; overscroll-behavior: contain; }
+  .tracker-shell .toolbar .btn-pair { gap: 8px; }
 }
 @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 
@@ -61,7 +104,7 @@
   max-width: none;
   max-height: min(82dvh, 560px);
   margin: 0;
-  padding: 16px 14px calc(16px + env(safe-area-inset-bottom));
+  padding: 16px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
   border: 0;
   border-top: 1px solid #3a3a3e;
   border-radius: 18px 18px 0 0;
@@ -79,8 +122,8 @@
   .tracker-shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
   .tracker-sidebar, .tracker-footer { display: none; }
   .companion-page, .tracker-shell .app { grid-column: 1; grid-row: 1; }
-  .companion-page { padding: 14px 14px 24px; }
-  .tracker-shell .app { padding: 14px 14px 0; }
+  .companion-page { padding: 14px max(14px, env(safe-area-inset-right)) 24px max(14px, env(safe-area-inset-left)); }
+  .tracker-shell .app { padding: 14px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left)); }
 
   .page-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; margin: 0 0 14px; min-height: 0; }
   .tracker-shell .app .page-header { padding: 0; margin-bottom: 10px; }
@@ -98,7 +141,7 @@
   .todo-link > span:last-child { grid-column: 2; grid-row: 1 / span 2; }
 
   /* Tab bar */
-  .mobile-tabs { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); background: #141415; border-top: 1px solid #2a2a2d; z-index: 30; }
+  .mobile-tabs { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px max(4px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left)); background: #141415; border-top: 1px solid #2a2a2d; z-index: 30; }
   .mobile-tabs button { display: grid; justify-items: center; gap: 3px; min-height: 52px; padding: 4px 2px; border: 0; background: none; color: #a9a9b0; font: inherit; }
   .mobile-tabs .tab-icon { display: grid; place-items: center; width: min(52px, 100%); height: 28px; border-radius: 99px; }
   .mobile-tabs .tab-label { min-width: 0; overflow-wrap: anywhere; font-size: 10.5px; font-weight: 600; line-height: 1.2; letter-spacing: -.01em; }
@@ -138,15 +181,67 @@
   /* My data: name on its own line, the four medals underneath. */
   .medal-row { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
   .medal-row > :first-child { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 8px; }
-  .medal-row > :first-child small { margin: 0; }
+  .medal-row > :first-child small { margin: 0; font-size: 14px; }
 
-  /* Second screen page: big address fits the width. */
-  .second-url { font-size: 18px; }
+  /* Second screen page: the address stays on one line down to 320px instead of breaking inside the port. */
+  .second-url { padding: 10px 14px; font-size: clamp(14px, 4.4vw, 18px); }
 
   /* Checklist tiles a little larger for fingers. */
   .tracker-shell .tiles { gap: 7px; }
   .tracker-shell .tile.small { min-width: 44px; min-height: 44px; }
   .masonry-col { gap: 12px; }
+}
+
+/* ---------- Fios do Tempo+ (threads) ---------- */
+/* Two columns only where each one still fits a quest name plus its status. */
+@media (max-width: 890px), (max-height: 500px) {
+  .story-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (pointer: coarse) {
+  .story-chapter summary { min-height: 44px; }
+  .story-chapter li small { font-size: 12px; }
+}
+@media (max-width: 640px) {
+  .story-chapter li { font-size: 14px; }
+  .story-chapter li small, .story-chapter summary small { font-size: 13px; }
+  .side-quest p { font-size: 14px; }
+}
+
+/* ---------- Overview (Visão geral) ---------- */
+/* Values never break inside ("9h 11m"). */
+.metric strong { white-space: nowrap; }
+/* Tablet portrait: five metrics in one row leave ~120px each; three over two instead. */
+@media (min-width: 721px) and (max-width: 890px) {
+  .metric-strip { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .metric { grid-column: span 2; }
+  .metric:nth-child(n+4) { grid-column: span 3; border-top: 1px solid var(--hyrule-line); }
+  .metric:nth-child(4) { border-left: 0; }
+}
+/* Phone landscape: the progress panel sizes to its content instead of filling the short screen. */
+@media (max-height: 500px) and (min-width: 641px) {
+  .progress-panel { min-height: 0; padding: 18px 22px; }
+  .big-progress { font-size: 50px; }
+  .progress-copy p { margin-bottom: 10px; }
+}
+/* Touch: the panel actions get a full finger target. */
+@media (pointer: coarse) {
+  .progress-copy .action, .empty-state .action { min-height: 44px; padding-inline: 16px; }
+  .section-line { margin-bottom: 5px; }
+  .section-line .text-action { min-height: 44px; padding: 0 2px 0 8px; }
+}
+/* Phone portrait: readable sizes for the secondary text. */
+@media (max-width: 640px) {
+  .metric { font-size: 13px; }
+  .metric-label { font-size: 13px; }
+  .progress-copy p { font-size: 14px; }
+  .progress-place { font-size: 13px; }
+  .progress-place small { font-size: 12px; }
+  .section-line .text-action { font-size: 14px; }
+  .chapter-line { min-height: 44px; font-size: 14px; }
+  .chapter-line small { font-size: 13px; }
+  .home-grid .activity-list li { font-size: 13px; }
+  .home-grid .activity-list small { font-size: 12px; }
+  .home-grid .activity-list time { font-size: 13px; }
 }
 
 /* Very narrow phones */

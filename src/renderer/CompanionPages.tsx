@@ -684,7 +684,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const unknownRate = progress.byKey.get('unknown');
 
   return <>
-    <div className="filter-bar">
+    <div className="filter-bar map-filter-bar">
       <label>{t("Região")}{' '}<select value={selected} onChange={e => open(e.target.value)}><option value="">{t("Mapa de Hyrule")}</option>{Object.entries(LOCAL_NAMES).filter(([key]) => !hideUnknown || seen.has(key) || key === selected).map(([key, name]) => <option key={key} value={key}>{t(name)}</option>)}{!hideUnknown && <option value="unknown">{t("Baús sem posição mapeada")}</option>}</select></label>
       <label><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} />{t("Ocultar regiões não vistas")}</label>
       <label><input type="checkbox" checked={follow} onChange={e => { setFollow(e.target.checked); setActive(undefined); }} />{t("Seguir Link")}</label>
@@ -758,6 +758,20 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   </>;
 }
 
+/** Screens where the marker card docks to the map's edge instead of floating beside its marker. */
+const DOCKED_CARD = '(max-width: 640px), (max-height: 500px), (pointer: coarse)';
+function useMatches(query: string) {
+  const [matches, setMatches] = useState(() => matchMedia(query).matches);
+  useEffect(() => {
+    const media = matchMedia(query);
+    const update = () => setMatches(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, [query]);
+  return matches;
+}
+
 type AtlasPlace = (typeof atlas.places)[number];
 /** One marker on a floor map: an atlas location or a tracked collectible. */
 interface Pin { id: string; filter?: string; icon?: string; kind: string; name: string; at?: { map: string; x: number; y: number }; status: 'done' | 'todo' | 'unknown'; images: string[]; item?: TrackedItem; tick?: { id: string; on: boolean } }
@@ -811,13 +825,44 @@ function RegionAtlas({ place, state, era, filter, hideDone, player, follow, over
   };
   // A row picked outside the map: open its floor and its marker.
   useEffect(() => {
-    const pin = focusItem ? pool.find(p => p.item?.id === focusItem && p.at) : undefined;
-    if (!pin || pin.id === active) return;
+    // A row can have a marker on several floors (child and adult): keep the floor on screen when it has one.
+    const pins = focusItem ? pool.filter(p => p.item?.id === focusItem && p.at) : [];
+    const pin = pins.find(p => p.at!.map === currentFloor?.id) ?? pins[0];
+    if (!pin || pins.some(p => p.id === active)) return;
     setFloor(pin.at!.map);
     setActive(pin.id);
     setShot(0);
   }, [focusItem]);
   const statusLabel = (s: Pin['status']) => t(s === 'done' ? 'Coletado' : s === 'todo' ? 'Pendente' : 'Situação não mapeada');
+  const docked = useMatches(DOCKED_CARD);
+  // Beside its marker on a large screen. On phones and touch screens it docks to the map's edge away from the marker,
+  // outside the zoom layer, so it stays on screen at any zoom and scrolls with a finger.
+  const card = selected?.at?.map === currentFloor?.id && selected?.at && <div role="dialog" aria-label={t(selected.name)} className={docked ? 'marker-card docked' : 'marker-card'}
+    style={docked ? (selected.at.y > 0.5 ? { top: 8 } : { bottom: 8 }) : {
+      transformOrigin: `${selected.at.x > 0.5 ? 'right' : 'left'} ${selected.at.y > 0.5 ? 'bottom' : 'top'}`,
+      ...(selected.at.x > 0.5 ? { right: `calc(${(1 - selected.at.x) * 100}% + 16px)` } : { left: `calc(${selected.at.x * 100}% + 16px)` }),
+      ...(selected.at.y > 0.5 ? { bottom: `max(8px, calc(${(1 - selected.at.y) * 100}% - 40px))` } : { top: `max(8px, calc(${selected.at.y * 100}% - 40px))` }),
+    }}>
+    <div className="marker-card-head">
+      <span className="marker-kind"><GameItemIcon id={selected.icon} size={15} />{selected.kind}</span>
+      <button className="marker-close" aria-label={t('Fechar')} onClick={() => setActive('')}>×</button>
+    </div>
+    <h3><ObjectiveName done={selected.status === 'done'}>{t(selected.name)}</ObjectiveName></h3>
+    <small className={`marker-status ${selected.status}`}>{statusLabel(selected.status)}</small>
+    {selected.item?.where && <p className="marker-where">{t(selected.item.where)}</p>}
+    <div className="result-actions">
+      {selected.tick && <button className="action" onClick={() => void api.toggleManual(selected.tick!.id)}>{selected.tick.on ? t('Desmarcar') : t('Concluí')}</button>}
+      {selected.item && onShowInChecklist && <button className="small-btn" onClick={() => onShowInChecklist(selected.item!.id)}>{t('Ver na checklist')}</button>}
+    </div>
+    {!!selected.images.length && <div className="marker-photo">
+      <img src={selected.images[shot]} alt={t("Local no jogo")} />
+      {selected.images.length > 1 && <>
+        <button className="photo-nav prev" aria-label={t("Foto anterior")} onClick={() => setShot((shot + selected.images.length - 1) % selected.images.length)}>‹</button>
+        <button className="photo-nav next" aria-label={t("Próxima foto")} onClick={() => setShot((shot + 1) % selected.images.length)}>›</button>
+        <span className="photo-count">{shot + 1}/{selected.images.length}</span>
+      </>}
+    </div>}
+  </div>;
   return <div className="region-atlas">
     <div className="atlas-controls">
       {place.maps.length > 1 && <label className="inline-field">{t("Andar / era")}<select value={currentFloor.id} onChange={e => { setFloor(e.target.value); select(''); }}>{place.maps.map(m => <option key={m.id} value={m.id}>{t(m.label)}</option>)}</select></label>}
@@ -826,7 +871,7 @@ function RegionAtlas({ place, state, era, filter, hideDone, player, follow, over
           <button key={id} role="radio" aria-checked={show === id} className={`filter-${id}`} onClick={() => { setShow(id); setActive(''); }}>{t(label)} <b>{n}</b></button>)}
       </div>}
     </div>
-    {currentFloor && <ZoomPan key={currentFloor.id} ratio={currentFloor.aspect ?? 1.6} className="floor-map" overlay={overlay}>
+    {currentFloor && <ZoomPan key={currentFloor.id} ratio={currentFloor.aspect ?? 1.6} className="floor-map" overlay={<>{overlay}{docked && card}</>}>
       <div className="floor-fill" aria-label={t("Mapa da região")}
         onClick={e => { if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('map-art')) setActive(''); }}>
         <img className="map-art" src={currentFloor.image} alt="" draggable={false} />
@@ -844,32 +889,7 @@ function RegionAtlas({ place, state, era, filter, hideDone, player, follow, over
           </button>;
         })}
         {here?.at && here.mapId === currentFloor.id && <PlayerPin at={here.at} yaw={here.yaw} live={here.source === 'live'} />}
-        {selected?.at?.map === currentFloor.id && <div role="dialog" aria-label={t(selected.name)} className="marker-card"
-          style={{
-            transformOrigin: `${selected.at.x > 0.5 ? 'right' : 'left'} ${selected.at.y > 0.5 ? 'bottom' : 'top'}`,
-            ...(selected.at.x > 0.5 ? { right: `calc(${(1 - selected.at.x) * 100}% + 16px)` } : { left: `calc(${selected.at.x * 100}% + 16px)` }),
-            ...(selected.at.y > 0.5 ? { bottom: `max(8px, calc(${(1 - selected.at.y) * 100}% - 40px))` } : { top: `max(8px, calc(${selected.at.y * 100}% - 40px))` }),
-          }}>
-          <div className="marker-card-head">
-            <span className="marker-kind"><GameItemIcon id={selected.icon} size={15} />{selected.kind}</span>
-            <button className="marker-close" aria-label={t('Fechar')} onClick={() => setActive('')}>×</button>
-          </div>
-          <h3><ObjectiveName done={selected.status === 'done'}>{t(selected.name)}</ObjectiveName></h3>
-          <small className={`marker-status ${selected.status}`}>{statusLabel(selected.status)}</small>
-          {selected.item?.where && <p className="marker-where">{t(selected.item.where)}</p>}
-          <div className="result-actions">
-            {selected.tick && <button className="action" onClick={() => void api.toggleManual(selected.tick!.id)}>{selected.tick.on ? t('Desmarcar') : t('Concluí')}</button>}
-            {selected.item && onShowInChecklist && <button className="small-btn" onClick={() => onShowInChecklist(selected.item!.id)}>{t('Ver na checklist')}</button>}
-          </div>
-          {!!selected.images.length && <div className="marker-photo">
-            <img src={selected.images[shot]} alt={t("Local no jogo")} />
-            {selected.images.length > 1 && <>
-              <button className="photo-nav prev" aria-label={t("Foto anterior")} onClick={() => setShot((shot + selected.images.length - 1) % selected.images.length)}>‹</button>
-              <button className="photo-nav next" aria-label={t("Próxima foto")} onClick={() => setShot((shot + 1) % selected.images.length)}>›</button>
-              <span className="photo-count">{shot + 1}/{selected.images.length}</span>
-            </>}
-          </div>}
-        </div>}
+        {!docked && card}
       </div>
     </ZoomPan>}
     {!!markers.length && <label className="inline-field">{t("Mostrar local")}<select value={selected ? active : ''} onChange={e => {
@@ -938,6 +958,16 @@ function Hall({ state }: { state: AppState }) {
   const [selected, setSelected] = useState<string>();
   const highlighted = cat?.items.find(item => item.id === selected);
   const highlightedPhoto = highlighted ? enemyPhoto(highlighted.id, highlighted.name) : undefined;
+  // The photo opens above the list; on a long list (phones) the tapped row is far below it.
+  // Closing it brings that row back into view so the reader keeps their place.
+  const focusRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (selected) focusRef.current?.scrollIntoView({ block: 'nearest' }); }, [selected]);
+  const closeFocus = () => {
+    const row = selected ? listRef.current?.querySelector<HTMLElement>(`[data-hall-id="${CSS.escape(selected)}"]`) : null;
+    setSelected(undefined);
+    if (row) requestAnimationFrame(() => row.scrollIntoView({ block: 'center' }));
+  };
   const done = categories.reduce((count, category) => count + category.done, 0);
   const total = categories.reduce((count, category) => count + category.total, 0);
   return <div>
@@ -946,13 +976,13 @@ function Hall({ state }: { state: AppState }) {
       <div className="section-line"><h2>{t(cat?.label ?? 'Salão dos Inimigos')}</h2>{cat && <b>{cat.done}/{cat.total}</b>}</div>
       <div className="segment">{hallTabs.map(([id, label]) => <button key={id} aria-pressed={tab === id} onClick={() => setTab(id)}>{t(label)}</button>)}</div>
       {tab !== 'trials' && <label className="inline-field">{t("Buscar inimigo")}<input type="search" value={query} onChange={e => setQuery(e.target.value)} /></label>}
-      {highlightedPhoto && <div className="enemy-focus"><img src={highlightedPhoto.file} alt={highlighted?.name} /><div><h3><ObjectiveName done={highlighted?.done}>{highlighted?.name}</ObjectiveName></h3><span>{highlighted?.done ? t('Obtido') : t('Pendente')}</span></div><button className="action" onClick={() => setSelected(undefined)}>{t("Fechar")}</button></div>}
-      <div className="hall-list">{cat?.items.filter(i => tab === 'trials' || i.name.toLowerCase().includes(query.toLowerCase())).map(i => {
+      {highlightedPhoto && <div className="enemy-focus" ref={focusRef}><img src={highlightedPhoto.file} alt={highlighted?.name} /><div><h3><ObjectiveName done={highlighted?.done}>{highlighted?.name}</ObjectiveName></h3><span>{highlighted?.done ? t('Obtido') : t('Pendente')}</span></div><button className="action" onClick={closeFocus}>{t("Fechar")}</button></div>}
+      <div className="hall-list" ref={listRef}>{cat?.items.filter(i => tab === 'trials' || i.name.toLowerCase().includes(query.toLowerCase())).map(i => {
         const trial = state.companion?.trials.find(t => i.id.endsWith('.' + t.id));
         const rematch = state.companion?.rematches.find(r => r.id === i.id);
         const frames = trial?.frames ?? rematch?.frames;
         const photo = enemyPhoto(i.id, i.name);
-        return <div className="hall-row" key={i.id}><span className={i.done ? 'story-dot done' : 'story-dot'} />{photo && <button className="enemy-thumb" aria-label={i.name} onClick={() => setSelected(i.id)}><img src={photo.file} alt="" loading="lazy" /></button>}<b><ObjectiveName done={i.done}>{t(i.name)}</ObjectiveName></b>
+        return <div className="hall-row" key={i.id} data-hall-id={i.id}><span className={i.done ? 'story-dot done' : 'story-dot'} />{photo && <button className="enemy-thumb" aria-label={i.name} onClick={() => setSelected(i.id)}><img src={photo.file} alt="" loading="lazy" /></button>}<b><ObjectiveName done={i.done}>{t(i.name)}</ObjectiveName></b>
           <span>{i.done && frames != null && frames > 0 && frames < 216000 ? `${t('Recorde')} · ${number(frames / 60)} s` : i.done ? t('Concluído') : i.state === 'unknown' ? t('Indisponível') : t('Pendente')}</span>
         </div>;
       })}</div>
@@ -978,7 +1008,7 @@ function Timeline({ state }: { state: AppState }) {
   const day = picked ?? dayStamp();
   const events = (state.activity ?? []).filter(a => dayStamp(a.ms) === day);
   const totals = events.reduce((a, e) => [a[0] + (e.enemies ?? 0), a[1] + (e.rupees ?? 0), a[2] + (e.pieces ?? 0)], [0, 0, 0]);
-  return <section className="focus-panel"><div className="section-line"><h2>{t("Atividade da partida")}</h2><label className="inline-field">{t("Dia")}{' '}<input type="date" value={day} onChange={e => setDay(e.target.value)} /></label></div>
+  return <section className="focus-panel timeline-panel"><div className="section-line"><h2>{t("Atividade da partida")}</h2><label className="inline-field">{t("Dia")}{' '}<input type="date" value={day} onChange={e => setDay(e.target.value)} /></label></div>
     <div className="timeline-stats"><span><b>{totals[0]}</b>{t("inimigos contabilizados")}</span><span><b><GameItemIcon id="rupee" /> {totals[1]}</b>{t("rupees de ganhos observados")}</span><span><b><GameItemIcon id="heart_piece" /> {totals[2]}</b>{t("pedaços registrados")}</span></div>
     {events.length ? <ActivityList activity={events} photos /> : <p className="quiet">{t("Nenhum avanço foi registrado neste dia com o tracker aberto.")}</p>}
   </section>;

@@ -4,6 +4,27 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [1.4.5] - 2026-11-19
+
+### New
+- **Pinch to zoom the maps.** On a phone or tablet, pinch with two fingers to zoom the Hyrule and dungeon maps, drag with one finger to move a zoomed map, and double-tap to zoom in. At normal size, one finger still scrolls the page.
+
+### Improved
+- **Second Screen on phones and tablets.** Every page was reviewed on phones and tablets in portrait and landscape:
+  - Buttons, filters and tabs are large enough to tap.
+  - Long names wrap instead of being cut off.
+  - Nothing slides off the side of the screen.
+  - Content keeps clear of the notch and the home indicator.
+- **What to do on a phone.** Tapping an objective opens its details in a panel that slides up from the bottom. Before, the details changed at the top of the page, out of view. On tablets, the list and the details sit side by side.
+- **Map marker details on a phone.** The details stay inside the map instead of sliding off the screen.
+- **Checklist on a phone.** Tiles fill each card and show their full names. Tap outside the details panel to close it.
+
+### Fixed
+- **Scrolling on phones.** The Enemy Hall list and the What to do details no longer trap your finger in a box inside the page.
+- **Checklist categories.** Picking a category in the "Categories" menu did nothing.
+- **Map floors.** Tapping a marker found on both the child and adult floors switched floors and reset the zoom.
+- **Daily quiz.** The score read "2of 5correct", without spaces.
+
 ## [1.4.4] - 2026-11-18
 
 ### New

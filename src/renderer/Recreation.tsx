@@ -103,7 +103,7 @@ export function Quiz() {
   return <section className="focus-panel quiz-panel"><div className="section-line"><h2>{t("Conhecimentos de Hyrule")}</h2><span>{practice ? t('Treino') : t('Rodada diária')}</span></div>
     <div className="segment">{(['normal','hard'] as const).map(l => <button key={l} aria-pressed={level === l} onClick={() => { setLevel(l); reset(false); }}>{l === 'normal' ? t('Normal') : t('Difícil')}</button>)}</div>
     {index >= testLength || (!practice && history[key] != null) ? <>
-      <p className="quiz-score">{!practice && history[key] != null ? history[key] : score}{t("de")}{' '}{testLength}{t("acertos")}</p>
+      <p className="quiz-score">{!practice && history[key] != null ? history[key] : score} {t("de")} {testLength} {t("acertos")}</p>
       <button className="action primary" onClick={() => reset(true)}>{t("Jogar no modo treino")}</button>
     </> : <>
       <p className="quiet">{t("Questão")} {index + 1} {t("de")} {testLength}</p><h3>{t(label)}</h3>

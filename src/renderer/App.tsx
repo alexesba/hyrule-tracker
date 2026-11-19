@@ -290,7 +290,9 @@ function Toolbar({ state, cards, prefs, onPrefs, query, onQuery }: { state: AppS
         setCatsOpen(false);
         e.currentTarget.querySelector('button')?.focus();
       }} onBlur={e => {
-        if (!e.currentTarget.contains(e.relatedTarget)) setCatsOpen(false);
+        // Only when focus moves to another control (Tab). Pressing a category's label blurs the button with no
+        // relatedTarget; closing then would unmount the menu before the click toggles the box. Taps outside close it above.
+        if (e.relatedTarget && !e.currentTarget.contains(e.relatedTarget)) setCatsOpen(false);
       }}>
         <button aria-expanded={catsOpen} onClick={() => setCatsOpen(o => !o)}>{t("Categories ▾")}</button>
         {catsOpen && (
@@ -460,7 +462,8 @@ function shortName(n: string): string {
   const inner = n.match(/^Heart Container \((.+)\)$/);
   if (inner) return inner[1];
   const afterColon = n.includes(': ') ? n.slice(n.indexOf(': ') + 2) : n;
-  return afterColon.replace(/\s*\([^()]*\)$/, '').slice(0, 30);
+  const short = afterColon.replace(/\s*\([^()]*\)$/, '');
+  return short.length > 30 ? `${short.slice(0, 29).trimEnd()}…` : short;
 }
 
 /** Rows that show the enemy photo, the same one the Hall of Fallen Foes page uses. */
@@ -497,7 +500,12 @@ function ChecklistDetails({ selection, dev, onShow, onClose, onShowOnMap }: {
     ? <StackDetails stack={selection.stack} onShow={onShow} onClose={onClose} />
     : <Details cat={selection.cat} item={selection.item} dev={dev} onClose={onClose} onShowOnMap={onShowOnMap} />;
   return compact ? <dialog ref={dialog} className="checklist-sheet" aria-labelledby="checklist-detail-title"
-    onCancel={e => { e.preventDefault(); onClose(); }}>{content}</dialog> : content;
+    onCancel={e => { e.preventDefault(); onClose(); }}
+    onClick={e => {
+      // A tap on the dimmed backdrop (outside the sheet) closes it.
+      const box = e.currentTarget.getBoundingClientRect();
+      if (e.target === e.currentTarget && (e.clientY < box.top || e.clientY > box.bottom || e.clientX < box.left || e.clientX > box.right)) onClose();
+    }}>{content}</dialog> : content;
 }
 
 function StackDetails({ stack, onShow, onClose }: { stack: Extract<TileModel, { kind: 'stack' }>; onShow: (id: string) => void; onClose: () => void }) {
