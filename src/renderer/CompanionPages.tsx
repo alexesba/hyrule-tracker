@@ -634,6 +634,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   // On by default: the map opens where Link is and keeps up with him.
   const [follow, setFollow] = useStored('map.follow', true);
   const [panelOpen, setPanelOpen] = useStored('map.panel', true);
+  const [hudOpen, setHudOpen] = useStored('map.hud', false);
   const [active, setActive] = useState<TrackedItem>();
   const mapView = useRef<HTMLDivElement>(null);
   const [mapOnly, toggleMapOnly] = useMapOnlyView(mapView);
@@ -746,17 +747,17 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
         </div>}
       </aside> : showPanel;
   const regionMenu = <label className="map-region"><span>{t("Região")}</span><select value={selected} onChange={e => open(e.target.value)}><option value="">{t("Mapa de Hyrule")}</option>{Object.entries(LOCAL_NAMES).filter(([key]) => !hideUnknown || seen.has(key) || key === selected).map(([key, name]) => <option key={key} value={key}>{t(name)}</option>)}{!hideUnknown && <option value="unknown">{t("Baús sem posição mapeada")}</option>}</select></label>;
-  const mapModes = <>
+  const mapModes = <div className="map-hud-modes">
     <label className="map-switch"><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} /><span>{t("Ocultar regiões não vistas")}</span></label>
     <label className="map-switch"><input type="checkbox" checked={follow} onChange={e => { setFollow(e.target.checked); setActive(undefined); }} /><span>{t("Seguir Link")}</span></label>
-  </>;
+  </div>;
 
 
   return <div ref={mapView} className={mapOnly ? 'map-view map-only' : 'map-view'}>
     {player?.source === 'save' && <p className="map-note">{t(SAVE_POSITION_NOTE)}</p>}
     <div className={panelOpen ? 'map-stage' : 'map-stage no-panel'}>
       <section className="map-main">
-        {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={<><div className="map-float-tools"><div className="map-hud">{regionMenu}<span className="map-hud-divider" aria-hidden="true" />{mapModes}</div></div>{sideChrome}</>} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
+        {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={<><MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={regionMenu} how={<><span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} />{sideChrome}</>} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
           <img className="map-art" src={atlas.map.image} alt={t("Mapa de Hyrule")} draggable={false} />
           {atlas.places.filter(p => !hideUnknown || seen.has(atlasStages[p.id])).map(p => {
             const key = atlasStages[p.id];
@@ -767,21 +768,30 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
             return <button key={key} className={`map-node ${p.kind}${state}`} style={{ left: `${p.pin.x * 100}%`, top: `${p.pin.y * 100}%` }} title={title} aria-label={title} onClick={() => open(key)}><span>{label}</span></button>;
           })}
           {player && <PlayerPin at={player.world} yaw={player.yaw} live={player.source === 'live'} />}
-        </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} onEra={next => { setEra(next); setActive(undefined); }} filter={filter} hideDone={hideDone} player={player} follow={follow} regionMenu={regionMenu} mapModes={mapModes} overlay={sideChrome} onBack={back} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
+        </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} onEra={next => { setEra(next); setActive(undefined); }} filter={filter} hideDone={hideDone} player={player} follow={follow} regionMenu={regionMenu} mapModes={mapModes} overlay={sideChrome} onBack={back} hudOpen={hudOpen} onHud={() => setHudOpen(!hudOpen)} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
             focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
           : <div className="zoom-viewport map-unmapped">
-            <div className="map-float-tools"><div className="map-hud">
-              <button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={back}>←</button>
-              {regionMenu}
-              <span className="map-hud-divider" aria-hidden="true" />
-              {mapModes}
-            </div></div>
+            <MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<><button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={back}><Icon name="map" size={16} /></button>{regionMenu}</>} how={<><span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} />
             {sideChrome}
             <p className="map-unmapped-note">{showLocation ? t('Esta região não tem mapa próprio.') : t('Visite a região para ver os itens.')}</p>
           </div>}
       </section>
     </div>
   </div>;
+}
+
+/** One bar over the map. The groups disappear on a wide window so the controls stay one row. On a phone the extra rows start folded. */
+function MapHud({ where, how, open, onToggle }: { where: ReactNode; how: ReactNode; open: boolean; onToggle: () => void }) {
+  const label = t(open ? 'Ocultar opções do mapa' : 'Mostrar opções do mapa');
+  return <div className="map-float-tools"><div className={open ? 'map-hud' : 'map-hud is-collapsed'}>
+    <div className="map-hud-where">
+      {where}
+      <button type="button" className="map-hud-toggle" aria-expanded={open} aria-label={label} title={label} onClick={onToggle}>
+        <svg viewBox="0 0 12 12" aria-hidden="true"><path d={open ? 'M2.2 7.7 6 4l3.8 3.7' : 'M2.2 4.3 6 8l3.8-3.7'} /></svg>
+      </button>
+    </div>
+    <div className="map-hud-how">{how}</div>
+  </div></div>;
 }
 
 /** Icon button for the map's zoom cluster: enter or leave the dedicated map view. */
@@ -852,8 +862,8 @@ type AtlasPlace = (typeof atlas.places)[number];
 /** One marker on a floor map: an atlas location or a tracked collectible. */
 interface Pin { id: string; filter?: string; icon?: string; kind: string; name: string; at?: { map: string; x: number; y: number }; status: 'done' | 'todo' | 'unknown'; images: string[]; item?: TrackedItem; tick?: { id: string; on: boolean } }
 
-function RegionAtlas({ place, state, era, onEra, filter, hideDone, player, follow, regionMenu, mapModes, overlay, onBack, controls, tracked, focusItem, onPickItem, onShowInChecklist }: {
-  place: AtlasPlace; state: AppState; era: Era; onEra: (era: Era) => void; filter: string; hideDone: boolean; player?: PlayerState; follow: boolean; regionMenu?: ReactNode; mapModes?: ReactNode; overlay?: ReactNode; onBack?: () => void; controls?: ReactNode; tracked: TrackedPin[];
+function RegionAtlas({ place, state, era, onEra, filter, hideDone, player, follow, regionMenu, mapModes, overlay, onBack, hudOpen, onHud, controls, tracked, focusItem, onPickItem, onShowInChecklist }: {
+  place: AtlasPlace; state: AppState; era: Era; onEra: (era: Era) => void; filter: string; hideDone: boolean; player?: PlayerState; follow: boolean; regionMenu?: ReactNode; mapModes?: ReactNode; overlay?: ReactNode; onBack?: () => void; hudOpen: boolean; onHud: () => void; controls?: ReactNode; tracked: TrackedPin[];
   /** Checklist row picked outside the map (side list, "View on map"): its marker gets selected. */
   focusItem?: string; onPickItem?: (item: TrackedItem) => void; onShowInChecklist?: (id: string) => void;
 }) {
@@ -960,17 +970,16 @@ function RegionAtlas({ place, state, era, onEra, filter, hideDone, player, follo
     </span>
     <span className="era-toggle-label">{eraLabel}</span>
   </button>;
-  const mapTools = <div className="map-float-tools">
-    <div className="map-hud">
-      {onBack && <button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={onBack}>←</button>}
+  const mapTools = <MapHud open={hudOpen} onToggle={onHud} where={<>
+      {onBack && <button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={onBack}><Icon name="map" size={16} /></button>}
       {regionMenu}
       {floorSelect}
+    </>} how={<>
       {markerFilter}
       {eraChoice}
       <span className="map-hud-divider" aria-hidden="true" />
       {mapModes}
-    </div>
-  </div>;
+    </>} />;
   return <div className="region-atlas">
     {currentFloor ? <ZoomPan key={currentFloor.id} ratio={currentFloor.aspect ?? 1.6} className="floor-map" controls={controls} overlay={<>{mapTools}{overlay}{docked && card}</>}>
       <div className="floor-fill" aria-label={t("Mapa da região")}
