@@ -90,7 +90,7 @@ html, body { overscroll-behavior: none; }
   .tracker-shell .app button.card-head { min-height: 44px; align-items: center; margin-block: -6px; }
   .tracker-shell .toolbar button { padding-inline: 14px; }
   .tracker-shell .toolbar label.check, .tracker-shell .toolbar .dropdown-menu label { min-height: 44px; gap: 10px; }
-  .tracker-shell .toolbar input[type="checkbox"] { flex: none; width: 20px; height: 20px; margin: 0; }
+  .tracker-shell .toolbar input[type="checkbox"] { flex: none; margin: 0; }
   .tracker-shell .toolbar .dropdown-menu .dot { flex: none; }
   .tracker-shell .toolbar .dropdown-menu { row-gap: 0; padding: 4px 12px; overscroll-behavior: contain; }
   .tracker-shell .toolbar .btn-pair { gap: 8px; }
