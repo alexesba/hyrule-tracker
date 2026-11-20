@@ -1,10 +1,11 @@
-// Read-only access to a running game's memory: Windows (kernel32 through koffi) or Linux (/proc).
-// Picks the system's implementation; everything above this file is the same on both.
+// Read-only access to a running game's memory: Windows (kernel32 through koffi), Linux (/proc) or macOS (Mach calls through koffi).
+// Picks the system's implementation; everything above this file is the same on all of them.
 import type { Mem } from '../gamedata/live.js';
 import { WindowsProcessMemory, findWindowsProcesses, initWindowsMemoryAccess } from './procmem-win.js';
 import { LinuxProcessMemory, findLinuxProcesses } from './procmem-linux.js';
+import { MacProcessMemory, findMacProcesses, initMacMemoryAccess } from './procmem-mac.js';
 
-/** The system refused to let the tracker read the game (on Linux: ptrace rules). */
+/** The system refused to let the tracker read the game (on Linux: ptrace rules; on macOS: task_for_pid). */
 export { MemoryAccessDenied } from './procmem-linux.js';
 
 /** A committed, readable block of the process's memory. type: 0x20000 private, 0x40000 mapped, 0x1000000 image. */
@@ -24,18 +25,20 @@ export interface GameProcess extends Mem {
 }
 
 const linux = process.platform === 'linux';
+const mac = process.platform === 'darwin';
 
 /** Load what reading memory needs, once. False when this system can't. */
 export async function initMemoryAccess(): Promise<boolean> {
   if (linux) return true;
+  if (mac) return initMacMemoryAccess();
   return initWindowsMemoryAccess();
 }
 
 export function openProcess(pid: number): GameProcess {
-  return linux ? new LinuxProcessMemory(pid) : new WindowsProcessMemory(pid);
+  return linux ? new LinuxProcessMemory(pid) : mac ? new MacProcessMemory(pid) : new WindowsProcessMemory(pid);
 }
 
 /** Process ids of running programs with this image name (e.g. "hookshot.exe"; on Linux also a native build without ".exe"). */
 export function findProcesses(image: string): Promise<number[]> {
-  return linux ? findLinuxProcesses(image) : findWindowsProcesses(image);
+  return linux ? findLinuxProcesses(image) : mac ? findMacProcesses(image) : findWindowsProcesses(image);
 }

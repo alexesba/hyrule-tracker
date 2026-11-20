@@ -69,13 +69,17 @@ export interface LiveTables {
   location?: { record: bigint; vtable: bigint; base: bigint; checked: boolean };
 }
 
-/** Runs of records that all start with the same 8-byte pointer, `stride` apart. */
-export function findRecordRuns(buf: Buffer, base: bigint, stride: number, minRecords: number): { start: bigint; count: number; offset: number }[] {
+/**
+ * Runs of records that all start with the same 8-byte pointer, `stride` apart. Guest code pointers are small
+ * (below 4 GB); a game running natively on the host (nxnative on macOS) has real host addresses there, so
+ * `hostPointers` accepts any pointer from 0x10000 up.
+ */
+export function findRecordRuns(buf: Buffer, base: bigint, stride: number, minRecords: number, hostPointers = false): { start: bigint; count: number; offset: number }[] {
   const out: { start: bigint; count: number; offset: number }[] = [];
   const last = buf.length - 8;
   for (let o = 0; o + stride * 2 <= last; o += 8) {
     const p = buf.readBigUInt64LE(o);
-    if (p === 0n || p >= 0x1_0000_0000n) continue; // guest code pointers are small
+    if (hostPointers ? p < 0x10000n : p === 0n || p >= 0x1_0000_0000n) continue; // guest code pointers are small
     if (buf.readBigUInt64LE(o + stride) !== p || buf.readBigUInt64LE(o + stride * 2) !== p) continue;
     // Walk back to the first record of the run.
     let s = o;
@@ -140,7 +144,7 @@ function readValue(buf: Buffer, at: number, type: TypeLayout['type']): number | 
  * Find the live tables near `hint` (host address), using `ref` to tell real tables from
  * look-alikes. Searches `window` bytes either side of the hint.
  */
-export function locate(mem: Mem, ref: GameDataFile, hint: bigint, window = 64 << 20): LiveTables | null {
+export function locate(mem: Mem, ref: GameDataFile, hint: bigint, window = 64 << 20, hostPointers = false): LiveTables | null {
   const lo = hint > BigInt(window) ? hint - BigInt(window) : 0n;
   const buf = readWindow(mem, lo, window * 2);
   if (!buf) return null;
@@ -151,7 +155,7 @@ export function locate(mem: Mem, ref: GameDataFile, hint: bigint, window = 64 <<
     if (!refEntries?.size) { if (L.optional) continue; return null; }
     const wanted = new Set(refEntries.keys());
     let best: { t: RecordTable; score: number } | undefined;
-    for (const run of findRecordRuns(buf, lo, L.stride, L.minRecords)) {
+    for (const run of findRecordRuns(buf, lo, L.stride, L.minRecords, hostPointers)) {
       const index = readIndexMap(buf, run.offset, run.count, wanted);
       if (index.size < wanted.size * 0.9) continue;
       let agree = 0;
@@ -178,12 +182,12 @@ export function locate(mem: Mem, ref: GameDataFile, hint: bigint, window = 64 <<
     if (hits > bestHits || (hits === bestHits && run.count > b64!.count)) { bestHits = hits; b64 = run; }
   }
   if (!b64 || (refKeys.length && bestHits < refKeys.length * 0.9)) return null;
-  return { records, b64, location: findLocation(mem, buf, lo) };
+  return { records, b64, location: findLocation(mem, buf, lo, hostPointers) };
 }
 
 /** The location-list record: a run of 0x90-byte records whose map holds LOCATION_KEY. */
-function findLocation(mem: Mem, buf: Buffer, lo: bigint): LiveTables['location'] {
-  for (const run of findRecordRuns(buf, lo, LOC_STRIDE, 2)) {
+function findLocation(mem: Mem, buf: Buffer, lo: bigint, hostPointers = false): LiveTables['location'] {
+  for (const run of findRecordRuns(buf, lo, LOC_STRIDE, 2, hostPointers)) {
     const i = readIndexMap(buf, run.offset, run.count, new Set([LOCATION_KEY])).get(LOCATION_KEY);
     if (i === undefined) continue;
     const o = run.offset + i * LOC_STRIDE;
@@ -240,6 +244,20 @@ export function sweepRanges(regions: { base: bigint; size: bigint; type: number 
     if (last && last[1] === r.base) last[1] = r.base + r.size; else ranges.push([r.base, r.base + r.size]);
   }
   return ranges.filter(([lo, hi]) => hi - lo >= 4n << 20n).sort((a, b) => (b[1] - b[0] > a[1] - a[0] ? 1 : b[1] - b[0] < a[1] - a[0] ? -1 : 0));
+}
+
+/**
+ * A native program's readable memory (any block type), touching blocks merged, biggest first. Ranges under 4 MB
+ * can't hold the tables; ones over 8 GB are system reservations (the shared library cache), not game data.
+ */
+export function readableRanges(regions: { base: bigint; size: bigint; type: number }[]): [bigint, bigint][] {
+  const sorted = [...regions].sort((a, b) => (a.base < b.base ? -1 : a.base > b.base ? 1 : 0));
+  const ranges: [bigint, bigint][] = [];
+  for (const r of sorted) {
+    const last = ranges[ranges.length - 1];
+    if (last && last[1] === r.base) last[1] = r.base + r.size; else ranges.push([r.base, r.base + r.size]);
+  }
+  return ranges.filter(([lo, hi]) => hi - lo >= 4n << 20n && hi - lo <= 8n << 30n).sort((a, b) => (b[1] - b[0] > a[1] - a[0] ? 1 : b[1] - b[0] < a[1] - a[0] ? -1 : 0));
 }
 
 function locationStrings(b: Buffer): string[] {
