@@ -882,6 +882,8 @@ Taxa de conclusão por região||Completion rate by region|Tasa de finalización 
 Voltar ao mapa de Hyrule||Back to the Hyrule map|Volver al mapa de Hyrule
 Mostrar painel||Show panel|Mostrar panel
 Recolher painel||Hide panel|Ocultar panel
+Mostrar opções do mapa||Show map options|Mostrar opciones del mapa
+Ocultar opções do mapa||Hide map options|Ocultar opciones del mapa
 Tela cheia||Full screen|Pantalla completa
 Sair da tela cheia||Exit full screen|Salir de pantalla completa
 Ampliar||Zoom in|Acercar
