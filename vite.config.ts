@@ -11,6 +11,7 @@ export default defineConfig({
   // /api goes to the app's local network server, so http://localhost:5183 in a browser is the second screen with hot reload.
   server: { port: 5183, strictPort: true, proxy: {
     // The server refuses an Origin that doesn't match its Host; this proxy is the only caller, so drop it.
-    '/api': { target: 'http://127.0.0.1:5184', configure: proxy => proxy.on('proxyReq', req => req.removeHeader('origin')) },
+    // A regex, so the renderer's own module /api.ts is not sent to the server.
+    '^/api(/|$)': { target: 'http://127.0.0.1:5184', configure: proxy => proxy.on('proxyReq', req => req.removeHeader('origin')) },
   } },
 });

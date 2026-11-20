@@ -638,6 +638,8 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const [active, setActive] = useState<TrackedItem>();
   const mapView = useRef<HTMLDivElement>(null);
   const [mapOnly, toggleMapOnly] = useMapOnlyView(mapView);
+  // Phone portrait: the map is too short to carry the panel, so it sits below the map until full screen.
+  const panelBelow = useMatches(PANEL_BELOW) && !mapOnly;
   const inGame = (player && atlasStages[player.placeId]) || findRegion(state.summary?.area?.replace(/ \(.+\)$/, '') ?? '');
   const selected = follow && inGame ? inGame : picked;
   const inRegion = selected !== '';
@@ -746,6 +748,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
           </>}
         </div>}
       </aside> : showPanel;
+  const onMap = panelBelow ? undefined : sideChrome;
   const regionMenu = <label className="map-region"><span>{t("Região")}</span><select value={selected} onChange={e => open(e.target.value)}><option value="">{t("Mapa de Hyrule")}</option>{Object.entries(LOCAL_NAMES).filter(([key]) => !hideUnknown || seen.has(key) || key === selected).map(([key, name]) => <option key={key} value={key}>{t(name)}</option>)}{!hideUnknown && <option value="unknown">{t("Baús sem posição mapeada")}</option>}</select></label>;
   const mapModes = <div className="map-hud-modes">
     <label className="map-switch"><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} /><span>{t("Ocultar regiões não vistas")}</span></label>
@@ -757,7 +760,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
     {player?.source === 'save' && <p className="map-note">{t(SAVE_POSITION_NOTE)}</p>}
     <div className={panelOpen ? 'map-stage' : 'map-stage no-panel'}>
       <section className="map-main">
-        {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={<><MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={regionMenu} how={<><span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} />{sideChrome}</>} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
+        {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={<><MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={regionMenu} how={<><span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} />{onMap}</>} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
           <img className="map-art" src={atlas.map.image} alt={t("Mapa de Hyrule")} draggable={false} />
           {atlas.places.filter(p => !hideUnknown || seen.has(atlasStages[p.id])).map(p => {
             const key = atlasStages[p.id];
@@ -768,13 +771,14 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
             return <button key={key} className={`map-node ${p.kind}${state}`} style={{ left: `${p.pin.x * 100}%`, top: `${p.pin.y * 100}%` }} title={title} aria-label={title} onClick={() => open(key)}><span>{label}</span></button>;
           })}
           {player && <PlayerPin at={player.world} yaw={player.yaw} live={player.source === 'live'} />}
-        </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} onEra={next => { setEra(next); setActive(undefined); }} filter={filter} hideDone={hideDone} player={player} follow={follow} regionMenu={regionMenu} mapModes={mapModes} overlay={sideChrome} onBack={back} hudOpen={hudOpen} onHud={() => setHudOpen(!hudOpen)} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
+        </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} onEra={next => { setEra(next); setActive(undefined); }} filter={filter} hideDone={hideDone} player={player} follow={follow} regionMenu={regionMenu} mapModes={mapModes} overlay={onMap} onBack={back} hudOpen={hudOpen} onHud={() => setHudOpen(!hudOpen)} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
             focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
           : <div className="zoom-viewport map-unmapped">
             <MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<><button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={back}><Icon name="map" size={16} /></button>{regionMenu}</>} how={<><span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} />
-            {sideChrome}
+            {onMap}
             <p className="map-unmapped-note">{showLocation ? t('Esta região não tem mapa próprio.') : t('Visite a região para ver os itens.')}</p>
           </div>}
+        {panelBelow && sideChrome}
       </section>
     </div>
   </div>;
@@ -846,6 +850,8 @@ function useMapOnlyView(view: RefObject<HTMLElement | null>) {
 
 /** Screens where the marker card docks to the map's edge instead of floating beside its marker. */
 const DOCKED_CARD = '(max-width: 640px), (max-height: 500px), (pointer: coarse)';
+/** Phone portrait (the 760px block in companion.css): the progress panel sits below the map instead of on it. */
+const PANEL_BELOW = '(max-width: 760px)';
 function useMatches(query: string) {
   const [matches, setMatches] = useState(() => matchMedia(query).matches);
   useEffect(() => {
@@ -957,12 +963,17 @@ function RegionAtlas({ place, state, era, onEra, filter, hideDone, player, follo
   const floorSelect = place.maps.length > 1 && currentFloor && <label className="map-region map-floor"><span>{t("Andar / era")}</span><select value={currentFloor.id} onChange={e => { setFloor(e.target.value); select(''); }}>{place.maps.map(m => <option key={m.id} value={m.id}>{t(m.label)}</option>)}</select></label>;
   const eraLabel = t(eras.find(([id]) => id === era)?.[1] ?? 'Todas');
   const pickEra = (event: MouseEvent<HTMLButtonElement>) => {
-    const box = event.currentTarget.getBoundingClientRect();
-    const next: Era = event.clientX > box.left + box.width / 2 ? 'adult' : 'child';
-    onEra(era === next ? 'all' : next);
+    // A click picks the side it lands on. Enter and Space carry no position (detail 0): they step all, child, adult.
+    if (!event.detail) onEra(era === 'all' ? 'child' : era === 'child' ? 'adult' : 'all');
+    else {
+      const box = event.currentTarget.getBoundingClientRect();
+      const next: Era = event.clientX > box.left + box.width / 2 ? 'adult' : 'child';
+      onEra(era === next ? 'all' : next);
+    }
     setActive('');
   };
-  const eraChoice = <button type="button" className={`era-toggle era-${era}`} aria-label={eraLabel} title={eraLabel} onClick={pickEra}>
+  const eraName = `${t('Era')}: ${eraLabel}`;
+  const eraChoice = <button type="button" className={`era-toggle era-${era}`} aria-label={eraName} title={eraName} onClick={pickEra}>
     <span className="era-toggle-track">
       <span className="era-toggle-knob" aria-hidden="true" />
       <span className="era-toggle-face era-child" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="5.2" r="2.15" /><path d="M4.5 13.6c.35-2.5 1.7-3.7 3.5-3.7s3.15 1.2 3.5 3.7z" /></svg></span>

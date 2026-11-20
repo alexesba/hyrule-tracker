@@ -4,6 +4,20 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [1.4.8] - 2026-11-19
+
+### Improved
+- **Map controls on the map.** The region, floor, filters, child/adult and the "Hide unseen regions" and "Follow Link" switches sit in one bar over the map, and the progress panel sits on the map's right edge, so the map uses the whole width. The full screen button moved to the zoom buttons. On a wide window the bar wraps into a second row when it doesn't fit, instead of going under the panel.
+- **Child and adult in one switch.** Tap the child or adult side to see only that age, and tap it again to see both. With a keyboard, Enter steps through both, child and adult.
+- **Map on a phone.** The map is taller, the zoom buttons sit in a row under it, and the bar folds to one row (the arrow opens the rest). Outside full screen the progress panel stays under the map. In full screen it opens from the bottom, and the zoom buttons move above it. Turned sideways, the panel sits on the right.
+- **Switches and menus.** On/off options are switches, and menus use the tracker's own arrow, on every page.
+- **Full screen hides the note** about recomps and emulators, so the map gets that space.
+
+Thanks to alexesba for designing and contributing this. [#14](https://github.com/jv-prado/hyrule-tracker/pull/14)
+
+### Removed
+- **Region picture in the progress panel.** The panel starts with the region's name and score, to leave more room for the list.
+
 ## [1.4.7] - 2026-11-19
 
 ### New

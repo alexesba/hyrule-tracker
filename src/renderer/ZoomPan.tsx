@@ -12,6 +12,7 @@ const MAX_ZOOM = 6;
 export function ZoomPan({ ratio, className = '', children, overlay, controls }: { ratio: number; className?: string; children: ReactNode; overlay?: ReactNode; controls?: ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
   const layer = useRef<HTMLDivElement>(null);
+  const overlayBox = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<View>({ z: 1, x: 0, y: 0 });
   // At rest, shift the art into the space left of the progress panel.
   const [bias, setBias] = useState(0);
@@ -80,8 +81,9 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(el);
+    // The panel is a direct child of the overlay: watch it come and go, not every marker or Link moving on the map.
     const mutations = new MutationObserver(measure);
-    mutations.observe(el, { childList: true, subtree: true });
+    if (overlayBox.current) mutations.observe(overlayBox.current, { childList: true });
     return () => { observer.disconnect(); mutations.disconnect(); };
   }, [clamp]);
 
@@ -219,6 +221,6 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
     </div>
     {/* The wheel and drag hint is hidden on touch screens, where pinching is the expected gesture. */}
     <span className="zoom-hint">{Math.round(view.z * 100)}%<span className="zoom-hint-how"> · {t('Role para ampliar · Arraste para mover')}</span></span>
-    <div className="zoom-overlay">{overlay}</div>
+    <div ref={overlayBox} className="zoom-overlay">{overlay}</div>
   </div>;
 }

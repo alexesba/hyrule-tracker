@@ -344,6 +344,18 @@
 .map-region, .map-switch { display: inline-flex; align-items: center; gap: 8px; margin: 0; color: #f3ece2; font-size: 12.5px; cursor: pointer; }
 .map-hud select { min-height: 32px; width: min(220px, 46vw); background-color: #141211; }
 .map-floor select { width: auto; min-width: 92px; max-width: 180px; }
+/* Wide window: the bar spans the map left of the panel and wraps by group into centered rows. Labels stay on one line. */
+@media (min-width: 961px) and (min-height: 501px) {
+  .zoom-viewport { --map-h: max(380px, calc(100dvh - 200px)); }
+  .zoom-viewport .map-float-tools, .zoom-viewport:has(.map-side) .map-float-tools, .zoom-viewport:has(.map-panel-show) .map-float-tools { left: 12px; right: 12px; width: auto; max-width: none; transform: none; pointer-events: none; }
+  .zoom-viewport:has(.map-side) .map-float-tools { right: calc(min(320px, 100% - 80px) + 22px); }
+  .zoom-viewport:has(.map-panel-show) .map-float-tools { right: 210px; }
+  .map-hud { flex-wrap: wrap; row-gap: 6px; pointer-events: auto; }
+  .map-hud :is(.map-region, .map-switch, .era-toggle) { white-space: nowrap; }
+  .map-hud-modes { display: flex; align-items: center; gap: 14px; padding: 0 4px; }
+  /* A wrapped row would leave the divider dangling at its end, so spacing alone separates the groups. */
+  .map-hud .map-hud-divider { display: none; }
+}
 /* The one row is wider than a phone or a tablet, so it becomes stacked rows that fill the map. */
 @media (max-width: 960px) {
   .zoom-viewport .map-float-tools, .zoom-viewport:has(.map-side) .map-float-tools, .zoom-viewport:has(.map-panel-show) .map-float-tools { left: 10px; width: auto; max-width: none; transform: none; }
@@ -358,8 +370,9 @@
   .map-hud.is-collapsed :is(.map-hud-how, .map-floor) { display: none; }
   .map-hud-where .map-back { flex: none; }
   .map-hud-where .map-region { flex: 1 1 0; min-width: 0; }
-  .map-hud-where .map-floor { flex: 1 1 100%; min-width: 0; }
-  .map-hud-where select, .map-hud .map-floor select { width: auto; min-width: 0; max-width: none; flex: 1 1 auto; }
+  /* The floor menu takes its own row after the fold toggle, so the toggle stays beside the region. */
+  .map-hud-where .map-floor { order: 1; flex: 1 1 100%; min-width: 0; }
+  .map-hud .map-hud-where select { width: auto; min-width: 0; max-width: none; flex: 1 1 auto; }
   .map-hud-how .marker-filter { flex: 1 1 200px; min-width: 0; }
   .map-hud-how .era-toggle { flex: none; }
   .map-hud-how .era-toggle-label { min-width: 0; }
@@ -367,6 +380,15 @@
   .map-hud-modes { display: flex; flex: 1 1 100%; gap: 8px 10px; min-width: 0; }
   .map-hud-modes .map-switch { flex: 1 1 0; min-width: 0; }
   .map-hud-modes .map-switch span { min-width: 0; line-height: 1.25; }
+}
+/* Tablet: a slimmer panel leaves the bar room for long region names, and the map gets enough height for the panel to show its counters. */
+@media (min-width: 761px) and (max-width: 960px) and (min-height: 501px) {
+  .zoom-viewport { min-height: min(640px, calc(100dvh - 240px)); }
+  .zoom-viewport .map-side { width: min(288px, calc(100% - 80px)); }
+  .zoom-viewport:has(.map-side) .map-float-tools { right: calc(min(288px, 100% - 80px) + 20px); }
+  .zoom-viewport.map-unmapped:has(.map-side) :is(.map-unmapped-note, .map-unmapped-pick) { margin-right: min(288px, calc(100% - 80px)); }
+  /* The select shows the region name; its "Region" caption stays for screen readers only. */
+  .map-hud-where .map-region:not(.map-floor) > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 @media (max-width: 760px) {
   .zoom-viewport .map-side { top: auto; left: 10px; right: 10px; width: auto; max-height: min(46%, 320px); }
@@ -376,17 +398,48 @@
   /* The panel is a bottom sheet here, so its folded control sits on that edge, clear of the bar. */
   .map-panel-show { top: auto; right: auto; bottom: 12px; left: 50%; transform: translateX(-50%); }
   .map-panel-show svg { transform: rotate(-90deg); }
+  /* Phone portrait: the zoom buttons make one row in the bottom-left corner, and the zoom level moves to the other corner. */
+  .zoom-controls { grid-auto-flow: column; }
+  .zoom-controls .map-only-toggle { margin: 0 4px 0 0; }
+  .zoom-hint { left: auto; right: 12px; bottom: 24px; }
+  .zoom-viewport .map-panel-show { left: auto; right: 12px; transform: none; }
+  .zoom-viewport:has(.map-panel-show) .zoom-controls { bottom: 64px; }
+  .zoom-viewport:has(.map-panel-show) .zoom-hint { bottom: 76px; }
+  /* The fold button joins the region row, and the floor menu takes the next one. */
+  .map-hud-where .map-floor { order: 1; }
+  /* Inline (not full screen), the box leaves room above the art for the bar and below it for the zoom row. The layer fits what is left. */
+  .map-view:not(.map-only) .zoom-viewport:not(.map-unmapped) { --hud-room: 132px; aspect-ratio: auto; height: min(calc((100vw - 28px) / var(--ratio, 1.6) + var(--hud-room)), 74dvh); max-height: none; container-type: size; --map-h: calc(100cqh - var(--hud-room)); }
+  /* Inline, the progress panel follows the map (rendered outside it by HyruleMap). */
+  .map-main > .map-side { margin-top: 12px; }
+  .map-main > .map-side .map-side-collapse svg { transform: rotate(90deg); }
+  .map-main > .map-panel-show { position: static; display: flex; width: 100%; margin-top: 12px; transform: none; box-shadow: none; }
+  .map-main > .map-panel-show svg { transform: rotate(90deg); }
+  /* Full screen keeps the bottom sheet; the zoom row and the zoom level sit just above it. */
+  .map-only .zoom-viewport:has(.map-side) .zoom-controls { bottom: calc(min(46%, 320px) + 20px); }
+  .map-only .zoom-viewport:has(.map-side) .zoom-hint { bottom: calc(min(46%, 320px) + 32px); }
+  /* A docked marker card spans the map between the bar and the zoom row (its top or bottom offset is set inline, so margins move it). */
+  .zoom-viewport .marker-card.docked, .zoom-viewport .marker-card.docked.docked-bottom { left: 8px; right: 8px; width: auto; max-height: calc(100% - 140px); }
+  .zoom-viewport .marker-card.docked.docked-top { margin-top: 68px; }
+  .zoom-viewport .marker-card.docked.docked-bottom { margin-bottom: 56px; }
+  .map-only .zoom-viewport:has(.map-side) .marker-card.docked { max-height: calc(100% - min(46%, 320px) - 148px); }
+  .map-only .zoom-viewport:has(.map-side) .marker-card.docked.docked-bottom { margin-bottom: calc(min(46cqh, 320px) + 72px); }
 }
-/* Phone landscape is wide but short: the panel drops to the bottom and the bar uses the full width, so it stays two rows instead of covering the map. */
+/* Phone landscape is wide but short: a bottom sheet would cover the map, so the panel stays a slim column on the right and the bar and zoom share the left. */
 @media (max-height: 500px) and (min-width: 641px) {
-  .zoom-viewport .map-side { top: auto; left: 10px; right: 10px; width: auto; max-height: min(42%, 220px); }
-  .zoom-viewport .map-float-tools, .zoom-viewport:has(.map-side) .map-float-tools, .zoom-viewport:has(.map-panel-show) .map-float-tools { left: 10px; right: 10px; }
-  .zoom-viewport .map-side-collapse svg { transform: rotate(90deg); }
-  .map-hud-where .map-floor { flex: 0 1 200px; }
-  .map-hud-modes { flex-basis: 240px; }
-  .map-panel-show { top: auto; right: auto; bottom: 12px; left: 50%; transform: translateX(-50%); }
-  .map-panel-show svg { transform: rotate(-90deg); }
-  .zoom-viewport.map-unmapped:has(.map-side) :is(.map-unmapped-note, .map-unmapped-pick) { margin-right: 0; margin-bottom: min(42%, 220px); }
+  .zoom-viewport .map-side { top: 10px; bottom: 10px; left: auto; right: 10px; width: min(260px, 38%); max-height: none; }
+  .zoom-viewport .map-float-tools, .zoom-viewport:has(.map-side) .map-float-tools, .zoom-viewport:has(.map-panel-show) .map-float-tools { left: 10px; right: 10px; width: auto; max-width: none; transform: none; }
+  .zoom-viewport:has(.map-side) .map-float-tools { right: calc(min(260px, 38%) + 20px); }
+  .zoom-viewport:has(.map-panel-show) .map-float-tools { right: 210px; }
+  .zoom-viewport .map-side .map-side-collapse svg { transform: none; }
+  .map-panel-show { top: 10px; right: 10px; bottom: auto; left: auto; transform: none; }
+  .map-panel-show svg { transform: none; }
+  .zoom-viewport.map-unmapped:has(.map-side) :is(.map-unmapped-note, .map-unmapped-pick) { margin-right: min(260px, 38%); margin-bottom: 0; }
+  /* The zoom buttons make one row in the bottom-left corner, and the open bar scrolls above that row instead of running under it. */
+  .zoom-controls { grid-auto-flow: column; }
+  .zoom-controls .map-only-toggle { margin: 0 4px 0 0; }
+  .zoom-hint { left: 236px; bottom: 24px; }
+  .zoom-viewport .map-float-tools { flex-direction: column; max-height: calc(100% - 84px); }
+  .zoom-viewport .map-hud { flex-wrap: nowrap; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 }
 /* Progress panel (world: rate per region; region: score, era tabs, counters, list). */
 .map-side { overflow-y: auto; scrollbar-width: thin; border: 1px solid var(--hyrule-line); border-radius: var(--hyrule-radius); background: #141211; }
