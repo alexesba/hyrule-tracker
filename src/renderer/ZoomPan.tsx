@@ -66,8 +66,11 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
     if (!el || typeof ResizeObserver === 'undefined') return;
     const measure = () => {
       const panel = el.querySelector('.map-side');
-      const narrow = matchMedia('(max-width: 760px)').matches;
-      const shift = !panel || narrow ? 0 : (panel.getBoundingClientRect().left - el.getBoundingClientRect().left) / 2 - el.clientWidth / 2;
+      const panelBox = panel?.getBoundingClientRect();
+      const box = el.getBoundingClientRect();
+      // A bottom sheet starts at the left edge. Only a panel docked on the right should slide the map aside.
+      const dockedRight = !!panelBox && panelBox.left > box.left + box.width * 0.45;
+      const shift = !panelBox || !dockedRight ? 0 : (panelBox.left - box.left) / 2 - el.clientWidth / 2;
       setBias(current => Math.abs(current - shift) < 0.5 ? current : shift);
       setView(v => {
         const kept = clamp(v);
