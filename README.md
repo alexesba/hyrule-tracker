@@ -67,6 +67,7 @@ npm run dist:mac    # fetches the missing images, builds, signs ad hoc: release/
 | 📊 | **Overview** | Checklist %, hearts, Gold Skulltulas, opened chests, rupees and recent activity. |
 | 🗺️ | **Hyrule Map** | 32 regions, per-floor maps, location photos and filters by Link's age, collectible type and completion. A red arrow shows **where Link is** and which way he faces: live in recomps; in emulators it only updates when you save ([why](#-compatibility)). **Follow Link** keeps his region and dungeon floor on screen. Maps fit the window, even fullscreen. |
 | ✅ | **100% Checklist** | Hearts, 100 Gold Skulltulas, songs, equipment, trades, dungeons, Big Poes and more. Done items are struck through. **Available now** shows what you can get with known requirements. |
+| 📖 | **Walkthrough** | The whole game step by step: 20 story chapters and 6 side quests, with each step ticked from your save, the chapter you are on picked out, and links to the checklist and the map. Guide text in English, Portuguese and Spanish. |
 | ⏳ | **Threads of Time+** | Chapters, story steps and seven expandable side quests with guidance and progress from the save. |
 | 🎯 | **Minigames** | 18 activities with wins, prizes and scores: shooting galleries, Bombchu Bowling, fishing, races. Deku Theater and expert modes accept manual marking. |
 | ⚔️ | **Hall of Enemies** | 84 statues, 25 rematches and three trials, with best times from your save and reference images. |

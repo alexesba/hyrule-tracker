@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import type { AppState, TrackedCategory, TrackedItem, UiPrefs, ChangeRow, OverlayMode } from '../shared/types';
 import { api, isRemote, onConnection, timeAgo } from './api';
 import { symbolIcons, categoryColor } from './icons';
@@ -7,6 +7,9 @@ import { buildCards, tileItems, Card, TileModel } from './view';
 import { Masonry } from './Masonry';
 import { CompanionPage, Icon, MobileNav, Sidebar, PageHeader, MAP_CATEGORIES, type Page } from './CompanionPages';
 import { WhatToDo } from './WhatToDo';
+
+// The guide's text is large: it loads when the page opens.
+const Walkthrough = lazy(() => import('./Walkthrough'));
 import { LanguageSwitch } from './LanguageFlags';
 import { currentLocale, day, loadLocale, message, percent, setLocale, t, tail, tv, type Locale } from './i18n';
 import { ObjectiveName } from './ObjectiveName';
@@ -190,7 +193,10 @@ export function App() {
         </main>
       ) : page !== 'checklist' ? (
         <CompanionPage mapFocus={mapFocus} onShowInChecklist={showInChecklist} page={page}
-          todoView={page === 'todo' ? <WhatToDo state={state} onShowInChecklist={showInChecklist} onShowOnMap={showOnMap} /> : undefined} state={state} onPage={setPage} onScan={scan} scanning={scanning} onLanguage={changeLanguage} headerActions={headerActions} connectionLost={lost} />
+          todoView={page === 'todo' ? <WhatToDo state={state} onShowInChecklist={showInChecklist} onShowOnMap={showOnMap} /> : undefined}
+          walkthroughView={page === 'walkthrough' ? <Suspense fallback={<PageSkeleton page="walkthrough" />}>
+            <Walkthrough state={state} onShowInChecklist={showInChecklist} onShowOnMap={showOnMap} onShowPlace={id => showOnMap('place:' + id)} />
+          </Suspense> : undefined} state={state} onPage={setPage} onScan={scan} scanning={scanning} onLanguage={changeLanguage} headerActions={headerActions} connectionLost={lost} />
       ) : state.status !== 'ok' ? (
         <CompanionPage page="checklist" state={state} onPage={setPage} onScan={scan} scanning={scanning} onLanguage={changeLanguage} headerActions={headerActions} connectionLost={lost} />
       ) : (

@@ -983,3 +983,22 @@ Nenhuma mudança de área registrada.||No area changes recorded.|No hay cambios 
 Aproximado, pelas mudanças de área.||Approximate, from the area changes.|Aproximado, según los cambios de zona.
 Não identificado||Unidentified|Sin identificar
 Outros lugares||Other places|Otros lugares
+Passo a passo||Walkthrough|Guía paso a paso
+Siga a história do começo ao fim, capítulo por capítulo.||Follow the story from start to finish, chapter by chapter.|Sigue la historia de principio a fin, capítulo a capítulo.
+Capítulos||Chapters|Capítulos
+Parte 1: as Pedras Espirituais||Part 1: the Spiritual Stones|Parte 1: las Piedras Espirituales
+Parte 2: os Medalhões||Part 2: the Medallions|Parte 2: los Medallones
+Parte 3: o Rei do Mal||Part 3: the King of Evil|Parte 3: el Rey del Mal
+Capítulo concluído||Chapter complete|Capítulo completado
+{done} de {total} passos||{done} of {total} steps|{done} de {total} pasos
+Extras: {done}/{total}||Extras: {done}/{total}|Extras: {done}/{total}
+Expandir tudo||Expand all|Desplegar todo
+Recolher tudo||Collapse all|Plegar todo
+Encontre um save para ver no guia o que você já fez.||Find a save to see in the guide what you have already done.|Busca una partida para ver en la guía lo que ya has hecho.
+Capítulo anterior||Previous chapter|Capítulo anterior
+Próximo capítulo||Next chapter|Capítulo siguiente
+Texto escrito para o tracker. Fatos conferidos no guia da IGN:||Text written for the tracker. Facts checked against the IGN guide:|Texto escrito para el tracker. Datos comprobados con la guía de IGN:
+abrir a página do capítulo||open the chapter page|abrir la página del capítulo
+Opcional||Optional|Opcional
+{n} passo||{n} step|{n} paso
+{n} passos||{n} steps|{n} pasos

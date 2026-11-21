@@ -78,9 +78,12 @@ project's license).
   the checklist's Gold Skulltula and heart piece numbering, and where each numbered one is.
 - Video Games Chronicle's per-dungeon Gold Skulltula lists and Nintendo Life's heart piece guide:
   second sources for the dungeon Skulltulas and the Magic Bean heart pieces.
+- IGN's Ocarina of Time Remake walkthrough (https://www.ign.com/wikis/ocarina-of-time-remake/Walkthrough)
+  and its chapter and side quest pages: the order of events, routes, puzzles and bosses in the
+  Walkthrough page. Each chapter in `data/walkthrough.json` names the page it was checked against.
 
-The location descriptions in `data/descriptions.json` were written for this project from these
-facts; no guide text is reproduced.
+The location descriptions in `data/descriptions.json` and the steps in `data/walkthrough.json` were
+written for this project from these facts; no guide text or images are reproduced.
 
 ## Format write-ups for Tears of the Kingdom saves
 General GameData container background (Murmur3 keys, typed sections).
