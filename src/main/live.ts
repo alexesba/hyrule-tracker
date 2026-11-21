@@ -22,9 +22,9 @@ import { PlayerReader, type LivePlayer } from '../gamedata/player.js';
 interface GameEntry { image: string; emulator: boolean; /** Runs natively on the host: its tables are anywhere in readable memory, with real host pointers. */ hostPointers?: boolean }
 /**
  * nxnative (Switch games run natively on a Mac) keeps the game's data in its helper process "dmhost", not in "nxnative".
- * Found in macOS only: findProcesses matches nothing elsewhere.
+ * Searched for on macOS only.
  */
-const MAC_NATIVE_EXES = ['dmhost'];
+const MAC_NATIVE_EXES = process.platform === 'darwin' ? ['dmhost'] : [];
 const GAMES: GameEntry[] = [...NATIVE_EXES.map(image => ({ image, emulator: false })),
   ...EMULATOR_EXES.map(image => ({ image, emulator: true })),
   ...MAC_NATIVE_EXES.map(image => ({ image, emulator: true, hostPointers: true }))];

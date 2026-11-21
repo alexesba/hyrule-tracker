@@ -103,20 +103,32 @@ export class MacProcessMemory implements GameProcess {
 /** Base name of a path, lowercase, without ".app" / ".exe" ("/Applications/Game.app/Contents/MacOS/Game" is "game"). */
 const programName = (p: string) => (p.split('/').pop() ?? p).toLowerCase().replace(/\.(exe|app)$/, '');
 
-/** Process ids of running programs with this name (e.g. "nxnative"; a ".exe" on the name is ignored). */
-export function findMacProcesses(image: string): Promise<number[]> {
-  return new Promise((resolve, reject) => {
-    if (process.platform !== 'darwin') return resolve([]);
-    const want = programName(image);
+/** One process list serves every name the live search asks for in the same pass (it asks for each program in turn). */
+let listing: { at: number; procs: Promise<{ pid: number; name: string }[]> } | undefined;
+const LISTING_MS = 1000;
+
+function processList(): Promise<{ pid: number; name: string }[]> {
+  if (listing && Date.now() - listing.at < LISTING_MS) return listing.procs;
+  const procs = new Promise<{ pid: number; name: string }[]>((resolve, reject) => {
     // ps shows the full program path in "comm" on macOS; pid first so a path with spaces stays whole.
     execFile('/bin/ps', ['-axo', 'pid=,comm='], { timeout: 5000, maxBuffer: 8 << 20 }, (err, out) => {
       if (err) return reject(new Error(`ps failed: ${err.message}`));
-      const pids: number[] = [];
+      const list: { pid: number; name: string }[] = [];
       for (const line of String(out).split('\n')) {
         const m = /^\s*(\d+)\s+(.+)$/.exec(line);
-        if (m && Number(m[1]) !== process.pid && programName(m[2]) === want) pids.push(Number(m[1]));
+        if (m && Number(m[1]) !== process.pid) list.push({ pid: Number(m[1]), name: programName(m[2]) });
       }
-      resolve(pids);
+      resolve(list);
     });
   });
+  listing = { at: Date.now(), procs };
+  procs.catch(() => { listing = undefined; });
+  return procs;
+}
+
+/** Process ids of running programs with this name (e.g. "nxnative"; a ".exe" on the name is ignored). */
+export async function findMacProcesses(image: string): Promise<number[]> {
+  if (process.platform !== 'darwin') return [];
+  const want = programName(image);
+  return (await processList()).filter(p => p.name === want).map(p => p.pid);
 }
