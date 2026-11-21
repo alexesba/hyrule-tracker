@@ -35,7 +35,7 @@ export function resolveUserFolders(start: string): string[] {
   if (!fs.existsSync(start)) return [];
   if (isUserFolder(start)) return [start];
   if (/^slot_\d+$/i.test(path.basename(start)) && isUserFolder(path.dirname(start))) return [path.dirname(start)];
-  // NX2Saria keeps its saves in <game>\profile\save (the launcher's game folder is <install>\game).
+  // NX2Saria and Rekarina keep their saves in <game>\profile\save (their launchers' game folder is <install>\game).
   const tries = [start, path.join(start, 'save'), path.join(start, 'user', 'save'), path.join(start, 'profile', 'save'),
     path.join(start, 'game', 'profile', 'save')];
   const out: string[] = [];
@@ -91,17 +91,19 @@ export const NATIVE_EXES = ['Triforce.exe', 'hookshot.exe', 'HeyListen.exe', 'Lo
  * tracker API (nx2saria.ts), so it is not in NATIVE_EXES: its memory is not laid out as theirs.
  */
 export const NX2SARIA_EXES = ['ocarina.exe', 'nx2saria.exe'];
-const GAME_NAMES = /zelda|ocarina|hookshot|heylisten|longshot|triforce|nx2navi|nx2saria|relink|fritchii|lichii|eden|orchid|eglantine|pokedinner/i;
+/** Rekarina's game. Saves only: it keeps guest memory at the same host addresses, not at GUEST_BASE as NATIVE_EXES do. */
+const REKARINA_EXE = 'Rekarina.exe';
+const GAME_NAMES = /zelda|ocarina|hookshot|heylisten|longshot|triforce|nx2navi|nx2saria|rekarina|relink|fritchii|lichii|eden|orchid|eglantine|pokedinner/i;
 /** A program's name without ".exe" (or a Linux build's ".AppImage" / ".x86_64"), lowercase. */
 export const programName = (file: string) => file.toLowerCase().replace(/\.(exe|appimage|x86_64)$/, '');
-const GAME_FILES = new Set([...NATIVE_EXES, ...EMULATOR_EXES, ...NX2SARIA_EXES, 'ReLink.exe'].map(programName));
+const GAME_FILES = new Set([...NATIVE_EXES, ...EMULATOR_EXES, ...NX2SARIA_EXES, 'ReLink.exe', REKARINA_EXE].map(programName));
 const NX2SARIA_PROGRAMS = new Set(NX2SARIA_EXES.map(programName));
 /** A file that runs the game: the Windows exe, or a Linux build of the same name. */
 export const isGameFile = (file: string) => GAME_FILES.has(programName(file));
 const installations: Record<string, string> = {
   fritchii: 'Fritchii', lichii: 'Lichii', eden: 'Eden', orchid: 'Orchid', eglantine: 'Eglantine',
   pokedinner: 'PokeDinner', triforce: 'Triforce', longshot: 'Longshot', hookshot: 'Hookshot', heylisten: 'HeyListen',
-  nx2navi: 'NX2navi', nx2saria: 'NX2Saria', 'ocarina reborn': 'Ocarina Reborn', 'ocarina-reborn': 'Ocarina Reborn',
+  nx2navi: 'NX2navi', nx2saria: 'NX2Saria', rekarina: 'Rekarina', 'ocarina reborn': 'Ocarina Reborn', 'ocarina-reborn': 'Ocarina Reborn',
   ocarinareborn: 'Ocarina Reborn', 'ocarina-reborn-game': 'Ocarina Reborn', relink: 'ReLink', 'relink-game': 'ReLink',
 };
 export function installationLabel(saveDir: string): string | undefined {
@@ -183,7 +185,7 @@ function otherBases(home: string): Bases[] {
 }
 
 function foldersIn({ roaming, local, storage, prefix }: Bases): string[] {
-  const native = ['Hookshot', 'HeyListen', 'Longshot', 'Triforce', 'NX2navi', 'NX2Saria', 'Ocarina Reborn', 'OcarinaReborn', 'ReLink',
+  const native = ['Hookshot', 'HeyListen', 'Longshot', 'Triforce', 'NX2navi', 'NX2Saria', 'Rekarina', 'Ocarina Reborn', 'OcarinaReborn', 'ReLink',
     ...(isLinux ? ['heylisten'] : []), // HeyListen's Linux saves: ~/.local/share/heylisten/save
     ...(isMac ? [`nxnative/${OOT_TITLE_ID}`] : [])];
   return [...emulatorDataDirs(roaming), ...emulatorDataDirs(local),
@@ -192,7 +194,8 @@ function foldersIn({ roaming, local, storage, prefix }: Bases): string[] {
     ...configPaths(local, 'Ocarina Reborn/Config/build-state.json', ['dest'], prefix),
     ...configPaths(local, 'LongshotLauncher/builds.json', ['folder'], prefix),
     ...configPaths(local, 'LongshotLauncher/settings.json', ['buildsFolder'], prefix),
-    ...configPaths(local, 'ReLink/install.json', ['Out'], prefix)];
+    ...configPaths(local, 'ReLink/install.json', ['Out'], prefix),
+    ...configPaths(roaming, 'Rekarina/launcher.json', ['dest'], prefix)];
 }
 
 /** Install folders the ports and emulators use by default, or that launcher config points to. Cheap: no directory walk. */
