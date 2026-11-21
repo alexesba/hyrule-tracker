@@ -155,5 +155,4 @@ change's "from". 1,024 entries are not much: one test log covered 51 minutes (lo
 Z-targeting), another 10 hours. The page says which span the log covers.
 
 Not used: kind 26 (the game saved), kind 37 (hurt by the world; "likely" in Kabosune's table), kind 39
-(life and magic) and
-the position trail.
+(life and magic) and the position trail.
