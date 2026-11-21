@@ -359,7 +359,7 @@
         {
           "id": "heart_containers.heart_container_bongo",
           "number": 7,
-          "name": "Heart Container (Bongo)",
+          "name": "Heart Container (Bongo Bongo)",
           "chapter": "Shadow Temple",
           "iconId": "heart_container",
           "detect": null
@@ -1314,7 +1314,7 @@
         {
           "id": "equipment.biggorons_sword",
           "number": 4,
-          "name": "Biggoron's Sword",
+          "name": "Biggoron Sword",
           "iconId": "biggorons_sword",
           "detect": null
         },
@@ -1449,7 +1449,7 @@
         {
           "id": "items.gorons_bracelet",
           "number": 10,
-          "name": "Goron's Bracelet",
+          "name": "Goron Bracelet",
           "iconId": "gorons_bracelet",
           "detect": null
         },
@@ -1519,7 +1519,7 @@
         {
           "id": "items.double_magic",
           "number": 20,
-          "name": "Double Magic",
+          "name": "Gift of Doubled Magic",
           "iconId": "double_magic",
           "detect": null
         },
@@ -1584,7 +1584,7 @@
         {
           "id": "key_items.gerudo_membership_card",
           "number": 1,
-          "name": "Gerudo Membership Card",
+          "name": "Gerudo Pass",
           "iconId": "gerudo_membership_card",
           "detect": null
         }
@@ -1696,7 +1696,7 @@
         {
           "id": "great_fairies.hyrule_castle_grounds_child_enhanced_charged_spin_attack",
           "number": 2,
-          "name": "Hyrule Castle grounds (child): Enhanced (charged) Spin Attack",
+          "name": "Hyrule Castle grounds (child): Gift of Improved Spin",
           "iconId": "great_fairy",
           "detect": null
         },
@@ -1710,7 +1710,7 @@
         {
           "id": "great_fairies.death_mountain_crater_double_magic",
           "number": 4,
-          "name": "Death Mountain Crater: Double Magic",
+          "name": "Death Mountain Crater: Gift of Doubled Magic",
           "iconId": "great_fairy",
           "detect": null
         },
@@ -1724,7 +1724,7 @@
         {
           "id": "great_fairies.outside_ganons_castle_adult_double_defense_halved_damage",
           "number": 6,
-          "name": "Outside Ganon's Castle (adult): Double Defense (halved damage)",
+          "name": "Outside Ganon's Castle (adult): Gift of Halved Damage",
           "iconId": "great_fairy",
           "detect": null
         }
@@ -2054,7 +2054,7 @@
         {
           "id": "bosses.bongo",
           "number": 7,
-          "name": "Bongo",
+          "name": "Bongo Bongo",
           "iconId": "boss",
           "detect": null
         },
@@ -2155,6 +2155,13 @@
           "id": "mini_bosses.iron_knuckle_nabooru",
           "number": 10,
           "name": "Iron Knuckle (Nabooru)",
+          "iconId": "mini_boss",
+          "detect": null
+        },
+        {
+          "id": "mini_bosses.lizalfos",
+          "number": 11,
+          "name": "Lizalfos",
           "iconId": "mini_boss",
           "detect": null
         }
@@ -2339,7 +2346,7 @@
         {
           "id": "adult_trade.odd_potion",
           "number": 5,
-          "name": "Odd Potion",
+          "name": "Odd Poultice",
           "iconId": "odd_potion",
           "detect": null
         },
@@ -2353,7 +2360,7 @@
         {
           "id": "adult_trade.broken_gorons_sword",
           "number": 7,
-          "name": "Broken Goron's Sword",
+          "name": "Broken Goron Sword",
           "iconId": "broken_gorons_sword",
           "detect": null
         },
@@ -2374,14 +2381,14 @@
         {
           "id": "adult_trade.worlds_finest_eye_drops",
           "number": 10,
-          "name": "World's Finest Eye Drops",
+          "name": "Specialty Eye Drops",
           "iconId": "worlds_finest_eye_drops",
           "detect": null
         },
         {
           "id": "adult_trade.claim_check",
           "number": 11,
-          "name": "Claim Check",
+          "name": "Biggoron Receipt",
           "iconId": "claim_check",
           "detect": null
         }

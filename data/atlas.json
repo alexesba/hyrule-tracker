@@ -1442,12 +1442,12 @@
     },
     {
       "id": "lonlon-gs-02",
-      "place": "lonlon",
+      "place": "llanura",
       "cat": "gs",
       "at": {
         "map": "principal",
-        "x": 0.1398,
-        "y": 0.7037
+        "x": 0.638,
+        "y": 0.768
       },
       "name": "Crate in the grotto south of the ranch",
       "age": "adult",
@@ -1458,8 +1458,8 @@
       ],
       "hex32": [],
       "hex64": [
-        "0x25e6072d4df023b3",
-        "0x25e6072d4df023b1"
+        "0x7d8ec14bdd1f6341",
+        "0x7d8ec14bdd1f6343"
       ]
     },
     {
@@ -1502,8 +1502,8 @@
       ],
       "hex32": [],
       "hex64": [
-        "0x7d8ec14bdd1f6341",
-        "0x7d8ec14bdd1f6343"
+        "0x25e6072d4df023b3",
+        "0x25e6072d4df023b1"
       ]
     },
     {
@@ -1644,7 +1644,7 @@
         "x": 0.9146,
         "y": 0.6046
       },
-      "name": "Great Fairy: Spin Attack",
+      "name": "Great Fairy: Gift of Improved Spin",
       "age": "child",
       "night": false,
       "images": [
@@ -1708,7 +1708,7 @@
         "y": 0.425
       },
       "name": "The man on the roof",
-      "age": "adult",
+      "age": "child",
       "night": false,
       "images": [
         "images/atlas/da95819214f58d65.webp",
@@ -2245,7 +2245,7 @@
         "y": 0.4469
       },
       "name": "Domed rock in the Crater",
-      "age": "both",
+      "age": "adult",
       "night": false,
       "images": [
         "images/atlas/6b2ecd0a4ff9c8c9.webp",
@@ -2329,7 +2329,7 @@
         "x": 0.3326,
         "y": 0.602
       },
-      "name": "Great Fairy: double magic",
+      "name": "Great Fairy: Gift of Doubled Magic",
       "age": "adult",
       "night": false,
       "images": [
@@ -2694,7 +2694,7 @@
         "y": 0.2122
       },
       "name": "Diving in the laboratory",
-      "age": "both",
+      "age": "adult",
       "night": false,
       "images": [
         "images/atlas/d5dbbd9a135e4978.webp",
@@ -3036,7 +3036,7 @@
         "x": 0.5054,
         "y": 0.7148
       },
-      "name": "Horseback archery - 1,000 points",
+      "name": "Horseback archery - 750 points",
       "age": "adult",
       "night": false,
       "images": [
@@ -3780,8 +3780,8 @@
       ],
       "hex32": [],
       "hex64": [
-        "0x7f498ada1c2e9c7a",
-        "0x7f498ada1c2e9c78"
+        "0x4d1b7e35ca0c6484",
+        "0x4d1b7e35ca0c6486"
       ]
     },
     {
@@ -3802,8 +3802,8 @@
       ],
       "hex32": [],
       "hex64": [
-        "0x4d1b7e35ca0c6484",
-        "0x4d1b7e35ca0c6486"
+        "0x7f498ada1c2e9c7a",
+        "0x7f498ada1c2e9c78"
       ]
     },
     {
@@ -3998,8 +3998,8 @@
       ],
       "hex32": [],
       "hex64": [
-        "0xd23a7a2c9eced9ce",
-        "0xd23a7a2c9eced9cc"
+        "0xeafe60e592e9a3fb",
+        "0xeafe60e592e9a3f9"
       ]
     },
     {
@@ -4020,8 +4020,8 @@
       ],
       "hex32": [],
       "hex64": [
-        "0xd7ffbe169189e50d",
-        "0xd7ffbe169189e50f"
+        "0xd23a7a2c9eced9ce",
+        "0xd23a7a2c9eced9cc"
       ]
     },
     {
@@ -4042,8 +4042,8 @@
       ],
       "hex32": [],
       "hex64": [
-        "0xeafe60e592e9a3fb",
-        "0xeafe60e592e9a3f9"
+        "0xd7ffbe169189e50d",
+        "0xd7ffbe169189e50f"
       ]
     },
     {
@@ -4383,7 +4383,7 @@
         "x": 0.7921,
         "y": 0.5987
       },
-      "name": "Great Fairy: Double Defense",
+      "name": "Great Fairy: Gift of Halved Damage",
       "age": "adult",
       "night": false,
       "images": [

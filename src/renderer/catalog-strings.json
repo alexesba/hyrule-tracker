@@ -23,9 +23,9 @@
     "50 fichas: Pedaço de coração",
     "50 fichas: Pieza de corazón"
   ],
-  "A Bombchu Bowling prize. Whichever bag upgrade you get second is the biggest.": [
-    "Prêmio do Boliche de Bombchu. A segunda melhoria de bolsa que você ganhar é a maior.",
-    "Premio de los Bolos Bombchu. La segunda mejora de bolsa que consigas es la más grande."
+  "The prize for your second Bombchu Bowling win. Whichever bag upgrade you get second is the biggest.": [
+    "O prêmio da sua segunda vitória no Boliche de Bombchu. A segunda melhoria de bolsa que você obtiver é a maior.",
+    "El premio de tu segunda victoria en la bolera Bombchu. La segunda mejora de saco que consigas es la más grande."
   ],
   "a bottle": [
     "uma garrafa",
@@ -179,9 +179,9 @@
     "Como criança, à noite, na parede ao lado da porta da Casa das Skulltulas.",
     "De niño, de noche, en la pared junto a la puerta de la Casa de las Skulltulas."
   ],
-  "As a child at night, roll into the tall tree in the village square.": [
-    "Como criança, à noite, dê uma cambalhota contra a árvore alta da praça da vila.",
-    "De niño, de noche, rueda contra el árbol alto de la plaza de la aldea."
+  "As a child at night, roll into the tall tree by the village entrance.": [
+    "Criança, à noite, role contra a árvore alta perto da entrada da vila.",
+    "De niño, de noche, rueda contra el árbol alto junto a la entrada del pueblo."
   ],
   "As a child at night, under the eaves of the house near the gate to Death Mountain.": [
     "Como criança, à noite, sob o beiral da casa perto do portão da Montanha da Morte.",
@@ -227,7 +227,7 @@
     "Como criança, solte insetos na terra fofa ao lado do vendedor de feijões.",
     "De niño, suelta bichos en la tierra blanda junto al vendedor de judías."
   ],
-  "As a child, drop bugs on the soil in the little cave by the cavern entrance. The boulder in front of it breaks with a Bomb Flower, which needs the Goron's Bracelet.": [
+  "As a child, drop bugs on the soil in the little cave by the cavern entrance. The boulder in front of it breaks with a Bomb Flower, which needs the Goron Bracelet.": [
     "Como criança, solte insetos na terra da pequena caverna perto da entrada da Caverna dos Dodongos. A rocha na frente dela se quebra com uma Flor-Bomba, que exige o Bracelete Goron.",
     "De niño, suelta bichos en la tierra de la pequeña cueva junto a la entrada de la Cueva de los Dodongos. La roca que la tapa se rompe con una flor bomba, que requiere el brazalete goron."
   ],
@@ -235,9 +235,9 @@
     "Como criança, plane com um Cucco até a caverna ao lado da cachoeira e solte insetos na terra fofa de lá.",
     "De niño, planea con un cuco hasta la cueva junto a la cascada y suelta bichos en la tierra blanda."
   ],
-  "As a child, in the first alcove on the right inside the crater, by a crate.": [
-    "Como criança, no primeiro nicho à direita dentro da cratera, junto a um caixote.",
-    "De niño, en el primer nicho a la derecha dentro del cráter, junto a una caja."
+  "As a child, roll into the farther of the two crates by a pot on the left, just inside the crater. The heat starts to hurt after a few seconds.": [
+    "Criança, role contra o mais distante dos dois caixotes ao lado de um pote à esquerda, logo na entrada da cratera. O calor começa a ferir após alguns segundos.",
+    "De niño, rueda contra la más lejana de las dos cajas junto a una vasija a la izquierda, nada más entrar al cráter. El calor empieza a dañar tras unos segundos."
   ],
   "As a child, play the Song of Storms by the tree near Talon's dead end to open a grotto, bomb the wall inside and use the Boomerang.": [
     "Como criança, toque a Canção das Tempestades junto à árvore no beco sem saída perto de Talon para abrir uma gruta. Lá dentro, exploda a parede e use o bumerangue.",
@@ -259,17 +259,17 @@
     "Como criança, teletransporte-se com o Bolero do Fogo e solte insetos na terra fofa junto à lava.",
     "De niño, teletranspórtate con el Bolero del Fuego y suelta bichos en la tierra blanda junto a la lava."
   ],
-  "As an adult at night, high on the wall at a dead end of the meadow's maze. Hookshot.": [
-    "Como adulto, à noite, no alto da parede de um beco sem saída no labirinto da clareira. Use o gancho.",
-    "De adulto, de noche, en lo alto de la pared de un callejón sin salida del laberinto del prado. Usa el gancho."
+  "As an adult, high on the wall by the big tree roots near the ladder up the ruins, just before the stairs to the temple. Hookshot.": [
+    "Adulto, no alto da parede junto às raízes da árvore grande, perto da escada de mão das ruínas, logo antes da escadaria do templo. Gancho.",
+    "De adulto, en lo alto de la pared junto a las raíces del árbol grande, cerca de la escalera de mano de las ruinas, justo antes de la escalinata del templo. Gancho."
   ],
   "As an adult at night, in the cave past the net slope near the summit. Break the rock with the Megaton Hammer.": [
     "Como adulto, à noite, na caverna depois da encosta com rede, perto do cume. Quebre a rocha com o Martelo Megaton.",
     "De adulto, de noche, en la cueva pasada la pendiente con red, cerca de la cima. Rompe la roca con el Martillo Megatón."
   ],
-  "As an adult at night, in the dark tunnel towards Goron City. Break the rock with the Megaton Hammer.": [
-    "Como adulto, à noite, no túnel escuro em direção à Cidade Goron. Quebre a rocha com o Martelo Megaton.",
-    "De adulto, de noche, en el túnel oscuro hacia la Ciudad Goron. Rompe la roca con el Martillo Megatón."
+  "As an adult at night, just outside Goron City where the lone Bomb Flower grew. Break the grey rock with the Megaton Hammer.": [
+    "Adulto, à noite, logo na saída da Cidade Goron, onde ficava a Flor-Bomba solitária. Quebre a rocha cinza com o Martelo Megaton.",
+    "De adulto, de noche, justo a la salida de la Ciudad Goron, donde crecía la flor bomba solitaria. Rompe la roca gris con el Martillo Megatón."
   ],
   "As an adult at night, in the hollow of the big dead tree on the lake's island. Longshot.": [
     "Como adulto, à noite, no oco da grande árvore morta na ilha do lago. Use o gancho longo.",
@@ -323,9 +323,9 @@
     "Como adulto, à noite, sob o arco de rocha junto ao caminho do cânion. Use o gancho.",
     "De adulto, de noche, bajo el arco de roca junto al camino del cañón. Usa el gancho."
   ],
-  "As an adult, high on the lava cave wall seen from the metal walkway. Hookshot.": [
-    "Como adulto, no alto da parede da caverna de lava, visível da passarela de metal. Use o gancho.",
-    "De adulto, en lo alto de la pared de la cueva de lava, visible desde la pasarela metálica. Usa el gancho."
+  "As an adult, on the rock that juts down under the central platform where the Spiritual Stone sat. Drop to the level below the top one and Hookshot it.": [
+    "Adulto, na rocha que se projeta para baixo sob a plataforma central onde ficava a Pedra Espiritual. Desça ao nível abaixo do mais alto e use o gancho.",
+    "De adulto, en la roca que sobresale bajo la plataforma central donde estaba la Piedra Espiritual. Baja al nivel bajo el más alto y usa el gancho."
   ],
   "As an adult, in a small cave above the scarecrow. Play the Scarecrow's Song and Hookshot up, or use the Longshot.": [
     "Como adulto, numa pequena caverna acima do espantalho. Toque a Canção do Espantalho e suba com o gancho, ou use o gancho longo.",
@@ -507,9 +507,9 @@
     "Trepadeiras do subsolo",
     "Enredaderas del sótano"
   ],
-  "Basement web corridor": [
-    "Corredor das teias no subsolo",
-    "Pasillo de las telarañas del sótano"
+  "Basement alcove": [
+    "Nicho do subsolo",
+    "Hueco del sótano"
   ],
   "Beamos": [
     "Beamos",
@@ -627,7 +627,7 @@
     "Biggoron, no cume da Montanha da Morte, forja a espada ao final da sequência de trocas de adulto.",
     "Biggoron, en la cima de la Montaña de la Muerte, la forja al final de la cadena de intercambios de adulto."
   ],
-  "Biggoron's Sword": [
+  "Biggoron Sword": [
     "Espada de Biggoron",
     "Espada de Biggoron"
   ],
@@ -683,10 +683,6 @@
     "Bombas ou o Martelo Megaton",
     "Bombas o el Martillo Megatón"
   ],
-  "Bongo": [
-    "Bongo",
-    "Bongo"
-  ],
   "Bongo Bongo": [
     "Bongo Bongo",
     "Bongo Bongo"
@@ -739,7 +735,7 @@
     "Pilha de rochas",
     "Montón de rocas"
   ],
-  "Broken Goron's Sword": [
+  "Broken Goron Sword": [
     "Espada Goron Quebrada",
     "Espada goron rota"
   ],
@@ -795,13 +791,13 @@
     "Deku Mercador na cratera",
     "Deku comerciante en el cráter"
   ],
-  "Buy it from the Business Scrub in the Sacred Forest Meadow grotto that the Song of Storms opens.": [
-    "Compre do Deku Mercador na gruta da Clareira Sagrada que a Canção das Tempestades abre.",
-    "Cómpraselo al Deku comerciante de la gruta del Prado Sagrado del Bosque que abre la Canción de las Tormentas."
+  "Buy it for 40 Rupees from a Business Scrub in the Lost Woods grotto beside the way into the Sacred Forest Meadow. Bomb the rock over the hole first.": [
+    "Compre por 40 Rupias de um Deku Mercador na gruta do Bosque Perdido ao lado da entrada da Clareira Sagrada. Antes, exploda a rocha sobre o buraco.",
+    "Cómpraselo por 40 Rupias a un Deku comerciante de la gruta del Bosque Perdido junto a la entrada del Prado Sagrado del Bosque. Antes, vuela la roca que tapa el agujero."
   ],
-  "Buy it from the Business Scrub near the Lost Woods bridge, as a child.": [
-    "Compre do Deku Mercador perto da ponte do Bosque Perdido, como criança.",
-    "Cómpraselo al Deku comerciante cerca del puente del Bosque Perdido, de niño."
+  "As a child, buy it for 40 Rupees from the Business Scrub in the Lost Woods: from the entrance go right, then right again, to the dead end by a Gossip Stone.": [
+    "Como criança, compre por 40 Rupias do Deku Mercador do Bosque Perdido: da entrada vá para a direita e de novo para a direita, até o beco sem saída junto a uma Pedra Fofoqueira.",
+    "De niño, cómpraselo por 40 Rupias al Deku comerciante del Bosque Perdido: desde la entrada ve a la derecha y otra vez a la derecha, hasta el callejón sin salida junto a una piedra chismosa."
   ],
   "By the webbed grate": [
     "Junto à grade com teia",
@@ -871,9 +867,9 @@
     "Lado criança: na cerca de metal da sala com grade no primeiro andar. Use o bumerangue.",
     "Lado niño: en la valla metálica de la sala con rejilla del primer piso. Usa el bumerán."
   ],
-  "Claim Check": [
-    "Recibo",
-    "Resguardo"
+  "Biggoron Receipt": [
+    "Recibo de Biggoron",
+    "Recibo de Biggoron"
   ],
   "Cliff past the temple": [
     "Penhasco depois do templo",
@@ -931,9 +927,9 @@
     "Dark Link",
     "Dark Link"
   ],
-  "Dark tunnel": [
-    "Túnel escuro",
-    "Túnel oscuro"
+  "Rock by Goron City": [
+    "Rocha perto da Cidade Goron",
+    "Roca junto a la Ciudad Goron"
   ],
   "Darunia gives it after you defeat King Dodongo.": [
     "Darunia entrega depois que você derrota o King Dodongo.",
@@ -951,9 +947,9 @@
     "Dead Hand",
     "Dead Hand"
   ],
-  "Death Mountain Crater: Double Magic": [
-    "Cratera da Montanha da Morte: Magia Dupla",
-    "Cráter de la Montaña de la Muerte: Magia doble"
+  "Death Mountain Crater: Gift of Doubled Magic": [
+    "Cratera da Montanha da Morte: Dom da Magia Dobrada",
+    "Cráter de la Montaña de la Muerte: Don de la magia doble"
   ],
   "Death Mountain summit: Magic Meter + Din's Fire": [
     "Cume da Montanha da Morte: medidor de magia + Fogo de Din",
@@ -1039,9 +1035,9 @@
     "Rocha em forma de cúpula na cratera",
     "Roca en forma de cúpula en el cráter"
   ],
-  "Double Magic": [
-    "Magia Dupla",
-    "Magia doble"
+  "Gift of Doubled Magic": [
+    "Dom da Magia Dobrada",
+    "Don de la magia doble"
   ],
   "Dungeon Boss Key": [
     "Chave do chefe da masmorra",
@@ -1207,17 +1203,17 @@
     "Jogo dos sapos",
     "Juego de las ranas"
   ],
-  "From Biggoron. Come back after a few days to collect his sword.": [
-    "Entregue por Biggoron. Volte depois de alguns dias para buscar a espada dele.",
-    "Te lo da Biggoron. Vuelve al cabo de unos días para recoger su espada."
+  "From Biggoron. Wait three days (the Sun's Song speeds this up), then give it back to him for the sword.": [
+    "Entregue por Biggoron. Espere três dias (a Canção do Sol acelera) e devolva a ele para receber a espada.",
+    "Te lo da Biggoron. Espera tres días (la Canción del Sol lo acelera) y devuélveselo para recibir la espada."
   ],
   "From Biggoron. Take it to King Zora in Zora's Domain.": [
     "Entregue por Biggoron. Leve ao King Zora, no Domínio Zora.",
     "Te la da Biggoron. Llévasela al King Zora, en la Región de los Zora."
   ],
-  "From King Zora. Take it to the scientist at the Lakeside Laboratory before time runs out.": [
-    "Entregue pelo King Zora. Leve ao cientista do Laboratório do Lago antes que o tempo acabe.",
-    "Te la da el King Zora. Llévasela al científico del Laboratorio del Lago antes de que se acabe el tiempo."
+  "From King Zora. Take it to the scientist at the Lakeside Laboratory within 2 minutes 30 seconds. Warp songs end the timer.": [
+    "Entregue pelo Rei Zora. Leve ao cientista do Laboratório do Lago em até 2 minutos e 30 segundos. Canções de teletransporte encerram o tempo.",
+    "Te la da el rey Zora. Llévasela al científico del Laboratorio del Lago en menos de 2 minutos y 30 segundos. Las canciones de teletransporte acaban con el tiempo."
   ],
   "From the Bombchu Shop in Castle Town (open at night after King Dodongo), Bombchu Bowling, or the 40-token Skulltula reward.": [
     "Na Loja de Bombchus da Cidade do Castelo (aberta à noite depois do King Dodongo), no Boliche de Bombchu ou na recompensa de 40 fichas da Casa das Skulltulas.",
@@ -1227,9 +1223,9 @@
     "Entregue pela moça dos Cuccos em Kakariko, como adulto. Ele choca durante a noite.",
     "Te lo da la chica de los cucos de Kakariko, de adulto. Eclosiona durante la noche."
   ],
-  "From the Cucco Lady. Take it to the man in the Lost Woods.": [
-    "Entregue pela moça dos Cuccos. Leve ao homem do Bosque Perdido.",
-    "Te lo da la chica de los cucos. Llévaselo al hombre del Bosque Perdido."
+  "From the Cucco Lady. Take it to the man sleeping by the tree stump in the Lost Woods, first left from the entrance.": [
+    "Entregue pela Moça dos Cuccos. Leve ao homem que dorme junto ao toco de árvore no Bosque Perdido, na primeira à esquerda a partir da entrada.",
+    "Te lo da la mujer de los cucos. Llévaselo al hombre que duerme junto al tocón del Bosque Perdido, la primera a la izquierda desde la entrada."
   ],
   "From the Deku Babas around Kokiri Forest, or the Kokiri Shop.": [
     "Derrote as Deku Babas pela Floresta Kokiri ou compre na Loja Kokiri.",
@@ -1243,17 +1239,17 @@
     "Entregue pelo chefe dos carpinteiros no Vale Gerudo. Leve a Biggoron, no cume da Montanha da Morte.",
     "Te la da el jefe de los carpinteros del Valle Gerudo. Llévasela a Biggoron, en la cima de la Montaña de la Muerte."
   ],
-  "From the Lakeside Laboratory scientist. Take them to Biggoron before time runs out.": [
-    "Entregue pelo cientista do Laboratório do Lago. Leve a Biggoron antes que o tempo acabe.",
-    "Te las da el científico del Laboratorio del Lago. Llévaselas a Biggoron antes de que se acabe el tiempo."
+  "From the Lakeside Laboratory scientist. Take them to Biggoron within 3 minutes 30 seconds. Warp songs end the timer.": [
+    "Entregue pelo cientista do Laboratório do Lago. Leve a Biggoron em até 3 minutos e 30 segundos. Canções de teletransporte encerram o tempo.",
+    "Te las da el científico del Laboratorio del Lago. Llévaselas a Biggoron en menos de 3 minutos y 30 segundos. Las canciones de teletransporte acaban con el tiempo."
   ],
-  "From the man in the Lost Woods. Take it to the old woman in Kakariko's Potion Shop before it spoils.": [
-    "Entregue pelo homem do Bosque Perdido. Leve à velha da Loja de Poções de Kakariko antes que estrague.",
-    "Te lo da el hombre del Bosque Perdido. Llévaselo a la anciana de la tienda de pociones de Kakariko antes de que se estropee."
+  "From the man in the Lost Woods. Take it to Granny behind Kakariko's Potion Shop within 4 minutes. Warp songs end the timer.": [
+    "Entregue pelo homem do Bosque Perdido. Leve à vovó nos fundos da Loja de Poções de Kakariko em até 4 minutos. Canções de teletransporte encerram o tempo.",
+    "Te lo da el hombre del Bosque Perdido. Llévaselo a la abuela de la parte trasera de la tienda de pociones de Kakariko en menos de 4 minutos. Las canciones de teletransporte acaban con el tiempo."
   ],
-  "From the old woman in the Potion Shop. Take it to the girl in the Lost Woods.": [
-    "Entregue pela velha da Loja de Poções. Leve à garota do Bosque Perdido.",
-    "Te la da la anciana de la tienda de pociones. Llévasela a la chica del Bosque Perdido."
+  "From Granny at the Potion Shop. Take it to Fado, who now waits where the man was in the Lost Woods.": [
+    "Entregue pela vovó da Loja de Poções. Leve a Fado, que agora espera onde estava o homem no Bosque Perdido.",
+    "Te la da la abuela de la tienda de pociones. Llévasela a Fado, que ahora espera donde estaba el hombre en el Bosque Perdido."
   ],
   "Frozen bridge pillar": [
     "Pilar da ponte congelada",
@@ -1287,9 +1283,9 @@
     "Guardas Gerudo (celas dos carpinteiros)",
     "Guardias gerudo (celdas de los carpinteros)"
   ],
-  "Gerudo Membership Card": [
-    "Cartão de Membro Gerudo",
-    "Pase de miembro gerudo"
+  "Gerudo Pass": [
+    "Passe Gerudo",
+    "Pase gerudo"
   ],
   "Gerudo Thief": [
     "Ladra Gerudo",
@@ -1315,9 +1311,9 @@
     "Entregue na Fortaleza Gerudo depois que você liberta os quatro carpinteiros.",
     "Te lo dan en la Fortaleza Gerudo cuando liberas a los cuatro carpinteros."
   ],
-  "Given or sold in Goron City once you've stopped the rolling Goron as an adult.": [
-    "Dada ou vendida na Cidade Goron depois que você para o Goron que rola, como adulto.",
-    "Te la dan o te la venden en la Ciudad Goron cuando detienes al Goron que rueda, de adulto."
+  "Stop the rolling Goron in Goron City as an adult (a Bomb works) and he gives it to you. The Goron shop also sells it for 600 Rupees.": [
+    "Pare o Goron que rola na Cidade Goron como adulto (uma Bomba resolve) e ele te dá a túnica. A loja Goron também vende por 600 Rupias.",
+    "Detén al Goron que rueda en la Ciudad Goron de adulto (sirve una bomba) y te la da. La tienda Goron también la vende por 600 Rupias."
   ],
   "Glass Truth": [
     "Lente da Verdade",
@@ -1343,7 +1339,7 @@
     "Manoplas de Ouro",
     "Guanteletes de oro"
   ],
-  "Goron's Bracelet": [
+  "Goron Bracelet": [
     "Bracelete Goron",
     "Brazalete goron"
   ],
@@ -1383,13 +1379,13 @@
     "Mapa da Grande Árvore Deku",
     "Mapa del Gran Árbol Deku"
   ],
-  "Great Fairy: Double Defense": [
-    "Grande Fada: Defesa Dupla",
-    "Gran Hada: Defensa doble"
+  "Great Fairy: Gift of Halved Damage": [
+    "Grande Fada: Dom do Dano Reduzido pela Metade",
+    "Gran Hada: Don del daño reducido a la mitad"
   ],
-  "Great Fairy: double magic": [
-    "Grande Fada: Magia Dupla",
-    "Gran Hada: Magia doble"
+  "Great Fairy: Gift of Doubled Magic": [
+    "Grande Fada: Dom da Magia Dobrada",
+    "Gran Hada: Don de la magia doble"
   ],
   "Great Fairy: Farore's Wind": [
     "Grande Fada: Vento de Farore",
@@ -1403,9 +1399,9 @@
     "Grande Fada: Amor de Nayru",
     "Gran Hada: Amor de Nayru"
   ],
-  "Great Fairy: Spin Attack": [
-    "Grande Fada: Ataque Giratório",
-    "Gran Hada: Ataque giratorio"
+  "Great Fairy: Gift of Improved Spin": [
+    "Grande Fada: Dom do Giro Aprimorado",
+    "Gran Hada: Don del giro mejorado"
   ],
   "Great Moblin": [
     "Moblin gigante",
@@ -1479,7 +1475,7 @@
     "Recipiente de coração (Barinade)",
     "Contenedor de corazón (Barinade)"
   ],
-  "Heart Container (Bongo)": [
+  "Heart Container (Bongo Bongo)": [
     "Recipiente de coração (Bongo Bongo)",
     "Contenedor de corazón (Bongo Bongo)"
   ],
@@ -1543,9 +1539,9 @@
     "Gancho, bombas, Arco das Fadas, Lente da Verdade e Túnica Goron",
     "Gancho, bombas, Arco de las hadas, Lupa de la Verdad y Túnica goron"
   ],
-  "Horseback archery - 1,000 points": [
-    "Tiro a cavalo - 1.000 pontos",
-    "Tiro con arco a caballo - 1.000 puntos"
+  "Horseback archery - 750 points": [
+    "Tiro a cavalo - 750 pontos",
+    "Tiro con arco a caballo - 750 puntos"
   ],
   "House by the mountain gate": [
     "Casa junto ao portão da montanha",
@@ -1583,9 +1579,9 @@
     "Castelo de Hyrule (fora do Castelo de Ganon)",
     "Castillo de Hyrule (fuera del Castillo de Ganon)"
   ],
-  "Hyrule Castle grounds (child): Enhanced (charged) Spin Attack": [
-    "Arredores do Castelo de Hyrule (criança): Ataque Giratório Aprimorado (carregado)",
-    "Exterior del Castillo de Hyrule (niño): Ataque giratorio mejorado (cargado)"
+  "Hyrule Castle grounds (child): Gift of Improved Spin": [
+    "Arredores do Castelo de Hyrule (criança): Dom do Giro Aprimorado",
+    "Exterior del Castillo de Hyrule (niño): Don del giro mejorado"
   ],
   "Hyrule Field (near Gerudo Valley)": [
     "Campo de Hyrule (perto do Vale Gerudo)",
@@ -1627,13 +1623,13 @@
     "Num baú da Caverna dos Dodongos.",
     "En un cofre de la Cueva de los Dodongos."
   ],
-  "In a chest in Kokiri Forest's training area, through the small crawlspace.": [
-    "Num baú na área de treino da Floresta Kokiri, passando pela pequena passagem estreita.",
-    "En un cofre de la zona de entrenamiento del Bosque Kokiri, pasando por el pequeño hueco por el que hay que gatear."
+  "In a chest on a raised platform in Kokiri Forest's training area. Time your jumps to reach it.": [
+    "Num baú sobre uma plataforma elevada na área de treino da Floresta Kokiri. Acerte o tempo dos pulos para chegar lá.",
+    "En un cofre sobre una plataforma elevada de la zona de entrenamiento del Bosque Kokiri. Calcula bien los saltos para llegar."
   ],
-  "In a chest in one of the graveyard's graves, or sold in Castle Town.": [
-    "Num baú dentro de um dos túmulos do cemitério, ou à venda na Cidade do Castelo.",
-    "En un cofre dentro de una de las tumbas del cementerio, o a la venta en la Ciudadela."
+  "In a chest in one of the graveyard's graves, as a child. Castle Town's shop sells it for 80 Rupees, or 60 once you've shown Zelda's Letter to the guard at Kakariko's gate.": [
+    "Num baú dentro de um dos túmulos do cemitério, como criança. A loja da Cidade do Castelo vende por 80 Rupias, ou 60 depois que você mostra a Carta de Zelda ao guarda do portão de Kakariko.",
+    "En un cofre dentro de una de las tumbas del cementerio, de niño. La tienda de la Ciudadela lo vende por 80 Rupias, o 60 después de enseñar la Carta de Zelda al guardia de la puerta de Kakariko."
   ],
   "In a chest in the Fire Temple.": [
     "Num baú do Templo do Fogo.",
@@ -1695,9 +1691,9 @@
     "No Castelo de Ganon, no caminho de subida da torre.",
     "En el Castillo de Ganon, en la subida de la torre."
   ],
-  "In Gerudo Fortress, as an adult with the Gerudo Membership Card. Finished when you get the Ice Arrows.": [
-    "Na Fortaleza Gerudo, como adulto e com o Cartão de Membro Gerudo. Termina quando você obtém as Flechas de Gelo.",
-    "En la Fortaleza Gerudo, de adulto y con el pase de miembro gerudo. Termina cuando consigues las Flechas de Hielo."
+  "In Gerudo Fortress, as an adult with the Gerudo Pass. Finished when you get the Ice Arrows.": [
+    "Na Fortaleza Gerudo, como adulto e com o Passe Gerudo. Termina quando você pega as Flechas de Gelo.",
+    "En la Fortaleza Gerudo, de adulto y con el pase gerudo. Termina cuando consigues las flechas de hielo."
   ],
   "In Kakariko: learn the Song of Storms in the windmill as an adult, then play it there as a child to drain the well.": [
     "Em Kakariko, aprenda a Canção das Tempestades com o músico do moinho quando adulto. Volte ao moinho como criança e toque a canção para esvaziar o poço.",
@@ -1707,17 +1703,17 @@
     "Na Barriga de Jabu-Jabu.",
     "En el Interior de Jabu-Jabu."
   ],
-  "In the basement, behind a web in a dusty passage. Burn the web to reach it.": [
-    "No subsolo, atrás de uma teia numa passagem empoeirada. Queime a teia para alcançá-la.",
-    "En el sótano, detrás de una telaraña en un pasillo polvoriento. Quema la telaraña para llegar."
+  "In the basement, in the small room south of the elevator, past a Skulltula. If a wall blocks it, turn the basement walls until it opens.": [
+    "No subsolo, na salinha ao sul do elevador, depois de uma Skulltula. Se uma parede bloquear, gire as paredes do subsolo até abrir.",
+    "En el sótano, en la salita al sur del ascensor, tras una Skulltula. Si una pared la tapa, gira las paredes del sótano hasta que se abra."
   ],
   "In the basement, next to the grate covered by a spider web.": [
     "No subsolo, ao lado da grade coberta por uma teia de aranha.",
     "En el sótano, junto a la reja cubierta por una telaraña."
   ],
-  "In the basement's back room: burn the web, bomb the wall behind it and fetch the token with the Boomerang.": [
-    "Na sala dos fundos do subsolo: queime a teia, exploda a parede atrás dela e pegue a ficha com o bumerangue.",
-    "En la sala trasera del sótano: quema la telaraña, vuela la pared que hay detrás y recoge la ficha con el bumerán."
+  "In the basement's back room: burn the web with a lit Deku Stick, then shoot it off the vines at the back with the Slingshot and climb up.": [
+    "Na sala dos fundos do subsolo: queime a teia com um Graveto Deku aceso, derrube-a das trepadeiras do fundo com o estilingue e suba.",
+    "En la sala trasera del sótano: quema la telaraña con un palo deku encendido, derríbala de las enredaderas del fondo con el tirachinas y sube."
   ],
   "In the Bottom of the Well.": [
     "No Fundo do Poço.",
@@ -1763,9 +1759,9 @@
     "No baú grande do Templo da Floresta.",
     "En el cofre grande del Templo del Bosque."
   ],
-  "In the fountain behind a boulder near Hyrule Castle, as a child. Play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 50 Rupees.": [
-    "Na fonte atrás de uma rocha perto do Castelo de Hyrule, como criança. Toque a Canção de Ninar da Zelda. Ela só aparece depois que você obtém o Fogo de Din. Ela cobra 50 Rupias.",
-    "En la fuente detrás de una roca cerca del Castillo de Hyrule, de niño. Toca la Nana de Zelda. Solo aparece cuando ya tienes el Fuego de Din. Cobra 50 Rupias."
+  "In the fountain behind a cracked rock wall near Hyrule Castle, as a child. Bomb the wall and play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 50 Rupees.": [
+    "Na fonte atrás de uma parede de rocha rachada perto do Castelo de Hyrule, como criança. Exploda a parede e toque a Canção de Ninar da Zelda. Ela só aparece depois que você obtém o Fogo de Din. Ela cobra 50 Rupias.",
+    "En la fuente detrás de una pared de roca agrietada cerca del Castillo de Hyrule, de niño. Vuela la pared y toca la Nana de Zelda. Solo aparece cuando ya tienes el Fuego de Din. Cobra 50 Rupias."
   ],
   "In the fountain behind a cracked wall at the Desert Colossus. Play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 300 Rupees.": [
     "Na fonte atrás de uma parede rachada no Colosso do Deserto. Toque a Canção de Ninar da Zelda. Ela só aparece depois que você obtém o Fogo de Din. Ela cobra 300 Rupias.",
@@ -1783,9 +1779,9 @@
     "Na fonte atrás da parede rachada no cume da Montanha da Morte. Toque a Canção de Ninar da Zelda. Ela concede a magia e o Fogo de Din. Ela cobra 25 Rupias.",
     "En la fuente detrás de la pared agrietada en la cima de la Montaña de la Muerte. Toca la Nana de Zelda. Te concede la magia y el Fuego de Din. Cobra 25 Rupias."
   ],
-  "In the fountain outside Ganon's Castle, behind a huge rock the Golden Gauntlets lift. Play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 500 Rupees.": [
-    "Na fonte do lado de fora do Castelo de Ganon, atrás de uma rocha enorme que as Manoplas de Ouro levantam. Toque a Canção de Ninar da Zelda. Ela só aparece depois que você obtém o Fogo de Din. Ela cobra 500 Rupias.",
-    "En la fuente fuera del Castillo de Ganon, detrás de una roca enorme que levantan los guanteletes de oro. Toca la Nana de Zelda. Solo aparece cuando ya tienes el Fuego de Din. Cobra 500 Rupias."
+  "In the fountain outside Ganon's Castle, behind the black-and-gold pillar to the right of the entrance. The Golden Gauntlets lift it. Play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 500 Rupees.": [
+    "Na fonte do lado de fora do Castelo de Ganon, atrás do pilar preto e dourado à direita da entrada. As Manoplas de Ouro levantam o pilar. Toque a Canção de Ninar da Zelda. Ela só aparece depois que você obtém o Fogo de Din. Ela cobra 500 Rupias.",
+    "En la fuente fuera del Castillo de Ganon, detrás del pilar negro y dorado a la derecha de la entrada. Los guanteletes de oro lo levantan. Toca la Nana de Zelda. Solo aparece cuando ya tienes el Fuego de Din. Cobra 500 Rupias."
   ],
   "In the frozen Zora's Fountain, as an adult. Finished when you get the Iron Boots.": [
     "Na Fonte Zora congelada, como adulto. Termina quando você obtém as Botas de Ferro.",
@@ -1803,9 +1799,9 @@
     "Na Caverna de Gelo, guardando as Botas de Ferro.",
     "En la Caverna de Hielo, custodiando las botas de hierro."
   ],
-  "In the ivy-covered room after the pool room. Hookshot.": [
-    "Na sala coberta de hera depois da sala da piscina. Use o gancho.",
-    "En la sala cubierta de hiedra después de la sala de la piscina. Usa el gancho."
+  "After the Boss Key, drop to the balcony over the west courtyard with the well. Follow the ledge south past a door and around the corner. Hookshot.": [
+    "Depois da Chave do Chefe, desça até a varanda sobre o pátio oeste com o poço. Siga a borda para o sul, passe por uma porta e vire a esquina. Gancho.",
+    "Tras la llave del jefe, baja al balcón sobre el patio oeste del pozo. Sigue la cornisa hacia el sur, pasa una puerta y dobla la esquina. Gancho."
   ],
   "In the ruins of Ganon's Castle, the final battle.": [
     "Nas ruínas do Castelo de Ganon, a batalha final.",
@@ -1823,9 +1819,9 @@
     "No baú grande do Templo das Sombras.",
     "En el cofre grande del Templo de las Sombras."
   ],
-  "In the small side room off the first floor's south-east corner.": [
-    "Na pequena sala lateral no canto sudeste do primeiro andar.",
-    "En la pequeña sala lateral de la esquina sureste del primer piso."
+  "In the hallway east of the entrance hall, behind the cracked wall where Baby Dodongos come out. Bomb it, or let a Baby Dodongo blow it up.": [
+    "No corredor a leste do salão de entrada, atrás da parede rachada de onde saem os Bebês Dodongo. Exploda-a com uma bomba ou deixe um Bebê Dodongo explodir nela.",
+    "En el pasillo al este del vestíbulo, detrás de la pared agrietada de donde salen los Bebés Dodongo. Vuélala con una bomba o deja que un Bebé Dodongo explote junto a ella."
   ],
   "In the Spirit Temple, found by young Link on the child side.": [
     "No Templo dos Espíritos, encontrado por Link criança no lado infantil.",
@@ -1915,9 +1911,9 @@
     "Iron Knuckle (Nabooru)",
     "Iron Knuckle (Nabooru)"
   ],
-  "Ivy room": [
-    "Sala da hera",
-    "Sala de la hiedra"
+  "West courtyard balcony": [
+    "Varanda do pátio oeste",
+    "Balcón del patio oeste"
   ],
   "Jo, Second Born": [
     "Jo, a segunda irmã",
@@ -1931,9 +1927,9 @@
     "Keese",
     "Keese"
   ],
-  "King Zora gives it as an adult once you thaw him with Blue Fire.": [
-    "O King Zora entrega, quando você é adulto, depois que você o descongela com o Fogo Azul.",
-    "El King Zora te lo da de adulto, después de descongelarlo con el Fuego Azul."
+  "King Zora gives it as an adult once you thaw him with Blue Fire. The Zora shop also sells it for 600 Rupees.": [
+    "O Rei Zora te dá quando você, como adulto, o descongela com o Fogo Azul. A loja Zora também vende por 600 Rupias.",
+    "El rey Zora te la da de adulto cuando lo descongelas con el fuego azul. La tienda Zora también la vende por 600 Rupias."
   ],
   "King Zora moved (show him Ruto's Letter)": [
     "King Zora afastado (mostre a Carta de Ruto)",
@@ -2131,9 +2127,9 @@
     "Caixote da gruta do pântano",
     "Caja de la gruta del pantano"
   ],
-  "Maze dead end": [
-    "Beco sem saída do labirinto",
-    "Callejón sin salida del laberinto"
+  "Wall before the stairs": [
+    "Parede antes da escadaria",
+    "Pared antes de la escalinata"
   ],
   "meeting Zelda": [
     "conhecer Zelda",
@@ -2151,9 +2147,9 @@
     "Jogo de memória com a ocarina",
     "Juego de memoria con la ocarina"
   ],
-  "Mesh walkway": [
-    "Passarela de grade",
-    "Pasarela de rejilla"
+  "Under the central platform": [
+    "Sob a plataforma central",
+    "Bajo la plataforma central"
   ],
   "Metal fence": [
     "Cerca de metal",
@@ -2215,9 +2211,9 @@
     "Cogumelo Estranho",
     "Hongo raro"
   ],
-  "Odd Potion": [
-    "Poção Estranha",
-    "Poción rara"
+  "Odd Poultice": [
+    "Cataplasma Estranho",
+    "Cataplasma rara"
   ],
   "On a high ledge in the east courtyard. Play the Scarecrow's Song and Hookshot to the scarecrow.": [
     "Numa plataforma alta no pátio leste. Toque a Canção do Espantalho e use o gancho para chegar até o espantalho.",
@@ -2243,9 +2239,9 @@
     "No primeiro subsolo, no alto da parede de trepadeiras que leva a uma sala com três vasos.",
     "En el primer sótano, en lo alto de la pared de enredaderas que lleva a una sala con tres vasijas."
   ],
-  "On the first floor: push the block away from the cracked wall, bomb it open and find the Skulltula on the back wall.": [
-    "No primeiro andar: empurre o bloco para longe da parede rachada, exploda a parede e encontre a Skulltula na parede do fundo.",
-    "En el primer piso: aparta el bloque de la pared agrietada, vuela la pared y encuentra la Skulltula en la pared del fondo."
+  "Past the giant skull's mouth: push the fallen block against the cracked wall, bomb the wall and climb in. It hides behind an Armos statue.": [
+    "Depois da boca da caveira gigante: empurre o bloco que caiu até a parede rachada, exploda a parede e suba. Ela se esconde atrás de uma estátua Armos.",
+    "Pasada la boca de la calavera gigante: empuja el bloque caído hasta la pared agrietada, vuela la pared y sube. Se esconde tras una estatua Armos."
   ],
   "On the middle floor, in the room behind a cracked wall where the Shell Blades are. Break the wall to get in.": [
     "No andar do meio, na sala dos Shell Blades atrás de uma parede rachada. Quebre a parede para entrar.",
@@ -2271,13 +2267,13 @@
     "Na parede da sala iluminada por tochas onde fica o Like Like. Use o bumerangue.",
     "En la pared de la sala iluminada con antorchas donde está el Like Like. Usa el bumerán."
   ],
-  "On top of a vine-wrapped pillar in a passage on the second floor.": [
-    "No topo de um pilar coberto de trepadeiras numa passagem do segundo andar.",
-    "En lo alto de un pilar cubierto de enredaderas en un pasillo del segundo piso."
+  "In the big room before the boss, on the vines behind the tall pillar. Boomerang or Slingshot.": [
+    "Na sala grande antes do chefe, nas trepadeiras atrás do pilar alto. Bumerangue ou estilingue.",
+    "En la sala grande antes del jefe, en las enredaderas detrás del pilar alto. Bumerán o tirachinas."
   ],
-  "Outside Ganon's Castle (adult): Double Defense (halved damage)": [
-    "Fora do Castelo de Ganon (adulto): Defesa Dupla (metade do dano)",
-    "Fuera del Castillo de Ganon (adulto): Defensa doble (daño reducido a la mitad)"
+  "Outside Ganon's Castle (adult): Gift of Halved Damage": [
+    "Fora do Castelo de Ganon (adulto): Dom do Dano Reduzido pela Metade",
+    "Fuera del Castillo de Ganon (adulto): Don del daño reducido a la mitad"
   ],
   "Paradox of the chest from the past": [
     "O paradoxo do baú do passado",
@@ -2563,9 +2559,9 @@
     "Faça 1.000 pontos no tiro a cavalo das Gerudo, montado em Epona.",
     "Consigue 1.000 puntos en el tiro con arco a caballo de las gerudo, a lomos de Epona."
   ],
-  "Score high at the Gerudo horseback archery range. Whichever quiver upgrade you get second is the biggest.": [
-    "Faça uma pontuação alta no tiro a cavalo das Gerudo. A segunda melhoria de aljava que você ganhar é a maior.",
-    "Consigue una puntuación alta en el tiro con arco a caballo de las gerudo. La segunda mejora de carcaj que consigas es la más grande."
+  "Score 1,400 points at the Gerudo horseback archery range. Whichever quiver upgrade you get second is the biggest.": [
+    "Faça 1.400 pontos no tiro a cavalo dos Gerudo. A segunda melhoria de aljava que você obtiver é a maior.",
+    "Consigue 1.400 puntos en el tiro con arco a caballo de las gerudo. La segunda mejora de carcaj que consigas es la más grande."
   ],
   "Serenade of Water": [
     "Serenata da Água",
@@ -2679,9 +2675,9 @@
     "Telhadinho atrás da casa de Impa",
     "Tejadillo detrás de la casa de Impa"
   ],
-  "Smash the pile of rocks with the Megaton Hammer.": [
-    "Quebre a pilha de rochas com o Martelo Megaton.",
-    "Rompe el montón de rocas con el Martillo Megatón."
+  "Break the statue blocking the door in the lower right of the entrance hall with the Megaton Hammer, then smash the big rock at the back of the room past it.": [
+    "Quebre com o Martelo Megaton a estátua que bloqueia a porta no canto inferior direito do salão de entrada e destrua a rocha grande no fundo da sala seguinte.",
+    "Rompe con el Martillo Megatón la estatua que tapa la puerta abajo a la derecha del vestíbulo y destroza la roca grande al fondo de la sala siguiente."
   ],
   "Snowfield cave": [
     "Caverna do campo de neve",
@@ -2747,13 +2743,13 @@
     "Vendida por Medigoron na Cidade Goron, para Link adulto.",
     "La vende Medigoron en la Ciudad Goron, a Link adulto."
   ],
-  "Sold by the Bean Seller in Zora's River.": [
-    "Vendidos pelo vendedor de feijões no Rio Zora.",
-    "Las vende el vendedor de judías en el Río Zora."
+  "Sold by the Bean Seller in Zora's River. The first costs 10 Rupees and each one after costs 10 more.": [
+    "Vendido pelo Vendedor de Feijões no Rio Zora. O primeiro custa 10 Rupias e cada um depois custa 10 a mais.",
+    "Lo vende el vendedor de judías del Río Zora. La primera cuesta 10 Rupias y cada una de las siguientes, 10 más."
   ],
-  "Sold in the Kokiri Shop.": [
-    "Vendido na Loja Kokiri.",
-    "Se vende en la tienda kokiri."
+  "Sold in the Kokiri Shop for 40 Rupees.": [
+    "À venda na Loja Kokiri por 40 Rupias.",
+    "A la venta en la tienda Kokiri por 40 Rupias."
   ],
   "Song of Storms": [
     "Canção das Tempestades",
@@ -2875,9 +2871,9 @@
     "O prêmio de adulto do lago de pesca perto do Lago Hylia.",
     "El premio de adulto del estanque de pesca junto al Lago Hylia."
   ],
-  "The adult trading quest, from the Cucco Lady's Pocket Egg to Biggoron's Sword.": [
-    "Como adulto, pegue o Ovo de Bolso com a moça dos Cuccos em Kakariko. Siga a sequência de trocas até receber a Espada de Biggoron.",
-    "De adulto, consigue el Huevo de Bolsillo de la chica de los cucos en Kakariko. Sigue la cadena de intercambios hasta recibir la Espada de Biggoron."
+  "The adult trading quest, from the Cucco Lady's Pocket Egg to the Biggoron Sword. Win Epona and thaw King Zora first.": [
+    "A troca de itens do adulto, do Ovo de Bolso da Moça dos Cuccos até a Espada de Biggoron. Antes, conquiste Epona e descongele o Rei Zora.",
+    "La cadena de intercambios de adulto, del huevo de bolsillo de la mujer de los cucos a la Espada de Biggoron. Antes, consigue a Epona y descongela al rey Zora."
   ],
   "The Cucco Lady in Kakariko gives it once you've brought all seven Cuccos back to her pen.": [
     "A moça dos Cuccos em Kakariko entrega depois que você leva os sete Cuccos de volta ao cercado dela.",
@@ -2923,9 +2919,9 @@
     "Entregue pela Grande Fada do cume da Montanha da Morte. Ela é a primeira Grande Fada que você pode encontrar.",
     "Te lo da la Gran Hada de la cima de la Montaña de la Muerte. Es la primera Gran Hada que puedes encontrar."
   ],
-  "The Happy Mask Shop lends it once you've paid for the Bunny Hood.": [
-    "A Loja de Máscaras empresta depois que você paga pelo Capuz de Coelho.",
-    "La tienda de máscaras te la presta cuando has pagado la Capucha de conejo."
+  "The Happy Mask Shop lends it once you've paid for the Bunny Hood. The Goron, Zora and Gerudo Masks unlock with it.": [
+    "A Loja de Máscaras da Felicidade empresta depois que você paga pelo Capuz de Coelho. As Máscaras Goron, Zora e Gerudo são liberadas junto.",
+    "La tienda de máscaras felices te la presta cuando pagas la capucha de conejo. Las máscaras Goron, Zora y Gerudo se desbloquean a la vez."
   ],
   "The lost puppy": [
     "O cachorrinho perdido",
@@ -2979,9 +2975,9 @@
     "o Templo das Sombras concluído",
     "el Templo de las Sombras completado"
   ],
-  "the six songs the frogs want": [
-    "as seis canções que os sapos querem",
-    "las seis canciones que quieren las ranas"
+  "the five songs the frogs want": [
+    "as cinco canções que os sapos querem",
+    "las cinco canciones que quieren las ranas"
   ],
   "the Spirit Temple cleared": [
     "o Templo dos Espíritos concluído",
@@ -3071,9 +3067,9 @@
     "Telhado superior",
     "Tejado superior"
   ],
-  "Village square tree": [
-    "Árvore da praça da vila",
-    "Árbol de la plaza de la aldea"
+  "Tree by the entrance": [
+    "Árvore da entrada",
+    "Árbol de la entrada"
   ],
   "Vine pillar": [
     "Pilar de trepadeiras",
@@ -3179,9 +3175,9 @@
     "Plataforma do pátio oeste",
     "Saliente del patio oeste"
   ],
-  "Where Hyrule Castle stood, as an adult with the Shadow and Spirit Medallions.": [
-    "Onde ficava o Castelo de Hyrule, como adulto e com os Medalhões das Sombras e dos Espíritos.",
-    "Donde se alzaba el Castillo de Hyrule, de adulto y con los Medallones de las Sombras y del Espíritu."
+  "Where Hyrule Castle stood, as an adult with all six Medallions.": [
+    "Onde ficava o Castelo de Hyrule, como adulto e com os seis Medalhões.",
+    "Donde se alzaba el Castillo de Hyrule, de adulto y con los seis Medallones."
   ],
   "Whirlpool river": [
     "Rio dos redemoinhos",
@@ -3215,9 +3211,9 @@
     "Wolfos",
     "Wolfos"
   ],
-  "World's Finest Eye Drops": [
-    "Colírio Mais Fino do Mundo",
-    "Gotas más finas del mundo"
+  "Specialty Eye Drops": [
+    "Colírio Especial",
+    "Colirio especial"
   ],
   "You start the game wearing it.": [
     "Você já começa o jogo vestindo.",
@@ -3266,5 +3262,9 @@
   "Zora's Sapphire": [
     "Safira Zora",
     "Zafiro Zora"
+  ],
+  "In Dodongo's Cavern: the pair that locks you in the arena above the lava.": [
+    "Na Caverna dos Dodongos: a dupla que tranca você na arena sobre a lava.",
+    "En la Caverna de los Dodongos: la pareja que te encierra en la arena sobre la lava."
   ]
 }

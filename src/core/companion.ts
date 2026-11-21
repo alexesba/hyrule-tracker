@@ -74,7 +74,7 @@ const bestShot = {
   shooting_adult: 'MiniGame_HitTarget_Kakariko_BestScore',
   archery_750: 'MiniGame_HorsebackArchery_BestScore',
 };
-const enemyName = (actor: string) => ({
+export const enemyName = (actor: string) => ({
   Enemy_DungeonBoss_Dodongo: 'King Dodongo', Enemy_Bubble_Green_Big: 'Giant Green Bubble',
   Enemy_MiddleBoss_Poe_Meg: 'Meg', Enemy_Stalfos_Weak: 'Stalfos (Forest Temple)',
   Enemy_Stalfos_ShadowTemple: 'Stalfos (Shadow Temple)', Enemy_Moblin_Club: 'Great Moblin',
@@ -268,6 +268,14 @@ export const RUPEES = murmur3('PlayerStatus.CurrentRupee');
  * Live mode keeps the save's value: the live tables hold no UInt records.
  */
 export const PLAY_TIME = 0xe573f564;
+/**
+ * Lifetime totals the game keeps in each slot (Int64, names unknown). Found by Kabosune with a
+ * save diff (4 jumps, 5 swings, 6 rolls and nothing else); see docs/save-format.md.
+ * Live mode reads them from the game's Int64 table like the other Int64 keys.
+ */
+export const ACTION_TOTALS = { jumps: 0xa6454431, rolls: 0x4ac3ff5d, swings: 0x2a24450a } as const;
+const int64 = (value: Value | undefined) =>
+  typeof value === 'bigint' && value >= 0n && value <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(value) : null;
 export function companionProgress(data: CompanionData, save: GameDataFile) {
   const get = (name: string) => save.entries.get(murmur3(name))?.value;
   const getKey = (key: number) => numeric(save.entries.get(key)?.value);
@@ -275,6 +283,9 @@ export function companionProgress(data: CompanionData, save: GameDataFile) {
   return {
     rupees: getKey(RUPEES),
     playSeconds: getKey(PLAY_TIME),
+    jumps: int64(save.entries.get(ACTION_TOTALS.jumps)?.value),
+    rolls: int64(save.entries.get(ACTION_TOTALS.rolls)?.value),
+    swings: int64(save.entries.get(ACTION_TOTALS.swings)?.value),
     enemies: counters.length ? counters.reduce((sum, n) => sum + n, 0) : null,
     visited: Object.keys(LOCAL_NAMES).filter(stage => get('IsVisitLocation.' + stage) === true),
     maskSales: maskSales(get),

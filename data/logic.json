@@ -339,7 +339,7 @@
     "Prelude": "Ocarina and Song_Prelude",
     "ScarecrowSong": "Ocarina and Song_Scarecrow",
     "Epona": "EponaOwned and EponasSong",
-    "FrogSongs": "ZeldasLullaby and EponasSong and SariasSong and SunsSong and SongOfTime and SongOfStorms",
+    "FrogSongs": "ZeldasLullaby and EponasSong and SariasSong and SunsSong and SongOfTime",
     "BeanRide": "adult and MagicBean",
     "WaterTempleGear": "IronBoots and ZoraTunic and Hookshot",
     "FireTempleGear": "GoronTunic",
@@ -376,7 +376,7 @@
     "HookshotItem": "Hookshot",
     "Longshot": "Longshot",
     "Hammer": "Megaton Hammer",
-    "GoronsBracelet": "Goron's Bracelet",
+    "GoronsBracelet": "Goron Bracelet",
     "SilverGauntlets": "Silver Gauntlets",
     "GoldenGauntlets": "Golden Gauntlets",
     "Bombs": "Bomb Bag",
@@ -396,8 +396,8 @@
     "OcarinaOfTime": "Ocarina of Time",
     "WeirdEgg": "Weird Egg",
     "ZeldasLetter": "Zelda's Letter",
-    "GerudoCard": "Gerudo Membership Card",
-    "ClaimCheck": "Claim Check",
+    "GerudoCard": "Gerudo Pass",
+    "ClaimCheck": "Biggoron Receipt",
     "KeatonMask": "Keaton Mask",
     "SkullMask": "Skull Mask",
     "SpookyMask": "Spooky Mask",
@@ -449,7 +449,7 @@
     "Hookshot": "Hookshot",
     "Explosives": "Bombs or Bombchus",
     "BlastOrSmash": "Bombs or the Megaton Hammer",
-    "Strength1": "Goron's Bracelet",
+    "Strength1": "Goron Bracelet",
     "Strength2": "Silver Gauntlets",
     "Strength3": "Golden Gauntlets",
     "DinsFire": "Din's Fire",
@@ -479,7 +479,7 @@
     "Prelude": "Prelude of Light",
     "ScarecrowSong": "Scarecrow's Song",
     "Epona": "Epona",
-    "FrogSongs": "the six songs the frogs want",
+    "FrogSongs": "the five songs the frogs want",
     "BeanRide": "Magic Beans (plant one as a child)",
     "WaterTempleGear": "Iron Boots, Zora Tunic and Hookshot",
     "FireTempleGear": "Goron Tunic",
@@ -787,7 +787,7 @@
       "note": "The Bombchu Bowling Alley opens only after King Dodongo."
     },
     "heart_pieces#14": {
-      "needs": "child or HoverBoots"
+      "needs": "(child and Explosives) or HoverBoots"
     },
     "heart_pieces#15": {
       "needs": "child or HoverBoots"
@@ -811,7 +811,7 @@
     },
     "heart_pieces#21": {
       "age": "adult",
-      "needs": "MagicBean or (ScarecrowSong and Hookshot)"
+      "needs": "MagicBean or (ScarecrowSong and Longshot)"
     },
     "heart_pieces#22": {
       "needs": "GoldenScale"
@@ -845,7 +845,7 @@
     },
     "heart_pieces#30": {
       "age": "adult",
-      "needs": "HoverBoots or (ScarecrowSong and Hookshot) or Longshot"
+      "needs": "ScarecrowSong and Longshot"
     },
     "heart_pieces#31": {
       "age": "adult",
@@ -861,12 +861,12 @@
     "heart_pieces#34": {
       "age": "child",
       "needs": "MasterSword and Explosives and StunScrub",
-      "note": "Read the password on the Fairy Note by the hole as adult, then buy it as a child for 100 Rupees."
+      "note": "Read the password on the fairy thought by the hole as adult, then buy it as a child for 100 Rupees."
     },
     "heart_pieces#35": {
       "age": "child",
       "needs": "MasterSword",
-      "note": "Read the Fairy Note as adult first; the chest is opened as a child."
+      "note": "Read the fairy thought as adult first; the chest is opened as a child."
     },
     "heart_pieces#36": {
       "age": "child",
@@ -1697,9 +1697,9 @@
       "needs": "SkullMask"
     },
     "capacity#13": {
-      "region": "Sacred Forest Meadow",
+      "region": "Lost Woods",
       "age": "child",
-      "needs": "SongOfStorms and StunScrub"
+      "needs": "Explosives and StunScrub"
     },
     "capacity#14": {
       "region": "Lost Woods",
@@ -1908,6 +1908,10 @@
       "age": "adult",
       "needs": "SpiritAdultSide and MirrorShield"
     },
+    "mini_bosses#11": {
+      "region": "Dodongo's Cavern",
+      "age": "child"
+    },
     "side_quests#1": {
       "region": "Lon Lon Ranch",
       "age": "adult",
@@ -2050,10 +2054,10 @@
       ],
       "sources": [
         {
-          "name": "the Sacred Forest Meadow storms grotto scrub",
-          "region": "Sacred Forest Meadow",
+          "name": "the Lost Woods grotto scrub",
+          "region": "Lost Woods",
           "age": "child",
-          "needs": "SongOfStorms and StunScrub"
+          "needs": "Explosives and StunScrub"
         },
         {
           "name": "the Deku Theater (Mask of Truth)",

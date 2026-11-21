@@ -258,6 +258,7 @@ function remoteApi() {
     getState: () => controller.state,
     getPrefs: () => settings.data.ui,
     pinSlot: (name: unknown) => (name === null || isString(name, 100)) ? controller.pinSlot(name) : undefined,
+    selectProfile: (id: unknown) => (id === null || isString(id, 64)) ? controller.selectProfile(id) : undefined,
     toggleManual: (id: unknown) => isString(id) ? controller.toggleManual(id) : undefined,
     setEasterEggFound: (id: unknown, found: unknown) => controller.setEasterEggFound(id, found),
     answerIdentify: (reqId: unknown, itemIds: unknown) => isString(reqId) && isStringArray(itemIds) ? controller.answerIdentify(reqId, itemIds) : undefined,
@@ -364,6 +365,7 @@ if (primaryInstance) app.whenReady().then(async () => {
     return settings.data.ui;
   });
   ipcMain.handle('slot:pin', (_e, name: unknown) => (name === null || isString(name, 100)) ? controller.pinSlot(name) : undefined);
+  ipcMain.handle('profile:select', (_e, id: unknown) => (id === null || isString(id, 64)) ? controller.selectProfile(id) : undefined);
   ipcMain.handle('manual:toggle', (_e, id: unknown) => isString(id) ? controller.toggleManual(id) : undefined);
   ipcMain.handle('easter-eggs:set', (_e, id: unknown, found: unknown) => controller.setEasterEggFound(id, found));
   ipcMain.handle('dev:set', (_e, on: unknown) => controller.setDevPanel(on === true));

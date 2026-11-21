@@ -16,6 +16,8 @@ export interface Settings {
   saveDir?: string;
   /** The save folder was picked by hand: don't replace it with an automatic scan. */
   manualSaveDir?: boolean;
+  /** Profile (32-hex folder name) picked by hand. Unset, or not in the current folder: the most recently played one. */
+  profile?: string;
   /** Language last chosen in the app (for the few texts main shows itself, like dialogs). */
   locale?: MainLocale;
   /** null = follow the most recently saved slot */

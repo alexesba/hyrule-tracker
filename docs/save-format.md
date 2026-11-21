@@ -85,3 +85,74 @@ and parameter files and the ExeFS, and keeps the ones whose Murmur3 hash is a sa
 Compound names (`IsGet.<actor>`, `PouchData.<actor>.StockNum`, `<Dungeon>.SmallKeyNum`)
 are built from parts already found. The result goes to `local/names.json` (gitignored).
 All 1,817 names that also appear in the OOT-SW2SE schema agree with it.
+
+## Totals in progress.sav: jumps, rolls, sword swings
+
+Found by [Kabosune](https://github.com/Kabosune/oot-remake-modding/blob/main/docs/zelda-notes.md)
+with a save diff (4 jumps, 5 sword swings and 6 rolls, nothing else, in one slot). Each slot
+keeps them as **Int64** fields; the names are unknown, so the tracker uses the hashes.
+
+| Hash | Type | Meaning |
+|---|---|---|
+| `0xA6454431` | Int64 | jumps |
+| `0x4AC3FF5D` | Int64 | rolls |
+| `0x2A24450A` | Int64 | sword swings |
+
+Checked here on 12 local saves from two save folders (game 1.1.1): all three are present in
+every slot with plausible, close values across the slots of one game (for example 1,454 to 1,457
+jumps). The diff itself was not repeated here. The tracker shows them on "My play data". Live, they come from the game's Int64 table
+([live-memory.md](live-memory.md)), which the tracker already reads; that path was not checked
+with the game running.
+
+## option.sav: the game's play log
+
+Also found and documented by Kabosune (the data behind Zelda Notes' "Today's Record"; the game
+writes it whether or not Zelda Notes is set up). `option.sav` sits next to the `slot_NN` folders,
+one per user, so the log covers every slot.
+
+| Hash | Type | Meaning |
+|---|---|---|
+| `0x5392E233` | Binary | events: 1,024 entries of 24 bytes, a ring buffer |
+| `0x25418E68` | Int | the next slot to write (the oldest entry once the ring is full) |
+| `0xE110CEB6` | Int | entries in use (at most 1,024) |
+| `0x3C99C416` | Binary | position trail: 1,024 × 16 bytes (not used by the tracker) |
+| `0x9B03CB4F` / `0xC2A3144C` | Int | the trail's next slot and count |
+
+Each event is `{u32 time, u32 kind, u32 name1, u32 name2, s32 value1, s32 value2}`, little-endian.
+The time is seconds since 1 January 2026, UTC. Actor names are **CRC32** of the actor name
+(`Player_Child`, `Enemy_Stalchild`, `Item_Melody_SunSong`); scene and event names are **Murmur3**
+(`HyruleField_Child`, `Dm_SY_Ocarina`).
+
+The tracker reads these kinds (Kabosune's table has the rest):
+
+| Kind | Event | Fields used |
+|---|---|---|
+| 1 | Link hurt | value2 = damage in quarter hearts |
+| 3 | enemy defeated | name1 = who defeated it, name2 = the enemy |
+| 17 | a file loaded | |
+| 25 | area change | name1 = from, name2 = to (scenes) |
+| 30 | a song played | name1 = `Item_Melody_*` |
+
+Checked here on 7 local `option.sav` files (game 1.1.1; two save folders, five of the files are
+earlier backups of one of them, so their logs overlap):
+
+- The layout check passes; both Binary fields have the sizes above, and the count was 1,024 in all.
+- Read from the next slot, the times never go back.
+- Every area change starts in the scene the previous one ended in (31 of 31).
+- Every kind 1 damage matched the drop in life of the next kind 39 entry (22 of 22).
+- With the names the tracker ships (enemy statues, chest items, the 13 songs, the checklist areas),
+  every song in these logs resolved, and every scene but one (`0x9EE9BA59`). Scenes without a
+  checklist area (houses, shops) and enemies without a statue are shown as "other places" /
+  "unidentified". A local `names.json` adds more actor names.
+- The defeated entries come from `Player_Child` (129 of 134), from an enemy that takes others with
+  it (a Peahat and its larvae, 2) or from 0 (3). The tracker counts all but the enemy ones. No kill
+  in these logs is by adult Link, so the name `Player_Adult` is assumed.
+
+How the tracker uses it ("Today's record"): per local day, enemies defeated by name, damage taken,
+songs played and an approximate time per area. The time between two entries goes to the area Link
+is in; gaps over 5 minutes are breaks; after a file loads the area is taken from the next area
+change's "from". 1,024 entries are not much: one test log covered 51 minutes (lots of talk and
+Z-targeting), another 10 hours. The page says which span the log covers.
+
+Not used: kind 26 (the game saved), kind 37 (hurt by the world; "likely" in Kabosune's table), kind 39
+(life and magic) and the position trail.

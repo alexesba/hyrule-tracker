@@ -19,12 +19,13 @@ describe('checklist.json', () => {
     const n = (id: string) => checklist.categories.find(c => c.id === id)!.items.length;
     expect([n('heart_pieces'), n('heart_containers'), n('gold_skulltulas'), n('songs'), n('equipment'), n('items'), n('masks'),
       n('bottles'), n('great_fairies'), n('capacity'), n('stones_medallions'), n('dungeons'), n('bosses'), n('mini_bosses'), n('side_quests')])
-      .toEqual([36, 8, 100, 13, 12, 27, 5, 5, 6, 14, 9, 12, 10, 10, 6]);
+      .toEqual([36, 8, 100, 13, 12, 27, 5, 5, 6, 14, 9, 12, 10, 11, 6]);
   });
   it('cleans doubled alt-text names', () => {
     expect(cleanName('Kokiri Sword Kokiri Sword')).toBe('Kokiri Sword');
     expect(cleanName('Heart Container (Gohma Gohma)')).toBe('Heart Container (Gohma)');
     expect(cleanName("Zelda's Lullaby")).toBe("Zelda's Lullaby");
+    expect(cleanName('Heart Container (Bongo Bongo)')).toBe('Heart Container (Bongo Bongo)');
     expect(slug("Lord Jabu-Jabu's Belly")).toBe('lord_jabu_jabus_belly');
   });
 });

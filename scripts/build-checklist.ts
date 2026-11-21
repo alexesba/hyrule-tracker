@@ -91,6 +91,7 @@ export function slug(s: string): string {
 /** Fix names doubled by image alt-text ("Kokiri Sword Kokiri Sword", "Heart Container (Gohma Gohma)"). */
 export function cleanName(s: string): string {
   let t = s.replace(/\s+/g, ' ').trim();
+  if (/\bBongo Bongo\b/.test(t)) return t; // the boss's real name repeats
   const words = t.split(' ');
   for (let n = Math.floor(words.length / 2); n >= 1; n--) {
     if (words.length === 2 * n && words.slice(0, n).join(' ') === words.slice(n).join(' ')) { t = words.slice(0, n).join(' '); break; }
