@@ -666,7 +666,7 @@ function MapCatDrawer({ open, onOpen, icon, name, children }: { open: boolean; o
 function StatusFilter({ show, onShow, total, left }: { show: MapBadgeStatus; onShow: (id: MapBadgeStatus) => void; total: number; left: number }) {
   return <div className="marker-filter" role="radiogroup" aria-label={t('Mostrar no mapa')}>
     {([['all', 'Todos', total], ['todo', 'Faltam', left], ['done', 'Coletados', total - left]] as const).map(([id, label, n]) =>
-      <button key={id} type="button" role="radio" aria-checked={show === id} className={`filter-${id}`} onClick={() => onShow(id)}>{t(label)} <b>{number(n)}</b></button>)}
+      <button key={id} type="button" role="radio" aria-checked={show === id} className={`filter-${id}`} onClick={() => onShow(id)}><span>{t(label)}</span><b>{number(n)}</b></button>)}
   </div>;
 }
 

@@ -468,8 +468,10 @@
 .map-cats-collapse path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .map-cats-collapse:hover { color: var(--hyrule-text); background: #26221e; }
 .map-cats .side-counters { margin: 0; border: 0; border-radius: 0; background: none; }
-.map-cats .marker-filter { display: flex; flex-direction: column; gap: 4px; margin: 0 8px 8px; }
-.map-cats .marker-filter button { display: flex; justify-content: space-between; width: 100%; text-align: left; }
+.map-cats .marker-filter { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; margin: 0 8px 8px; }
+.map-cats .marker-filter button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: auto; min-width: 0; padding: 6px 2px; font-size: 11.5px; text-align: center; line-height: 1.15; white-space: normal; }
+.map-cats .marker-filter button span { display: block; max-width: 100%; overflow-wrap: anywhere; }
+.map-cats .marker-filter button b { margin-left: 0; }
 .map-cats .era-tabs { margin: 8px 8px 8px; }
 .map-cats-rule { height: 1px; margin: 0; border: 0; background: var(--hyrule-line); }
 @media (max-width: 960px) {
