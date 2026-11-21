@@ -11,7 +11,7 @@ import { Minigames } from './Minigames';
 import { PageProgress } from './PageProgress';
 import { PageSkeleton } from './PageSkeleton';
 import { qrPath, qrTarget } from './qr';
-import { MAP_RAIL, regionBadges } from './mapCounts';
+import { regionCounts, type MapBadgeStatus } from './mapCounts';
 import { ZoomPan } from './ZoomPan';
 import { locatePlacement, type AtlasPlace as PositionPlace, type PlayerFix } from '../core/position';
 import atlas from '../../data/atlas.json';
@@ -624,12 +624,40 @@ export function rowMarkers(links: Record<string, string> | undefined) {
   return out;
 }
 
+function tallyCounters(list: MapRow[]) {
+  return [...list.reduce((map, r) => {
+    const entry = map.get(r.cat.id) ?? { cat: r.cat, icon: categoryIcons[r.cat.id] ?? trackedItemIcon(r.item), done: 0, total: 0 };
+    entry.total++;
+    if (r.item.done) entry.done++;
+    return map.set(r.cat.id, entry);
+  }, new Map<string, { cat: TrackedCategory; icon: string; done: number; total: number }>()).values()];
+}
+
+/** The area panel's category list. A click filters; the next click on the same row clears it. */
+function CategoryCounters({ rows, filter, onFilter }: { rows: MapRow[]; filter: string; onFilter: (id: string) => void }) {
+  const counters = tallyCounters(rows);
+  if (!counters.length) return null;
+  return <div className="side-counters">{counters.map(c =>
+    <button key={c.cat.id} type="button" aria-pressed={filter === c.cat.id} title={t('Filtrar a lista por esta categoria')} onClick={() => onFilter(filter === c.cat.id ? 'all' : c.cat.id)}>
+      <span className="counter-icon"><GameItemIcon id={c.icon} size={18} /></span><span>{t(c.cat.label)}</span><b>{number(c.done)}/{number(c.total)}</b>
+    </button>)}</div>;
+}
+
+/** All / still to find / already taken, the same control a region map uses for its markers. */
+function StatusFilter({ show, onShow, total, left }: { show: MapBadgeStatus; onShow: (id: MapBadgeStatus) => void; total: number; left: number }) {
+  return <div className="marker-filter" role="radiogroup" aria-label={t('Mostrar no mapa')}>
+    {([['all', 'Todos', total], ['todo', 'Faltam', left], ['done', 'Coletados', total - left]] as const).map(([id, label, n]) =>
+      <button key={id} type="button" role="radio" aria-checked={show === id} className={`filter-${id}`} onClick={() => onShow(id)}>{t(label)} <b>{number(n)}</b></button>)}
+  </div>;
+}
+
 export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState; focus?: string; onShowInChecklist?: (id: string) => void }) {
   const player = usePlayer(state);
   // The region opened by hand ('' = the world map).
   const [picked, setPicked] = useState('');
   const [era, setEra] = useState<Era>('all');
   const [filter, setFilter] = useState('all');
+  const [show, setShow] = useStored<MapBadgeStatus>('map.show', 'all');
   const [hideDone, setHideDone] = useState(false);
   const [hideUnknown, setHideUnknown] = useStored('map.hideUnknown', false);
   // On by default: the map opens where Link is and keeps up with him.
@@ -640,7 +668,8 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const mapView = useRef<HTMLDivElement>(null);
   const [mapOnly, toggleMapOnly] = useMapOnlyView(mapView);
   // Phone portrait: the map is too short to carry the panel, so it sits below the map until full screen.
-  const panelBelow = useMatches(PANEL_BELOW) && !mapOnly;
+  const narrowMap = useMatches(PANEL_BELOW);
+  const panelBelow = narrowMap && !mapOnly;
   const inGame = (player && atlasStages[player.placeId]) || findRegion(state.summary?.area?.replace(/ \(.+\)$/, '') ?? '');
   const selected = follow && inGame ? inGame : picked;
   const inRegion = selected !== '';
@@ -674,12 +703,6 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
 
   const local = rows.filter(r => r.area === selected && inEra(r, era));
   const visible = local.filter(r => (!hideDone || !r.item.done) && (filter === 'all' || filter === r.cat.id));
-  const counters = [...local.reduce((map, r) => {
-    const entry = map.get(r.cat.id) ?? { cat: r.cat, icon: categoryIcons[r.cat.id] ?? trackedItemIcon(r.item), done: 0, total: 0 };
-    entry.total++;
-    if (r.item.done) entry.done++;
-    return map.set(r.cat.id, entry);
-  }, new Map<string, { cat: TrackedCategory; icon: string; done: number; total: number }>()).values()];
   const showLocation = !hideUnknown || seen.has(selected);
   const place = atlas.places.find(p => atlasStages[p.id] === selected);
   // Rows with an atlas marker are drawn by that marker (with its photos), not a second time.
@@ -703,6 +726,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
 
   function open(key: string) { setPicked(key); setFollow(false); setActive(undefined); }
   const pickFilter = (id: string) => { setFilter(id); setActive(undefined); };
+  const pickShow = (id: MapBadgeStatus) => { setShow(id); setActive(undefined); };
   const back = () => open('');
   const selectItem = (item: TrackedItem) => setActive(item.id === active?.id ? undefined : item);
   const activeItem = local.find(({ item }) => active?.id === item.id)?.item;
@@ -718,6 +742,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
         {!inRegion ? <div className="map-side-body">
           <div className="side-score"><span className="side-region">{t('Hyrule')}</span></div>
           <SplitScore rows={rows.filter(r => LOCAL_NAMES[r.area])} overall={state.summary ? { done: state.summary.doneA, total: state.summary.totalA } : undefined} />
+          {!narrowMap && <CategoryCounters rows={rows} filter={filter} onFilter={pickFilter} />}
           <p className="side-sub">{t('Taxa de conclusão por região')}</p>
           <div className="region-rates">
             {listed.map(r => <button key={r.key} type="button" className="region-rate" style={areaShot(r.key) ? { backgroundImage: `linear-gradient(90deg, #14121100 0%, #141211a0 52%, #141211 88%), url("${areaShot(r.key)}")` } : undefined} onClick={() => open(r.key)}>
@@ -735,10 +760,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
           <div className="era-tabs" role="radiogroup" aria-label={t('Era')}>{eras.map(([id, label]) =>
             <button key={id} type="button" role="radio" aria-checked={era === id} onClick={() => { setEra(id); setActive(undefined); }}>{t(label)}</button>)}</div>
           {!showLocation ? <p className="quiet">{t("Visite a região para ver os itens.")}</p> : <>
-            {!!counters.length && <div className="side-counters">{counters.map(c =>
-              <button key={c.cat.id} type="button" aria-pressed={filter === c.cat.id} title={t('Filtrar a lista por esta categoria')} onClick={() => pickFilter(filter === c.cat.id ? 'all' : c.cat.id)}>
-                <span className="counter-icon"><GameItemIcon id={c.icon} size={18} /></span><span>{t(c.cat.label)}</span><b>{c.done}/{c.total}</b>
-              </button>)}</div>}
+            <CategoryCounters rows={local} filter={filter} onFilter={pickFilter} />
             <div className="side-list-head"><h3>{t('Coletáveis')}</h3><small>{visible.length}</small>
               <label><input type="checkbox" checked={hideDone} onChange={e => setHideDone(e.target.checked)} />{t("Só pendentes")}</label></div>
             {visible.length ? <div className="result-list">{visible.map(({ item, cat }) => <Fragment key={item.id}><button aria-expanded={item.id === active?.id} aria-pressed={item.id === active?.id} onClick={() => selectItem(item)}><span className={item.done ? 'story-dot done' : 'story-dot'} /><span><ObjectiveName done={item.done}>{t(item.name)}</ObjectiveName><small>{t(cat.label)} · {item.done ? t('Coletado') : item.state === 'unknown' || item.state === 'unmapped' ? t('Situação não mapeada') : t('Pendente')}</small></span></button>
@@ -753,7 +775,17 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const onMap = panelBelow ? undefined : sideChrome;
   const regionMenu = <label className="map-region"><span>{t("Região")}</span><select value={selected} onChange={e => open(e.target.value)}><option value="">{t("Mapa de Hyrule")}</option>{Object.entries(LOCAL_NAMES).filter(([key]) => !hideUnknown || seen.has(key) || key === selected).map(([key, name]) => <option key={key} value={key}>{t(name)}</option>)}{!hideUnknown && <option value="unknown">{t("Baús sem posição mapeada")}</option>}</select></label>;
   const counts = useMemo(() => rows.map(r => ({ area: r.area, catId: r.cat.id, done: r.item.done })), [rows]);
-  const rail = <MapRail filter={filter} onFilter={pickFilter} />;
+  const scoped = useMemo(() => counts.filter(r => filter === 'all' || r.catId === filter), [counts, filter]);
+  const scopeLeft = scoped.reduce((n, r) => n + (r.done ? 0 : 1), 0);
+  const statusFilter = <StatusFilter show={show} onShow={pickShow} total={scoped.length} left={scopeLeft} />;
+  const phoneBar = narrowMap && !inRegion;
+  const categoryMenu = phoneBar && <label className="map-region map-category">
+    <span>{t('Mostrar no mapa')}</span>
+    <select value={filter} aria-label={t('Mostrar no mapa')} onChange={e => pickFilter(e.target.value)}>
+      <option value="all">{t('Todas')}</option>
+      {tallyCounters(rows).map(c => <option key={c.cat.id} value={c.cat.id}>{t(c.cat.label)} {number(c.done)}/{number(c.total)}</option>)}
+    </select>
+  </label>;
   const mapModes = <div className="map-hud-modes">
     <label className="map-switch"><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} /><span>{t("Ocultar regiões não vistas")}</span></label>
     <label className="map-switch"><input type="checkbox" checked={follow} onChange={e => { setFollow(e.target.checked); setActive(undefined); }} /><span>{t("Seguir Link")}</span></label>
@@ -764,26 +796,34 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
     {player?.source === 'save' && <p className="map-note">{t(SAVE_POSITION_NOTE)}</p>}
     <div className={panelOpen ? 'map-stage' : 'map-stage no-panel'}>
       <section className="map-main">
-        {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={<><MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={regionMenu} how={<><span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} rail={rail} />{onMap}</>} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
+        {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={<><MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<>{regionMenu}{categoryMenu}</>} how={<>{statusFilter}<span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} />{onMap}</>} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
           <img className="map-art" src={atlas.map.image} alt={t("Mapa de Hyrule")} draggable={false} />
           {atlas.places.filter(p => !hideUnknown || seen.has(atlasStages[p.id])).map(p => {
             const key = atlasStages[p.id];
             const label = t(LOCAL_NAMES[key] ?? p.name);
             const entry = progress.byKey.get(key);
-            const badges = regionBadges(counts, key, filter);
-            const countLabel = badges.map(b => `${number(b.left)} ${t(b.label)}`).join(', ');
+            const counted = regionCounts(counts, key, filter, show);
+            // A phone has no room for every category at once. All keeps one total under the name.
+            const badges = narrowMap && filter === 'all' ? [] : counted;
+            const summary = narrowMap && filter === 'all' ? counted.reduce((sum, b) => ({ left: sum.left + b.left, total: sum.total + b.total, count: sum.count + b.count }), { left: 0, total: 0, count: 0 }) : null;
+            const summaryText = summary && summary.total ? (show === 'all' ? `${number(summary.left)}/${number(summary.total)}` : number(summary.count)) : '';
+            const countLabel = summaryText || badges.map(b => `${show === 'all' ? `${number(b.left)}/${number(b.total)}` : number(b.count)} ${t(state.categories.find(c => c.id === b.catId)?.label ?? '')}`).join(', ');
             const title = [label, entry ? `${rate(key)}%` : '', countLabel].filter(Boolean).join(' · ');
-            const state = key === inGame ? ' in-game' : entry && entry.done === entry.total ? ' complete' : '';
-            return <button key={key} className={`map-node ${p.kind}${state}`} style={{ left: `${p.pin.x * 100}%`, top: `${p.pin.y * 100}%` }} title={title} aria-label={title} onClick={() => open(key)}>
+            const node = key === inGame ? ' in-game' : entry && entry.done === entry.total ? ' complete' : '';
+            return <button key={key} className={`map-node ${p.kind}${node}`} style={{ left: `${p.pin.x * 100}%`, top: `${p.pin.y * 100}%` }} title={title} aria-label={title} onClick={() => open(key)}>
               <span className="map-node-name">{label}</span>
-              {!!badges.length && <span className="map-counts" aria-hidden="true">{badges.map(b => <span key={b.id} className="map-count"><GameItemIcon id={b.icon} size={14} /><b>{number(b.left)}</b></span>)}</span>}
+              {summaryText && <span className="map-counts" aria-hidden="true"><span className="map-count"><b>{summaryText}</b></span></span>}
+              {!!badges.length && <span className="map-counts" aria-hidden="true">{badges.map(b => {
+                const icon = categoryIcons[b.catId];
+                return icon && <span key={b.catId} className="map-count"><GameItemIcon id={icon} size={14} /><b>{show === 'all' ? `${number(b.left)}/${number(b.total)}` : number(b.count)}</b></span>;
+              })}</span>}
             </button>;
           })}
           {player && <PlayerPin at={player.world} yaw={player.yaw} live={player.source === 'live'} />}
-        </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} onEra={next => { setEra(next); setActive(undefined); }} filter={filter} onFilter={pickFilter} hideDone={hideDone} player={player} follow={follow} regionMenu={regionMenu} mapModes={mapModes} overlay={onMap} onBack={back} hudOpen={hudOpen} onHud={() => setHudOpen(!hudOpen)} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
+        </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} onEra={next => { setEra(next); setActive(undefined); }} filter={filter} onFilter={pickFilter} show={show} onShow={pickShow} hideDone={hideDone} player={player} follow={follow} regionMenu={regionMenu} mapModes={mapModes} overlay={onMap} onBack={back} hudOpen={hudOpen} onHud={() => setHudOpen(!hudOpen)} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
             focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
           : <div className="zoom-viewport map-unmapped">
-            <MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<><button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={back}><Icon name="map" size={16} /></button>{regionMenu}</>} how={<><span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} rail={rail} />
+            <MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<><button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={back}><Icon name="map" size={16} /></button>{regionMenu}</>} how={<>{statusFilter}<span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} />
             {onMap}
             <p className="map-unmapped-note">{showLocation ? t('Esta região não tem mapa próprio.') : t('Visite a região para ver os itens.')}</p>
           </div>}
@@ -794,7 +834,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
 }
 
 /** One bar over the map. The groups disappear on a wide window so the controls stay one row. On a phone the extra rows start folded. */
-function MapHud({ where, how, rail, open, onToggle }: { where: ReactNode; how: ReactNode; rail?: ReactNode; open: boolean; onToggle: () => void }) {
+function MapHud({ where, how, open, onToggle }: { where: ReactNode; how: ReactNode; open: boolean; onToggle: () => void }) {
   const label = t(open ? 'Ocultar opções do mapa' : 'Mostrar opções do mapa');
   return <div className="map-float-tools"><div className={open ? 'map-hud' : 'map-hud is-collapsed'}>
     <div className="map-hud-where">
@@ -804,22 +844,7 @@ function MapHud({ where, how, rail, open, onToggle }: { where: ReactNode; how: R
       </button>
     </div>
     <div className="map-hud-how">{how}</div>
-  </div>{rail}</div>;
-}
-
-/** Category icons for the map. On a region map, status (all / left / collected) sits in the same control. */
-function MapRail({ filter, onFilter, status }: { filter: string; onFilter: (id: string) => void; status?: ReactNode }) {
-  return <div className="map-rail">
-    <div className="map-rail-cats" role="radiogroup" aria-label={t('Mostrar no mapa')}>
-      {MAP_RAIL.map(cat => {
-        const on = filter === cat.id;
-        return <button key={cat.id} type="button" role="radio" aria-checked={on} title={t(cat.label)} aria-label={cat.icon ? t(cat.label) : undefined} onClick={() => onFilter(on && cat.id !== 'all' ? 'all' : cat.id)}>
-          {cat.icon ? <GameItemIcon id={cat.icon} size={22} /> : <span className="map-rail-all">{t(cat.label)}</span>}
-        </button>;
-      })}
-    </div>
-    {status && <div className="map-rail-status">{status}</div>}
-  </div>;
+  </div></div>;
 }
 
 /** Icon button for the map's zoom cluster: enter or leave the dedicated map view. */
@@ -892,8 +917,8 @@ type AtlasPlace = (typeof atlas.places)[number];
 /** One marker on a floor map: an atlas location or a tracked collectible. */
 interface Pin { id: string; filter?: string; icon?: string; kind: string; name: string; at?: { map: string; x: number; y: number }; status: 'done' | 'todo' | 'unknown'; images: string[]; item?: TrackedItem; tick?: { id: string; on: boolean } }
 
-function RegionAtlas({ place, state, era, onEra, filter, onFilter, hideDone, player, follow, regionMenu, mapModes, overlay, onBack, hudOpen, onHud, controls, tracked, focusItem, onPickItem, onShowInChecklist }: {
-  place: AtlasPlace; state: AppState; era: Era; onEra: (era: Era) => void; filter: string; onFilter: (id: string) => void; hideDone: boolean; player?: PlayerState; follow: boolean; regionMenu?: ReactNode; mapModes?: ReactNode; overlay?: ReactNode; onBack?: () => void; hudOpen: boolean; onHud: () => void; controls?: ReactNode; tracked: TrackedPin[];
+function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow, hideDone, player, follow, regionMenu, mapModes, overlay, onBack, hudOpen, onHud, controls, tracked, focusItem, onPickItem, onShowInChecklist }: {
+  place: AtlasPlace; state: AppState; era: Era; onEra: (era: Era) => void; filter: string; onFilter: (id: string) => void; show: MapBadgeStatus; onShow: (id: MapBadgeStatus) => void; hideDone: boolean; player?: PlayerState; follow: boolean; regionMenu?: ReactNode; mapModes?: ReactNode; overlay?: ReactNode; onBack?: () => void; hudOpen: boolean; onHud: () => void; controls?: ReactNode; tracked: TrackedPin[];
   /** Checklist row picked outside the map (side list, "View on map"): its marker gets selected. */
   focusItem?: string; onPickItem?: (item: TrackedItem) => void; onShowInChecklist?: (id: string) => void;
 }) {
@@ -903,7 +928,6 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, hideDone, pla
   useEffect(() => { if (follow && here?.mapId) setFloor(here.mapId); }, [follow, here?.mapId]);
   const [active, setActive] = useState('');
   const [shot, setShot] = useState(0);
-  const [show, setShow] = useStored<'all' | 'todo' | 'done'>('map.show', 'all');
   // Close the marker card with Escape.
   useEffect(() => {
     if (!active) return;
@@ -980,10 +1004,7 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, hideDone, pla
       </>}
     </div>}
   </div>;
-  const markerFilter = !!pool.length && <div className="marker-filter" role="radiogroup" aria-label={t("Mostrar no mapa")}>
-    {([['all', 'Todos', pool.length], ['todo', 'Faltam', pool.length - doneCount], ['done', 'Coletados', doneCount]] as const).map(([id, label, n]) =>
-      <button key={id} role="radio" aria-checked={show === id} className={`filter-${id}`} onClick={() => { setShow(id); setActive(''); }}>{t(label)} <b>{n}</b></button>)}
-  </div>;
+  const markerFilter = !!pool.length && <StatusFilter show={show} onShow={id => { onShow(id); setActive(''); }} total={pool.length} left={pool.length - doneCount} />;
   const floorSelect = place.maps.length > 1 && currentFloor && <label className="map-region map-floor"><span>{t("Andar / era")}</span><select value={currentFloor.id} onChange={e => { setFloor(e.target.value); select(''); }}>{place.maps.map(m => <option key={m.id} value={m.id}>{t(m.label)}</option>)}</select></label>;
   const eraLabel = t(eras.find(([id]) => id === era)?.[1] ?? 'Todas');
   const pickEra = (event: MouseEvent<HTMLButtonElement>) => {
@@ -1010,10 +1031,11 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, hideDone, pla
       {regionMenu}
       {floorSelect}
     </>} how={<>
+      {markerFilter}
       {eraChoice}
       <span className="map-hud-divider" aria-hidden="true" />
       {mapModes}
-    </>} rail={<MapRail filter={filter} onFilter={id => { onFilter(id); setActive(''); }} status={markerFilter} />} />;
+    </>} />;
   return <div className="region-atlas">
     {currentFloor ? <ZoomPan key={currentFloor.id} ratio={currentFloor.aspect ?? 1.6} className="floor-map" controls={controls} overlay={<>{mapTools}{overlay}{docked && card}</>}>
       <div className="floor-fill" aria-label={t("Mapa da região")}
