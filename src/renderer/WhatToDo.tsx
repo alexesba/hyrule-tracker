@@ -115,7 +115,7 @@ export function WhatToDo({ state, onShowInChecklist, onShowOnMap }: { state: App
 }
 
 /** True while the element is narrower than `min` px. Measured before paint, so the first frame already has the right layout. */
-function useNarrow(el: HTMLElement | null, min: number) {
+export function useNarrow(el: HTMLElement | null, min: number) {
   const [narrow, setNarrow] = useState(false);
   useLayoutEffect(() => {
     if (!el) return;

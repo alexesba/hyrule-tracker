@@ -1,3 +1,10 @@
+# Walkthrough
+
+- [x] Mover o crédito à IGN dos capítulos para Configurações e conferir no desktop e no navegador. O crédito e o link aparecem em Créditos, o aviso saiu dos capítulos e a navegação foi preservada. No navegador a 320 px, o texto coube sem rolagem horizontal. O link usa o endereço registrado no projeto, que retornou HTTP 403 na verificação externa.
+- [x] Abrir os detalhes dos objetivos no próprio capítulo, usando o cartão do mapa.
+- [x] Traduzir os 1.373 trechos para os nove idiomas restantes e conferir a terminologia com os catálogos do app.
+- [x] Validar a troca entre os 12 idiomas no navegador e o popup no Electron e em tela de 390 px.
+
 # Anti-Slop
 
 - [x] Baixar, conferir e instalar as seis skills no repositório.

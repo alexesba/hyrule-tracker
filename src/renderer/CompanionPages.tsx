@@ -1,12 +1,14 @@
 import { Fragment, lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import type { Activity, AppState, PlayerState, SaveFolderChoice, TrackedCategory, TrackedItem } from '../shared/types';
 import { LOCAL_NAMES, MASK_SALE_NAMES } from '../core/companion';
+import { WALKTHROUGH_SOURCE_URL } from '../core/walkthrough';
 import { api, isRemote } from './api';
 import { enemyPhoto, regionPhoto } from './referenceImages';
 import { LanguageSwitch } from './LanguageFlags';
-import { currentLocale, date, day, hour, languages, number, plural, t, tv, type Locale } from './i18n';
+import { currentLocale, date, day, hour, languages, message, number, plural, t, tv, type Locale } from './i18n';
 import { ObjectiveName } from './ObjectiveName';
 import { GameItemIcon, trackedItemIcon } from './GameItemIcon';
+import { MarkerDetails, markerStatusLabel, trackedMarkerDetails, type MarkerDetailsData } from './MarkerDetails';
 import { Minigames } from './Minigames';
 import { PageProgress } from './PageProgress';
 import { PageSkeleton } from './PageSkeleton';
@@ -28,7 +30,7 @@ const EasterEggs = lazy(() => import('./EasterEggs').catch(error => {
 }));
 
 const pages = {
-  overview: 'Visão geral', todo: 'O que fazer?', map: 'Mapa de Hyrule', checklist: 'Checklist 100%', threads: 'Fios do Tempo+',
+  overview: 'Visão geral', todo: 'O que fazer?', walkthrough: 'Passo a passo', map: 'Mapa de Hyrule', checklist: 'Checklist 100%', threads: 'Fios do Tempo+',
   hall: 'Salão dos Inimigos', minigames: 'Minijogos', timeline: 'Registro do dia', medals: 'Meus dados',
   secrets: 'Easter Eggs and Secrets', quiz: 'Quiz diário', second: 'Segunda tela', settings: 'Configurações',
 };
@@ -36,6 +38,7 @@ export type Page = keyof typeof pages;
 const pageDescriptions: Record<Page, string> = {
   overview: 'Veja o progresso da sua partida e retome a jornada.',
   todo: 'O que você já consegue fazer agora com os itens que tem.',
+  walkthrough: 'Siga a história do começo ao fim, capítulo por capítulo.',
   map: 'Explore as regiões de Hyrule e localize os colecionáveis.',
   checklist: 'Acompanhe os objetivos que faltam para completar 100% do jogo.',
   threads: 'Acompanhe os capítulos da história e as missões secundárias.',
@@ -49,13 +52,14 @@ const pageDescriptions: Record<Page, string> = {
   settings: 'Configure o idioma, a origem da partida e a janela flutuante.',
 };
 const navGroups: Page[][] = [
-  ['overview', 'todo', 'map', 'checklist', 'threads', 'minigames', 'hall', 'secrets'],
+  ['overview', 'todo', 'walkthrough', 'map', 'checklist', 'threads', 'minigames', 'hall', 'secrets'],
   ['timeline', 'medals', 'quiz'],
   ['second', 'settings'],
 ];
 const iconPaths: Record<string, string> = {
   overview: 'm3 11 9-8 9 8M5 10v10h5v-6h4v6h5V10',
   todo: 'M9 18h6m-5 3h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z',
+  walkthrough: 'M4 4.5A1.5 1.5 0 0 1 5.5 3H19v15H5.5A1.5 1.5 0 0 0 4 19.5zm0 15A1.5 1.5 0 0 0 5.5 21H19v-3M8 7h7m-7 4h5',
   map: 'm3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15m6-12v15',
   checklist: 'M9 5h12M9 12h12M9 19h12M3 5l1 1 2-2m-3 8 1 1 2-2m-3 8 1 1 2-2',
   threads: 'M4 4h16v16H4zM8 8h8m-8 4h8m-8 4h5',
@@ -287,12 +291,13 @@ function SaveActions({ activeDir, notFound = false }: { activeDir?: string; notF
   </>;
 }
 
-export function CompanionPage({ page, state, onPage, onScan, scanning, onLanguage, headerActions, connectionLost, mapFocus, onShowInChecklist, todoView }: { mapFocus?: string; onShowInChecklist?: (id: string) => void; todoView?: ReactNode; page: Page; state: AppState; onPage: (page: Page) => void; onScan: () => void; scanning: boolean; onLanguage: (locale: Locale) => void; headerActions: ReactNode; connectionLost: boolean }) {
+export function CompanionPage({ page, state, onPage, onScan, scanning, onLanguage, headerActions, connectionLost, mapFocus, onShowInChecklist, todoView, walkthroughView }: { mapFocus?: string; onShowInChecklist?: (id: string) => void; todoView?: ReactNode; walkthroughView?: ReactNode; page: Page; state: AppState; onPage: (page: Page) => void; onScan: () => void; scanning: boolean; onLanguage: (locale: Locale) => void; headerActions: ReactNode; connectionLost: boolean }) {
   const view = {
     overview: <Overview state={state} onPage={onPage} onScan={onScan} scanning={scanning} />,
     checklist: <Overview state={state} onPage={onPage} onScan={onScan} scanning={scanning} />,
     // Built by App (the page uses this module's map helpers, so it can't be imported here).
     todo: todoView,
+    walkthrough: walkthroughView,
     map: <HyruleMap state={state} focus={mapFocus} onShowInChecklist={onShowInChecklist} />,
     threads: <Threads state={state} />,
     hall: <Hall state={state} />,
@@ -441,6 +446,10 @@ function Settings({ state, onLanguage }: { state: AppState; onLanguage: (locale:
       <code className="save-path">{state.saveDir || t('Pasta do save ainda não encontrada.')}</code>
       {state.message && <p className="notice" role="status">{tv(state.message, state.messageValues)}</p>}
       {!isRemote && <SaveActions activeDir={state.status === 'ok' ? state.saveDir : undefined} notFound={!state.saveDir} />}
+      {state.profiles.length > 0 && <label className="inline-field">{t('Perfil')}<select value={state.chosenProfile ?? ''} onChange={e => void api.selectProfile(e.target.value || null)}>
+        <option value="">{t('Seguir o perfil jogado por último')}</option>
+        {state.profiles.map(profile => <option key={profile.id} value={profile.id}>{profile.name ?? profile.id.slice(0, 8)} · {date(profile.lastSavedMs)}</option>)}
+      </select></label>}
       {!!state.slots.length && <label className="inline-field">{t('Slot')}<select value={state.slotMode === 'manual' ? state.activeSlot : ''} onChange={e => void api.pinSlot(e.target.value || null)}>
         <option value="">{t("Seguir o save mais recente")}</option>
         {state.slots.map(slot => <option key={slot.name} value={slot.name}>{slot.name} · {t(slot.area ?? '?')} · {date(slot.mtimeMs)}</option>)}
@@ -460,6 +469,8 @@ function Settings({ state, onLanguage }: { state: AppState; onLanguage: (locale:
         <a href="https://www.nintenduo.com/" target="_blank" rel="noreferrer">Nintendúo</a></p>
       <p>{t("Imagens de itens, colecionáveis e HUD: Zelda Wiki e Mt. Wildwood Zelda Wiki. Imagens de inimigos e regiões: Mt. Wildwood Zelda Wiki.")}</p>
       <p>{t("Mapeamento do save e lógica do jogo: Clawshot, OOT-SW2SE, editor de save de dlr-developer e OoT Randomizer.")}</p>
+      <p>{t('O passo a passo do Hyrule Tracker foi escrito com base no guia da IGN para Ocarina of Time Remake.')}{' '}
+        <a href={WALKTHROUGH_SOURCE_URL} target="_blank" rel="noreferrer">{t('Consultar o guia da IGN')}</a></p>
       <p>{t("As imagens do jogo pertencem aos seus respectivos detentores de direitos.")}{' '}
         <a href="https://github.com/jv-prado/hyrule-tracker/blob/master/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">{t("Ver todos os créditos")}</a></p>
     </section>
@@ -612,10 +623,6 @@ function SplitScore({ rows, overall }: { rows: MapRow[]; overall?: { done: numbe
   ))}</div>;
 }
 
-/** A checklist row's status as the map shows it (a hand tick counts as done). */
-export const rowStatus = (item: TrackedItem): 'done' | 'todo' | 'unknown' =>
-  item.done ? 'done' : item.state === 'unknown' || item.state === 'unmapped' ? 'unknown' : 'todo';
-
 /** Checklist row id -> the atlas marker that stands for it on the map. */
 export function rowMarkers(links: Record<string, string> | undefined) {
   const byId = new Map(atlas.items.map(m => [m.id, m]));
@@ -732,6 +739,9 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
 
   // Arriving from a checklist entry: open its region and highlight it.
   useEffect(() => {
+    // "place:<atlas id>" (from the walkthrough): open that region.
+    const placeKey = focus?.startsWith('place:') ? atlasStages[focus.slice(6)] : undefined;
+    if (placeKey) { setPicked(placeKey); setFollow(false); setFilter('all'); setEra('all'); setActive(undefined); return; }
     const row = focus ? rows.find(r => r.item.id === focus) : undefined;
     if (!row) return;
     setPicked(row.area);
@@ -935,7 +945,7 @@ function useMatches(query: string) {
 
 type AtlasPlace = (typeof atlas.places)[number];
 /** One marker on a floor map: an atlas location or a tracked collectible. */
-interface Pin { id: string; filter?: string; icon?: string; kind: string; name: string; at?: { map: string; x: number; y: number }; status: 'done' | 'todo' | 'unknown'; images: string[]; item?: TrackedItem; tick?: { id: string; on: boolean } }
+interface Pin extends MarkerDetailsData { id: string; filter?: string; at?: { map: string; x: number; y: number } }
 
 function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow, hideDone, player, follow, regionMenu, mapModes, overlay, onBack, hudOpen, onHud, controls, tracked, categoryRows, catsOpen, onCats, below, focusItem, onPickItem, onShowInChecklist }: {
   place: AtlasPlace; state: AppState; era: Era; onEra: (era: Era) => void; filter: string; onFilter: (id: string) => void; show: MapBadgeStatus; onShow: (id: MapBadgeStatus) => void; hideDone: boolean; player?: PlayerState; follow: boolean; regionMenu?: ReactNode; mapModes?: ReactNode; overlay?: ReactNode; onBack?: () => void; hudOpen: boolean; onHud: () => void; controls?: ReactNode; tracked: TrackedPin[];
@@ -948,7 +958,6 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
   // Following Link: keep his floor / era on screen as he moves between them.
   useEffect(() => { if (follow && here?.mapId) setFloor(here.mapId); }, [follow, here?.mapId]);
   const [active, setActive] = useState('');
-  const [shot, setShot] = useState(0);
   // Close the marker card with Escape.
   useEffect(() => {
     if (!active) return;
@@ -964,14 +973,13 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
     const base = { id: m.id, filter: atlasCategories[m.cat], icon: categoryIcons[atlasCategories[m.cat]] ?? atlasIcons[m.cat], kind: kindOf(m.cat), name: m.name, at: m.at ?? undefined, images: m.images };
     const row = rowsById.get(state.atlasLinks?.[m.id] ?? '');
     // A marker with a checklist row shows that row: same status, same hand tick, same description.
-    if (row) return { ...base, item: row, status: rowStatus(row) === 'unknown' ? status[m.id] ?? 'unknown' : rowStatus(row), tick: row.state !== 'yes' ? { id: row.id, on: row.done } : undefined };
+    if (row) return { ...base, ...trackedMarkerDetails(row, status[m.id]) };
     // Detected in the save: nothing to tick. Otherwise tick (or untick a hand tick).
     return { ...base, status: status[m.id] ?? 'unknown', tick: status[m.id] !== 'done' || state.atlasManual?.[m.id] ? { id: m.id, on: !!state.atlasManual?.[m.id] } : undefined };
   });
   const trackedPins: Pin[] = tracked.map(p => ({
-    id: p.item.id + '@' + p.at.map, filter: p.cat.id, icon: categoryIcons[p.cat.id], kind: t(p.cat.label), name: p.item.name, at: p.at, images: [], item: p.item,
-    tick: p.item.state !== 'yes' ? { id: p.item.id, on: p.item.done } : undefined,
-    status: rowStatus(p.item),
+    id: p.item.id + '@' + p.at.map, filter: p.cat.id, icon: categoryIcons[p.cat.id], kind: t(p.cat.label), name: p.item.name, at: p.at, images: [],
+    ...trackedMarkerDetails(p.item),
   }));
   const pool = [...atlasPins, ...trackedPins].filter(p => filter === 'all' || p.filter === filter);
   const doneCount = pool.filter(m => m.status === 'done').length;
@@ -980,7 +988,6 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
   const selected = markers.find(item => item.id === active);
   const select = (id: string) => {
     setActive(id);
-    setShot(0);
     const item = pool.find(p => p.id === id)?.item;
     if (item && item.id !== focusItem) onPickItem?.(item);
   };
@@ -992,9 +999,7 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
     if (!pin || pins.some(p => p.id === active)) return;
     setFloor(pin.at!.map);
     setActive(pin.id);
-    setShot(0);
   }, [focusItem]);
-  const statusLabel = (s: Pin['status']) => t(s === 'done' ? 'Coletado' : s === 'todo' ? 'Pendente' : 'Situação não mapeada');
   const docked = useMatches(DOCKED_CARD);
   // Beside its marker on a large screen. On phones and touch screens it docks to the map's edge away from the marker,
   // outside the zoom layer, so it stays on screen at any zoom and scrolls with a finger.
@@ -1005,25 +1010,8 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
       ...(selected.at!.x > 0.5 ? { right: `calc(${(1 - selected.at!.x) * 100}% + 16px)` } : { left: `calc(${selected.at!.x * 100}% + 16px)` }),
       ...(selected.at!.y > 0.5 ? { bottom: `max(8px, calc(${(1 - selected.at!.y) * 100}% - 40px))` } : { top: `max(8px, calc(${selected.at!.y * 100}% - 40px))` }),
     }}>
-    <div className="marker-card-head">
-      <span className="marker-kind"><GameItemIcon id={selected.icon} size={15} />{selected.kind}</span>
-      <button className="marker-close" aria-label={t('Fechar')} onClick={() => setActive('')}>×</button>
-    </div>
-    <h3><ObjectiveName done={selected.status === 'done'}>{t(selected.name)}</ObjectiveName></h3>
-    <small className={`marker-status ${selected.status}`}>{statusLabel(selected.status)}</small>
-    {selected.item?.where && <p className="marker-where">{t(selected.item.where)}</p>}
-    <div className="result-actions">
-      {selected.tick && <button className="action" onClick={() => void api.toggleManual(selected.tick!.id)}>{selected.tick.on ? t('Desmarcar') : t('Concluí')}</button>}
-      {selected.item && onShowInChecklist && <button className="small-btn" onClick={() => onShowInChecklist(selected.item!.id)}>{t('Ver na checklist')}</button>}
-    </div>
-    {!!selected.images.length && <div className="marker-photo">
-      <img src={selected.images[shot]} alt={t("Local no jogo")} />
-      {selected.images.length > 1 && <>
-        <button className="photo-nav prev" aria-label={t("Foto anterior")} onClick={() => setShot((shot + selected.images.length - 1) % selected.images.length)}>‹</button>
-        <button className="photo-nav next" aria-label={t("Próxima foto")} onClick={() => setShot((shot + 1) % selected.images.length)}>›</button>
-        <span className="photo-count">{shot + 1}/{selected.images.length}</span>
-      </>}
-    </div>}
+    <MarkerDetails key={selected.id} marker={selected} onClose={() => setActive('')} actions={selected.item && onShowInChecklist &&
+      <button type="button" className="small-btn" onClick={() => onShowInChecklist(selected.item!.id)}>{t('Ver na checklist')}</button>} />
   </div>;
   const markerFilter = !!pool.length && <StatusFilter show={show} onShow={id => { onShow(id); setActive(''); }} total={pool.length} left={pool.length - doneCount} />;
   const floorSelect = place.maps.length > 1 && currentFloor && <label className="map-region map-floor"><span>{t("Andar / era")}</span><select value={currentFloor.id} onChange={e => { setFloor(e.target.value); select(''); }}>{place.maps.map(m => <option key={m.id} value={m.id}>{t(m.label)}</option>)}</select></label>;
@@ -1047,14 +1035,14 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
         <img className="map-art" src={currentFloor.image} alt="" draggable={false} />
         {markers.filter(m => m.at?.map === currentFloor.id).map(m => {
           const tipBelow = m.at!.y < 0.22;
-          return <button key={m.id} aria-label={`${m.kind}: ${t(m.name)} · ${statusLabel(m.status)}`} aria-pressed={active === m.id} aria-expanded={active === m.id}
+          return <button key={m.id} aria-label={`${m.kind}: ${t(m.name)} · ${markerStatusLabel(m.status)}`} aria-pressed={active === m.id} aria-expanded={active === m.id}
             className={`plot-point atlas-marker ${m.status}`} style={{ left: `${m.at!.x * 100}%`, top: `${m.at!.y * 100}%` }}
             onClick={() => active === m.id ? setActive('') : select(m.id)}>
             <GameItemIcon id={m.icon} size={14} />
             {active !== m.id && <span className={`marker-tip ${tipBelow ? 'below' : ''} ${m.at!.x > 0.75 ? 'end' : m.at!.x < 0.25 ? 'start' : ''}`} aria-hidden="true">
               <span className="marker-kind"><GameItemIcon id={m.icon} size={13} />{m.kind}</span>
               <b>{t(m.name)}</b>
-              <small className={`marker-status ${m.status}`}>{statusLabel(m.status)}</small>
+              <small className={`marker-status ${m.status}`}>{markerStatusLabel(m.status)}</small>
             </span>}
           </button>;
         })}
@@ -1181,9 +1169,35 @@ function Timeline({ state }: { state: AppState }) {
   const day = picked ?? dayStamp();
   const events = (state.activity ?? []).filter(a => dayStamp(a.ms) === day);
   const totals = events.reduce((a, e) => [a[0] + (e.enemies ?? 0), a[1] + (e.rupees ?? 0), a[2] + (e.pieces ?? 0)], [0, 0, 0]);
-  return <section className="focus-panel timeline-panel"><div className="section-line"><h2>{t("Atividade da partida")}</h2><label className="inline-field">{t("Dia")}{' '}<input type="date" value={day} onChange={e => setDay(e.target.value)} /></label></div>
-    <div className="timeline-stats"><span><b>{totals[0]}</b>{t("inimigos contabilizados")}</span><span><b><GameItemIcon id="rupee" /> {totals[1]}</b>{t("rupees de ganhos observados")}</span><span><b><GameItemIcon id="heart_piece" /> {totals[2]}</b>{t("pedaços registrados")}</span></div>
-    {events.length ? <ActivityList activity={events} photos /> : <p className="quiet">{t("Nenhum avanço foi registrado neste dia com o tracker aberto.")}</p>}
+  return <>
+    <section className="focus-panel timeline-panel"><div className="section-line"><h2>{t("Atividade da partida")}</h2><label className="inline-field">{t("Dia")}{' '}<input type="date" value={day} onChange={e => setDay(e.target.value)} /></label></div>
+      <div className="timeline-stats"><span><b>{totals[0]}</b>{t("inimigos contabilizados")}</span><span><b><GameItemIcon id="rupee" /> {totals[1]}</b>{t("rupees de ganhos observados")}</span><span><b><GameItemIcon id="heart_piece" /> {totals[2]}</b>{t("pedaços registrados")}</span></div>
+      {events.length ? <ActivityList activity={events} photos /> : <p className="quiet">{t("Nenhum avanço foi registrado neste dia com o tracker aberto.")}</p>}
+    </section>
+    {state.playLog && <GameLog log={state.playLog} day={day} />}
+  </>;
+}
+
+/** The game's own log (option.sav) for one day: it covers play with the tracker closed, too. */
+function GameLog({ log, day }: { log: NonNullable<AppState['playLog']>; day: string }) {
+  const d = log.days[day];
+  const counted = (rows: { name: string; count: number }[], unknown: string) => <ul className="game-log-list">{rows.slice(0, 6).map(r =>
+    <li key={r.name}><span>{r.name ? t(r.name) : t(unknown)}</span><b>{number(r.count)}</b></li>)}</ul>;
+  return <section className="focus-panel game-log">
+    <h2>{t("Registro do jogo")}</h2>
+    <p className="quiet">{message("O jogo guarda os últimos 1.024 eventos em option.sav. Este registro vai de {from} a {to}.", { from: date(log.fromMs), to: date(log.toMs) })}</p>
+    {!d ? <p className="quiet">{t("O registro do jogo não tem eventos deste dia.")}</p> : <div className="game-log-grid">
+      <div><h3>{t("Inimigos derrotados")} <b>{number(d.enemies)}</b></h3>{counted(d.enemyNames, 'Não identificado')}</div>
+      <div><h3>{t("Dano recebido")} <b>{plural(d.damage / 4, '{n} coração', '{n} corações')}</b></h3>
+        <p className="quiet">{plural(d.hits, '{n} golpe', '{n} golpes')}</p></div>
+      <div><h3>{t("Canções tocadas")} <b>{number(d.songs.reduce((n, s) => n + s.count, 0))}</b></h3>
+        {d.songs.length ? counted(d.songs, '') : <p className="quiet">{t("Nenhuma canção tocada.")}</p>}</div>
+      <div><h3>{t("Tempo por área")}</h3>
+        {d.areas.length ? <ul className="game-log-list">{d.areas.slice(0, 6).map(a =>
+          <li key={a.name}><span>{a.name ? t(a.name) : t('Outros lugares')}</span><b>{playTime(Math.max(60, a.seconds))}</b></li>)}</ul>
+          : <p className="quiet">{t("Nenhuma mudança de área registrada.")}</p>}
+        <p className="quiet">{t("Aproximado, pelas mudanças de área.")}</p></div>
+    </div>}
   </section>;
 }
 
@@ -1196,12 +1210,24 @@ function Medals({ state }: { state: AppState }) {
     ['Baús abertos', chests?.done, [20,50,100,chests?.total ?? 206]], ['Estátuas', statues?.done, [20,40,60,84]],
     ['Inimigos derrotados', state.companion?.enemies, [50,100,250,500]], ['Checklist (%)', s?.percent, [25,50,75,100]],
   ] as const;
-  return <section className="focus-panel"><h2>{t("Medalhas da jornada")}</h2><p className="quiet">{t("Marcos locais calculados a partir do seu progresso.")}</p>
-    <div className="medal-list">{milestones.map(([name, n, thresholds]) => <div className="medal-row" key={name}>
-      <div><b>{t(name)}</b><small>{value(n)}</small></div>{thresholds.map(x => {
-        const earned = n != null && n >= x;
-        return <span className={earned ? 'medal earned' : 'medal'} key={x} title={t(earned ? 'Medalha conquistada' : 'Medalha pendente')}><Icon name="medals" /><ObjectiveName done={earned}>{x}</ObjectiveName></span>;
-      })}
-    </div>)}</div>
-  </section>;
+  const c = state.companion;
+  const counters = [['Pulos', c?.jumps], ['Rolamentos', c?.rolls], ['Golpes de espada', c?.swings]] as const;
+  return <>
+    {c && <section className="focus-panel"><h2>{t("Contadores do jogo")}</h2>
+      {counters.some(([, n]) => n != null) ? <>
+        <p className="quiet">{t("Totais que o próprio jogo guarda no save.")}</p>
+        <div className="metric-strip counter-strip">{counters.map(([label, n]) => <div className="metric" key={label}>
+          <span className="metric-label">{t(label)}</span><strong>{value(n)}</strong>
+        </div>)}</div>
+      </> : <p className="quiet">{t("Este save não tem esses contadores.")}</p>}
+    </section>}
+    <section className="focus-panel"><h2>{t("Medalhas da jornada")}</h2><p className="quiet">{t("Marcos locais calculados a partir do seu progresso.")}</p>
+      <div className="medal-list">{milestones.map(([name, n, thresholds]) => <div className="medal-row" key={name}>
+        <div><b>{t(name)}</b><small>{value(n)}</small></div>{thresholds.map(x => {
+          const earned = n != null && n >= x;
+          return <span className={earned ? 'medal earned' : 'medal'} key={x} title={t(earned ? 'Medalha conquistada' : 'Medalha pendente')}><Icon name="medals" /><ObjectiveName done={earned}>{x}</ObjectiveName></span>;
+        })}
+      </div>)}</div>
+    </section>
+  </>;
 }

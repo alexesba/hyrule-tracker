@@ -1,5 +1,5 @@
 ﻿import { describe, it, expect } from 'vitest';
-import { locate, readLive, matchesReference, fingerprint, readTables, areaFrom, sweepRanges, LAYOUTS, STAGE_KEY, LOCATION_KEY, DAY_NIGHT_KEY, GUEST_BASE, Mem } from '../src/gamedata/live';
+import { locate, readLive, matchesReference, fingerprint, readTables, areaFrom, sweepRanges, findRecordRuns, readableRanges, LAYOUTS, STAGE_KEY, LOCATION_KEY, DAY_NIGHT_KEY, GUEST_BASE, Mem } from '../src/gamedata/live';
 import type { GameDataFile, Entry } from '../src/gamedata/parser';
 
 // Synthetic memory laid out like the game's: per type a {hash, index} map followed by a
@@ -260,5 +260,29 @@ describe('live memory tables', () => {
     const t = locate(m, ref, BASE + 0x200000n, 2 << 20)!;
     mem.fill(0, tables.Bool, tables.Bool + 0x100);
     expect(readTables(m, t)).toBeNull();
+  });
+});
+
+describe('a game running natively on the host (nxnative on macOS)', () => {
+  const stride = 0x18, n = 8;
+  const buf = Buffer.alloc(0x1000);
+  for (let i = 0; i < n; i++) buf.writeBigUInt64LE(0x7d98e915e8n, 0x100 + i * stride); // records start with a real host address
+  it('ignores records that start with a large pointer by default', () => {
+    expect(findRecordRuns(buf, 0x5000n, stride, 4)).toEqual([]);
+  });
+  it('finds them when host pointers are allowed', () => {
+    const runs = findRecordRuns(buf, 0x5000n, stride, 4, true);
+    expect(runs).toHaveLength(1);
+    expect(runs[0]).toMatchObject({ start: 0x5100n, count: n });
+  });
+  it('lists readable ranges between 4 MB and 8 GB, merged, biggest first', () => {
+    const M = 1n << 20n;
+    expect(readableRanges([
+      { base: 0x1000n * M, size: 2n * M, type: 0x20000 }, // too small
+      { base: 0x2000n * M, size: 6n * M, type: 0x20000 },
+      { base: 0x2006n * M, size: 10n * M, type: 0x40000 }, // touches the block before: merged
+      { base: 0x3000n * M, size: 9000n * M, type: 0x20000 }, // over 8 GB: a system reservation
+      { base: 0x9000n * M, size: 5n * M, type: 0x20000 },
+    ])).toEqual([[0x2000n * M, 0x2010n * M], [0x9000n * M, 0x9005n * M]]);
   });
 });

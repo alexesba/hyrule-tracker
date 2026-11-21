@@ -238,3 +238,69 @@ describe('a temporarily missing pinned slot', () => {
     expect(new SettingsStore(file).data.easterEggs).toEqual([first.id, second.id]);
   });
 });
+
+describe('choosing a profile', () => {
+  const DAD = 'A1B2C3D4E5F60718293A4B5C6D7E8F90', SON = '0F1E2D3C4B5A69788796A5B4C3D2E1F0'; // made up
+  let dir: string;
+  const controllers: Controller[] = [];
+  beforeEach(() => { dir = mkdtempSync(join(tmpdir(), 'hyrule-profiles-')); });
+  afterEach(() => {
+    for (const c of controllers.splice(0)) c.stop();
+    rmSync(dir, { recursive: true, force: true });
+  });
+  function play(id: string, hour: number) {
+    const slot = join(dir, 'save', id, 'slot_00');
+    mkdirSync(slot, { recursive: true });
+    const buffer = Buffer.alloc(0x38);
+    buffer.writeUInt32LE(0x01020304, 0);
+    buffer.writeUInt32LE(0x002d80eb, 4);
+    buffer.writeUInt32LE(buffer.length, 8);
+    buffer.writeUInt32LE(2, 0x2c);
+    buffer.writeUInt32LE(murmur3('PlayerStatus.MaxLife'), 0x30);
+    buffer.writeUInt32LE(28, 0x34);
+    writeFileSync(join(slot, 'progress.sav'), buffer);
+    const stamp = new Date(2026, 0, 1, hour);
+    utimesSync(join(slot, 'progress.sav'), stamp, stamp);
+    return join(dir, 'save', id);
+  }
+  async function open(settings: SettingsStore) {
+    const c = new Controller({ appDir: fileURLToPath(new URL('..', import.meta.url)),
+      userData: dir, snapshots: join(dir, 'snapshots'), version: 'test', noLive: true }, settings);
+    controllers.push(c);
+    await c.start();
+    return c;
+  }
+
+  it('switches to the chosen profile, remembers it, and follows the most recent one when it goes', async () => {
+    const dad = play(DAD, 10), son = play(SON, 11);
+    const settings = new SettingsStore(join(dir, 'settings.json'));
+    settings.data.saveDir = dir;
+    const first = await open(settings);
+    expect(first.state.saveDir).toBe(son);
+    expect(first.state.profiles.map(p => p.id)).toEqual([SON, DAD]);
+    expect(first.state.chosenProfile).toBeUndefined();
+
+    await first.selectProfile(DAD);
+    expect(first.state.saveDir).toBe(dad);
+    expect(first.state.chosenProfile).toBe(DAD);
+    first.stop();
+
+    const again = await open(new SettingsStore(join(dir, 'settings.json')));
+    expect(again.state.saveDir).toBe(dad);
+    // Opening the game folder again keeps the chosen profile, though the other one saved last.
+    await again.useFolder(dir);
+    expect(again.state.saveDir).toBe(dad);
+    await again.selectProfile(null);
+    expect(again.state.saveDir).toBe(son);
+    expect(again.state.chosenProfile).toBeUndefined();
+    again.stop();
+
+    const reopened = new SettingsStore(join(dir, 'settings.json'));
+    reopened.data.profile = DAD;
+    reopened.data.saveDir = dir;
+    rmSync(dad, { recursive: true });
+    const gone = await open(reopened);
+    expect(gone.state.saveDir).toBe(son);
+    expect(gone.state.chosenProfile).toBeUndefined();
+  });
+});

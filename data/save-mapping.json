@@ -217,7 +217,7 @@
       "evidence": "Clawshot (MIT, github.com/hiKareeem/Clawshot) data/locations.toml: \"Water Temple Morpha Heart\" has object id 14426685265732353862; boss hearts are saved under their object id (Clawshot saw Gohma's in real saves). The earlier rule is kept as a fallback."
     },
     "heart_containers.heart_container_bongo": {
-      "label": "Heart Container (Bongo)",
+      "label": "Heart Container (Bongo Bongo)",
       "detect": {
         "any": [
           {
@@ -377,7 +377,7 @@
       "evidence": "Flag name from game files: IsGet.Weapon_Sword_Giant"
     },
     "equipment.biggorons_sword": {
-      "label": "Biggoron's Sword",
+      "label": "Biggoron Sword",
       "detect": {
         "name": "IsGet.Weapon_Sword_Biggoron"
       },
@@ -521,7 +521,7 @@
       "evidence": "Flag name from game files: IsGet.Item_Hammer"
     },
     "items.gorons_bracelet": {
-      "label": "Goron's Bracelet",
+      "label": "Goron Bracelet",
       "detect": {
         "name": "IsGet.Armor_Child_Gauntlet_Goron"
       },
@@ -601,7 +601,7 @@
       "evidence": "Flag name from game files: IsGet.Item_NayruLove"
     },
     "items.double_magic": {
-      "label": "Double Magic",
+      "label": "Gift of Doubled Magic",
       "detect": {
         "name": "IsGet.Item_FairyBless_MPDouble"
       },
@@ -665,7 +665,7 @@
       "evidence": "Flag name from game files: IsGet.Item_MagicBean"
     },
     "key_items.gerudo_membership_card": {
-      "label": "Gerudo Membership Card",
+      "label": "Gerudo Pass",
       "detect": {
         "name": "IsGet.Item_Token_Gerudo"
       },
@@ -769,7 +769,7 @@
       "evidence": "HavePlayedEvent.Dm_FairyFountain_Din or Din's Fire owned. Slot_05: the only fountain event played is Din's, and it has Din's Fire + a magic meter (MPMax 240), matching the checklist"
     },
     "great_fairies.hyrule_castle_grounds_child_enhanced_charged_spin_attack": {
-      "label": "Hyrule Castle grounds (child): Enhanced (charged) Spin Attack",
+      "label": "Hyrule Castle grounds (child): Gift of Improved Spin",
       "detect": {
         "any": [
           {
@@ -799,7 +799,7 @@
       "evidence": "Fountain event Dm_FairyFountain_Frore (Farore) or Farore's Wind owned"
     },
     "great_fairies.death_mountain_crater_double_magic": {
-      "label": "Death Mountain Crater: Double Magic",
+      "label": "Death Mountain Crater: Gift of Doubled Magic",
       "detect": {
         "any": [
           {
@@ -829,7 +829,7 @@
       "evidence": "Fountain event Dm_FairyFountain_Nayru or Nayru's Love owned"
     },
     "great_fairies.outside_ganons_castle_adult_double_defense_halved_damage": {
-      "label": "Outside Ganon's Castle (adult): Double Defense (halved damage)",
+      "label": "Outside Ganon's Castle (adult): Gift of Halved Damage",
       "detect": {
         "any": [
           {
@@ -1179,7 +1179,7 @@
       "evidence": "Kill counter DefeatedEnemyNum.Enemy_DungeonBoss_Morpha ≥ 1 (the HaveDefeatedEnemy_* bools stay false after a kill)"
     },
     "bosses.bongo": {
-      "label": "Bongo",
+      "label": "Bongo Bongo",
       "detect": {
         "name": "DefeatedEnemyNum.Enemy_DungeonBoss_BongoBongo",
         "gte": 1
@@ -1331,6 +1331,15 @@
       },
       "confidence": "likely",
       "evidence": "Kill counter"
+    },
+    "mini_bosses.lizalfos": {
+      "label": "Lizalfos",
+      "detect": {
+        "name": "DefeatedEnemyNum.Enemy_MiddleBoss_Lizalfos",
+        "gte": 1
+      },
+      "confidence": "likely",
+      "evidence": "Kill counter for the Dodongo's Cavern mini-boss pair"
     },
     "side_quests.malons_friend": {
       "label": "Malon's Friend",
@@ -1505,7 +1514,7 @@
       "evidence": "Flag name from game files: IsGet.Item_OddMushroom"
     },
     "adult_trade.odd_potion": {
-      "label": "Odd Potion",
+      "label": "Odd Poultice",
       "detect": {
         "name": "IsGet.Item_OddPowder"
       },
@@ -1521,7 +1530,7 @@
       "evidence": "Flag name from game files: IsGet.Item_PoacherSaw"
     },
     "adult_trade.broken_gorons_sword": {
-      "label": "Broken Goron's Sword",
+      "label": "Broken Goron Sword",
       "detect": {
         "name": "IsGet.Item_BrokenSword"
       },
@@ -1545,7 +1554,7 @@
       "evidence": "Flag name from game files: IsGet.Item_EyeballFrog"
     },
     "adult_trade.worlds_finest_eye_drops": {
-      "label": "World's Finest Eye Drops",
+      "label": "Specialty Eye Drops",
       "detect": {
         "name": "IsGet.Item_EyeDrop"
       },
@@ -1553,7 +1562,7 @@
       "evidence": "Flag name from game files: IsGet.Item_EyeDrop"
     },
     "adult_trade.claim_check": {
-      "label": "Claim Check",
+      "label": "Biggoron Receipt",
       "detect": {
         "name": "IsGet.Item_ClaimCheck"
       },

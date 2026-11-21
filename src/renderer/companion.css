@@ -734,6 +734,18 @@
   .timeline-panel .activity-list time { padding-top: 1px; }
   .timeline-panel .activity-list img { grid-column: 2; width: 100%; max-width: 320px; }
 }
+/* Registro do jogo: the game's own log (option.sav) for the chosen day, one column per kind of event. */
+.game-log-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 4px 26px; }
+.game-log-grid h3 { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.game-log-grid h3 b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.game-log-grid .quiet { font-size: 12px; margin: 7px 0 0; }
+.game-log-list { list-style: none; margin: 0; padding: 0; }
+.game-log-list li { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid #303033; padding: 7px 0; font-size: 13px; }
+.game-log-list li span { min-width: 0; overflow-wrap: anywhere; }
+.game-log-list li b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.counter-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 0; }
+/* A label that wraps on a narrow screen keeps the three numbers on one line. */
+.counter-strip .metric { align-content: space-between; }
 .medal-row { display: grid; grid-template-columns: minmax(120px, 1.1fr) repeat(4, minmax(38px, .75fr)); gap: 8px; align-items: center; padding: 9px 0; border-top: 1px solid #303033; }
 .medal { color: var(--hyrule-muted); padding: 8px 4px; display: flex; align-items: center; justify-content: center; gap: 3px; border: 1px solid #333236; border-radius: 8px; }
 .medal.earned { color: var(--hyrule-gold); background: #1b3727; border-color: #35714e; }
@@ -832,6 +844,14 @@
   .metric:nth-child(n+3) { border-top: 1px solid var(--hyrule-line); }
   .metric:last-child:nth-child(odd) { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 12px; }
   .metric:last-child:nth-child(odd) strong { grid-column: 2; grid-row: 1 / span 2; }
+  /* Three short counters stay on one row on a phone. */
+  .counter-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .counter-strip .metric { padding: 12px 10px; }
+  .counter-strip .metric strong { font-size: 22px; }
+  .counter-strip .metric + .metric:nth-child(odd) { border-left: 1px solid var(--hyrule-line); }
+  .counter-strip .metric:nth-child(n+3) { border-top: 0; }
+  .counter-strip .metric:last-child:nth-child(odd) { grid-column: auto; grid-template-columns: none; }
+  .counter-strip .metric:last-child:nth-child(odd) strong { grid-column: auto; grid-row: auto; }
   .progress-panel { min-height: 220px; }
 }
 

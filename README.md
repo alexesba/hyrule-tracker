@@ -14,7 +14,7 @@ A desktop app for Windows and Linux that **reads your local save** and updates t
 
 👤 Created by **João Victor Prado**.
 
-[🚀 First use](#-first-use) · [🐧 Linux](#-linux-experimental) · [🍎 macOS](#-macos-saves-only) · [✨ Features](#-features) · [🎮 Compatibility](#-compatibility) · [🔒 Local data](#-local-data) · [🛠️ Development](#️-development) · [🤝 Contributing](#-contributing)
+[🚀 First use](#-first-use) · [🐧 Linux](#-linux-experimental) · [🍎 macOS](#-macos-experimental) · [✨ Features](#-features) · [🎮 Compatibility](#-compatibility) · [🔒 Local data](#-local-data) · [🛠️ Development](#️-development) · [🤝 Contributing](#-contributing)
 
 </div>
 
@@ -47,15 +47,16 @@ The Linux build is new and hasn't been tested on many systems yet. **Please tell
 4. In a Wayland-only session, Electron can open the app natively without an environment override. When `DISPLAY` is set, the app requests X11 (XWayland on Wayland) for overlay placement and global shortcuts. With NVIDIA's driver in a Wayland session, the app opens natively in Wayland instead, because XWayland can show an invisible window there. **If the window opens invisible**, start the app with `HYRULE_TRACKER_WAYLAND=1`, which leaves the decision to Electron; `HYRULE_TRACKER_X11=1` forces X11. On a Wayland desktop with XWayland, pass `--ozone-platform=x11` on launch to select X11 explicitly. Overlay placement and global shortcuts may be limited in native Wayland. The overlay requires windowed or borderless mode outside Gamescope.
 5. If the AppImage closes right away on Ubuntu 24.04+ with a sandbox error, start it with `--no-sandbox`. Older distros may need `libfuse2`.
 
-## 🍎 macOS (saves only)
+## 🍎 macOS (experimental)
 
-There is no macOS release. You can build the app yourself on Apple silicon; it finds saves on disk (nxnative's Ocarina of Time port keeps them in `~/Library/Application Support/nxnative/0400486024DEC000`) but **cannot follow the running game live**: reading another program's memory needs `task_for_pid`, which is not implemented. The status stays **Save connected**, so save in the game or click **Refresh now**. The in-game overlay is untested.
+There is no macOS release. You can build the app yourself on Apple silicon. It finds saves on disk (nxnative's Ocarina of Time port keeps them in `~/Library/Application Support/nxnative/0400486024DEC000`) and, for nxnative, can follow the running game **live** (progress and Link's position on the map). macOS only lets a program read another program's memory with administrator rights, so live reading needs the app started with `sudo` (see below). Without that the status stays **Save connected**, so save in the game or click **Refresh now**. The in-game overlay is untested.
 
 ```sh
 npm ci
 npm run dist:mac    # fetches the missing images, builds, signs ad hoc: release/mac-arm64/Hyrule Tracker.app
 ```
 
+- For live reading, start the built app as root (a separate data folder keeps root from owning your normal settings): `sudo HOME="$HOME" "release/mac-arm64/Hyrule Tracker.app/Contents/MacOS/Hyrule Tracker" --user-data-dir="$HOME/.hyrule-tracker-live"`. The tracker only reads, and never writes to the game. It finds nxnative's helper process `dmhost`; see the [live mode documentation](docs/live-memory.md#macos-nxnative).
 - Needs Node.js 22+ and an `ffmpeg` with libwebp for the item images (Homebrew's default `ffmpeg` has none; check with `ffmpeg -encoders | grep libwebp`). If npm skipped Electron's install script, the script runs it.
 - The app is signed ad hoc, not notarized. Build it on the Mac that runs it, or clear the quarantine flag after copying it: `xattr -dr com.apple.quarantine "Hyrule Tracker.app"`. Automatic updates do not apply to it; build again for a new version.
 
@@ -66,6 +67,7 @@ npm run dist:mac    # fetches the missing images, builds, signs ad hoc: release/
 | 📊 | **Overview** | Checklist %, hearts, Gold Skulltulas, opened chests, rupees and recent activity. |
 | 🗺️ | **Hyrule Map** | 32 regions, per-floor maps, location photos and filters by Link's age, collectible type and completion. A red arrow shows **where Link is** and which way he faces: live in recomps; in emulators it only updates when you save ([why](#-compatibility)). **Follow Link** keeps his region and dungeon floor on screen. Maps fit the window, even fullscreen. |
 | ✅ | **100% Checklist** | Hearts, 100 Gold Skulltulas, songs, equipment, trades, dungeons, Big Poes and more. Done items are struck through. **Available now** shows what you can get with known requirements. |
+| 📖 | **Walkthrough** | The whole game step by step: 20 story chapters and 6 side quests, with each step ticked from your save, the chapter you are on picked out, and links to the checklist and the map. Guide text in English, Portuguese and Spanish. |
 | ⏳ | **Threads of Time+** | Chapters, story steps and seven expandable side quests with guidance and progress from the save. |
 | 🎯 | **Minigames** | 18 activities with wins, prizes and scores: shooting galleries, Bombchu Bowling, fishing, races. Deku Theater and expert modes accept manual marking. |
 | ⚔️ | **Hall of Enemies** | 84 statues, 25 rematches and three trials, with best times from your save and reference images. |
@@ -101,10 +103,11 @@ Turn on **Show in-game overlay** in Settings. It can show counters, remaining ob
 ## 🎮 Compatibility
 
 - 🖥️ Desktop app for **Windows x64** and **Linux x86_64** (experimental), using the save format of the **Nintendo Switch 2 remake**.
-- 🔎 Search recognizes installations and saves from **Triforce / NX2navi**, **NX2Saria**, **Hookshot**, **HeyListen**, **Longshot**, **ReLink**, **Ocarina Reborn**, **Fritchii** and **Lichii**.
+- 🔎 Search recognizes installations and saves from **Triforce / NX2navi**, **NX2Saria**, **Rekarina**, **Hookshot**, **HeyListen**, **Longshot**, **ReLink**, **Ocarina Reborn**, **Fritchii** and **Lichii**.
 - ⚡ Live reading depends on the game version and the memory layout of the port or emulator. See the [live mode documentation](docs/live-memory.md).
-- 🧭 **Link's live position works only in recomps.** A recomp always keeps the game in the same place in memory, so the tracker knows where to find Link. An emulator moves it every time the game starts, so there the arrow only updates when you save.
+- 🧭 **Link's live position works only in recomps and in nxnative on macOS.** A recomp always keeps the game in the same place in memory, so the tracker knows where to find Link; nxnative runs the game natively, with guest address 0 at host address 0. An emulator moves it every time the game starts, so there the arrow only updates when you save.
 - ⚡ **NX2Saria** answers live reading itself, on Windows and Linux: turn on its tracker API (`tracker_api = 1` under `[tracker]` in `nx2saria.ini`) and the tracker reads the running game through `127.0.0.1:6545`, read-only, without reading the game's memory. Its saves are found in `<game folder>/profile/save`.
+- 🗂️ **Rekarina** (Windows) is followed through its saves only, in `<game folder>\profile\save`; the launcher's game folder is `<Rekarina folder>\game`. Live reading doesn't work with it yet: it keeps the game at other addresses in memory than the recomps the tracker reads.
 - 🗂️ Saves from other environments can be selected manually if they expose the same format.
 - ❌ Nintendo 64, Ocarina of Time 3D and original-game port saves use different formats and are **not** supported.
 
@@ -142,7 +145,7 @@ npm run dev
 | `npm test` | 🧪 Runs the test suite (tests needing private fixtures are skipped in public clones). |
 | `npm run dist` | 📦 Builds the Windows x64 installer (`Hyrule-Tracker-Setup-<version>.exe`) in `release/`. |
 | `npm run dist:linux` | 🐧 Builds the Linux AppImage in Docker (works from Windows with Docker Desktop). |
-| `npm run dist:mac` | 🍎 Builds an ad-hoc signed macOS arm64 app on a Mac, fetching the images it lacks (see [macOS](#-macos-saves-only)). |
+| `npm run dist:mac` | 🍎 Builds an ad-hoc signed macOS arm64 app on a Mac, fetching the images it lacks (see [macOS](#-macos-experimental)). |
 | `npm run dist:publish` | 🚀 Creates the draft GitHub release from `CHANGELOG.md` and uploads the installer (needs `GH_TOKEN`). |
 
 ### 🚀 Releasing a version

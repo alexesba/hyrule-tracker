@@ -4,7 +4,7 @@
 // system. Falls back to nothing (the save files) whenever the game isn't running or isn't
 // in the same playthrough.
 import type { GameDataFile } from '../gamedata/parser.js';
-import { locate, readTables, buildLive, fingerprint, matchesReference, sweepRanges, LiveTables, Agreement } from '../gamedata/live.js';
+import { locate, readTables, buildLive, fingerprint, matchesReference, sweepRanges, readableRanges, LiveTables, Agreement } from '../gamedata/live.js';
 import { MemoryAccessDenied, findProcesses, initMemoryAccess, openProcess, type GameProcess } from './procmem.js';
 import { ptraceScope } from './procmem-linux.js';
 import { ApiSession } from '../gamedata/nx2saria.js';
@@ -19,8 +19,15 @@ import { PlayerReader, type LivePlayer } from '../gamedata/player.js';
  * at a fixed place. The Fritchii
  * emulator (lichii.exe) puts it somewhere new every run, so it's found by sweeping.
  */
-const GAMES = [...NATIVE_EXES.map(image => ({ image, emulator: false })),
-  ...EMULATOR_EXES.map(image => ({ image, emulator: true }))];
+interface GameEntry { image: string; emulator: boolean; /** Runs natively on the host: its tables are anywhere in readable memory, with real host pointers. */ hostPointers?: boolean }
+/**
+ * nxnative (Switch games run natively on a Mac) keeps the game's data in its helper process "dmhost", not in "nxnative".
+ * Searched for on macOS only.
+ */
+const MAC_NATIVE_EXES = process.platform === 'darwin' ? ['dmhost'] : [];
+const GAMES: GameEntry[] = [...NATIVE_EXES.map(image => ({ image, emulator: false })),
+  ...EMULATOR_EXES.map(image => ({ image, emulator: true })),
+  ...MAC_NATIVE_EXES.map(image => ({ image, emulator: true, hostPointers: true }))];
 const TICK_MS = 500;
 const FIND_EVERY_MS = 3000;
 /**
@@ -63,6 +70,7 @@ export class LiveSource {
   private lastPrint?: string;
   private snapshot?: { data: GameDataFile; atMs: number; resettable: Set<bigint> };
   private emulator = false;
+  private hostPointers = false;
   /** Where the sweep is: ranges to search (host [lo, hi)), the current one and the next window's centre. */
   private sweep?: { ranges: [bigint, bigint][]; i: number; at: bigint };
   private sweepPausedUntil = 0;
@@ -178,14 +186,19 @@ export class LiveSource {
         this.mem = openProcess(game.pid);
       } catch (e) {
         if (!(e instanceof MemoryAccessDenied)) throw e;
+        // macOS: the game is running but the system won't hand over its task port (task_for_pid).
+        // (An existing, already translated message: a macOS-specific one would need every locale file updated.)
+        if (process.platform === 'darwin') return this.set({ status: 'unavailable', detail: 'Reading game memory is not available on this system.' });
         // Linux: the game is running but the kernel won't let another program read it (Yama ptrace_scope).
         return this.set(ptraceScope() === 1
           ? { status: 'unavailable', detail: 'Linux blocked reading the game\'s memory. To allow it until the next restart, run {command} in a terminal.', detailValues: { command: 'sudo sysctl kernel.yama.ptrace_scope=0' } }
           : { status: 'unavailable', detail: 'Linux blocked reading the game\'s memory (ptrace_scope {scope}). Only the save files can be followed.', detailValues: { scope: ptraceScope() ?? '?' } });
       }
       this.emulator = !!game.emulator;
-      // Link's position: only where guest memory sits at the fixed base (not in emulators).
-      if (!this.emulator) { const mem = this.mem; this.playerReader = new PlayerReader(mem, () => mem.regions()); }
+      this.hostPointers = !!game.hostPointers;
+      // Link's position: only where guest memory sits at a known base (not in emulators). A game running natively
+      // on the host (nxnative on macOS) has guest address 0 at host address 0.
+      if (!this.emulator || this.hostPointers) { const mem = this.mem; this.playerReader = new PlayerReader(mem, () => mem.regions(), this.hostPointers ? 0n : undefined); }
       await this.opts.onGame?.(this.mem.imagePath(), this.mem.appData?.());
     }
     if (!this.mem) return;
@@ -270,12 +283,14 @@ export class LiveSource {
       const hints = [...new Set([...this.opts.hints.map(h => BigInt('0x' + h)), ...DEFAULT_HINTS])];
       // Exact spots first (cheap), then a wider window around each. An emulator's memory
       // moves every run, so only a tracker restart during the same run hits a hint there.
-      for (const h of hints) { const t = locate(mem, ref, h, 4 << 20); if (t) return this.found(t); }
+      for (const h of hints) { const t = locate(mem, ref, h, 4 << 20, this.hostPointers); if (t) return this.found(t); }
       if (!this.emulator) for (const h of hints.slice(0, 2)) {
-        const t = locate(mem, ref, h, SWEEP_WINDOW);
+        const t = locate(mem, ref, h, SWEEP_WINDOW, this.hostPointers);
         if (t) return this.found(t);
       }
-      const ranges: [bigint, bigint][] = this.emulator
+      const ranges: [bigint, bigint][] = this.hostPointers
+        ? readableRanges(mem.regions())
+        : this.emulator
         ? sweepRanges(mem.regions())
         : [[HEAP_LO, HEAP_HI], ...sweepRanges(mem.regions()).filter(([lo, hi]) => hi <= HEAP_LO || lo >= HEAP_HI)];
       this.sweep = { ranges, i: 0, at: (ranges[0]?.[0] ?? 0n) + BigInt(SWEEP_WINDOW) };
@@ -283,7 +298,7 @@ export class LiveSource {
     const s = this.sweep;
     const range = s.ranges[s.i];
     if (range) {
-      const t = locate(mem, ref, s.at, SWEEP_WINDOW);
+      const t = locate(mem, ref, s.at, SWEEP_WINDOW, this.hostPointers);
       if (t) return this.found(t);
       s.at += SWEEP_STEP;
       if (s.at - BigInt(SWEEP_WINDOW) >= range[1] && s.ranges[++s.i]) s.at = s.ranges[s.i][0] + BigInt(SWEEP_WINDOW);
@@ -315,11 +330,11 @@ export class LiveSource {
 }
 
 /** The first running game, in the order of GAMES. */
-async function findGame(): Promise<{ pid: number; emulator?: boolean } | undefined> {
+async function findGame(): Promise<{ pid: number; emulator?: boolean; hostPointers?: boolean } | undefined> {
   for (const g of GAMES) {
     const pids = await findProcesses(g.image);
     const pid = pids.length > 1 ? largest(pids) : pids[0];
-    if (pid) return { pid, emulator: g.emulator };
+    if (pid) return { pid, emulator: g.emulator, hostPointers: g.hostPointers };
   }
   return undefined;
 }

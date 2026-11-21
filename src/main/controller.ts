@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseGameData, GameDataFile, GameDataError } from '../gamedata/parser.js';
-import { candidateGameFoldersAsync, detectInFolders, installationLabel, isUserFolder, latestSaveFoldersByProgram, latestUserFolder, resolvePickedFolder, resolveUserFolders, listSlots, mostRecentSlot, readSaveStable, userFolderForExe, SlotInfo } from '../gamedata/saves.js';
+import { candidateGameFoldersAsync, detectInFolders, installationLabel, isUserFolder, latestSaveFoldersByProgram, latestUserFolder, listProfiles, preferredUserFolder, profileIdOf, resolvePickedFolder, resolveUserFolders, listSlots, mostRecentSlot, readSaveStable, userFolderForExe, SlotInfo, type ProfileInfo } from '../gamedata/saves.js';
 import { loadNames } from '../gamedata/names.js';
 import { Tracker, ChecklistFile, MappingFile, DescriptionsFile, applyDescriptions } from '../core/tracker.js';
 import { regionsForArea } from '../core/areas.js';
@@ -20,6 +20,8 @@ import type { Activity, AppState, ChangeRow, Summary, Toast, SlotSummary } from 
 import { canonicalStage, companionProgress, extendChecklist, RUPEES, type CompanionData, type WorldMarker } from '../core/companion.js';
 import { evaluateAtlasWithManual, joinMarkerFlags, linkAtlas, type AtlasRule } from '../core/atlas.js';
 import { locatePlayer, type AtlasPlace, type PlayerPosition } from '../core/position.js';
+import { readPlayLog } from '../gamedata/playlog.js';
+import { playLogNames, summarizePlayLog, type PlayLogNames, type PlayLogSummary } from '../core/playlog.js';
 import type { PlayerState } from '../shared/types.js';
 
 /** caption.sav keys: Link's position (Vector3) and facing (Float, degrees) when the game saved. */
@@ -57,6 +59,8 @@ export class Controller {
   private lastActivityStats?: ReturnType<typeof companionProgress>;
   private lastHeartStats?: { hearts: number | null; pieces: number | null };
   private lastSaveImage?: { key: string; value?: string };
+  private playLogNames?: PlayLogNames;
+  private lastPlayLog?: { key: string; value?: PlayLogSummary };
   /** last parsed save per slot, for "just collected" and the change list */
   private lastParsed = new Map<string, { mtimeMs: number; data: GameDataFile; buf: Buffer }>();
   /** the save shown last (any slot) */
@@ -95,7 +99,7 @@ export class Controller {
     }
     const o = settings.data.overlay;
     this.state = {
-      status: 'loading', slots: [], slotMode: 'recent', categories: [], snapshots: [], toasts: [], devPanel: settings.data.devPanel, version: paths.version,
+      status: 'loading', slots: [], profiles: [], slotMode: 'recent', categories: [], snapshots: [], toasts: [], devPanel: settings.data.devPanel, version: paths.version,
       easterEggs: settings.data.easterEggs.filter(id => this.easterEggIds.has(id)),
       areaRegions: [],
       available: [],
@@ -210,7 +214,7 @@ export class Controller {
 
   async findSaveFolders() {
     const candidates = await this.searchGameFolders();
-    const choices = latestSaveFoldersByProgram(this.userDir ? [this.userDir, ...candidates] : candidates);
+    const choices = latestSaveFoldersByProgram(this.userDir ? [this.userDir, ...candidates] : candidates, this.settings.data.profile);
     this.detectedFolders = new Set(choices.map(choice => choice.dir));
     return choices;
   }
@@ -334,10 +338,12 @@ export class Controller {
     this.lastShownSave = undefined;
     this.live?.setReference(undefined);
     this.userDir = undefined;
+    this.profiles = [];
     if (!dir) return this.fail('no-folder', 'Nenhuma partida encontrada. Abra o jogo e salve uma vez, ou selecione a pasta do jogo.');
     if (!users.length) return this.fail('no-slots', 'A pasta escolhida não contém um save compatível.');
-    // If a game folder holds several profiles, use the most recently played one.
-    this.userDir = latestUserFolder(users)!;
+    // If a game folder holds several profiles: the one picked in Settings, else the most recently played one.
+    this.userDir = preferredUserFolder(users, this.settings.data.profile)!;
+    this.profiles = listProfiles(this.userDir);
     // Found a folder: no more background searching.
     clearTimeout(this.pollTimer);
     this.pollTimer = undefined;
@@ -360,7 +366,9 @@ export class Controller {
     // A folder picked by hand is a choice too (like a pinned slot).
     if ((!exe && !saveDir) || this.settings.data.pinnedSlot || (this.settings.data.manualSaveDir && this.userDir)) return;
     // NX2Saria says which save folder it uses; the other games' folders are found from their exe.
-    const dir = saveDir && isUserFolder(saveDir) ? saveDir : exe ? userFolderForExe(exe, appData) : null;
+    const found = saveDir && isUserFolder(saveDir) ? saveDir : exe ? userFolderForExe(exe, appData) : null;
+    // The profile picked in Settings, when that game has it.
+    const dir = found && preferredUserFolder([found], this.settings.data.profile);
     if (!dir || path.resolve(dir).toLowerCase() === path.resolve(this.userDir ?? '').toLowerCase()) return;
     const game = exe ? path.dirname(exe).replace(/[\\/]bin$/i, '') : 'NX2Saria';
     this.log.write({ kind: 'source', status: 'switched', detail: `Following the running game: ${game}` });
@@ -369,7 +377,7 @@ export class Controller {
   }
 
   private fail(status: AppState['status'], message: string, values?: Record<string, string | number>) {
-    this.state = { ...this.state, status, message, messageValues: values, saveReadError: false, slots: [], categories: [], summary: undefined, companion: undefined, atlasStatus: undefined, atlasManual: undefined,
+    this.state = { ...this.state, status, message, messageValues: values, saveReadError: false, slots: [], profiles: [], activeProfile: undefined, chosenProfile: undefined, categories: [], summary: undefined, companion: undefined, playLog: undefined, atlasStatus: undefined, atlasManual: undefined,
       saveDir: this.userDir, sourceLabel: undefined, saveImage: undefined };
     this.emit();
   }
@@ -469,6 +477,13 @@ export class Controller {
     this.lastShownBySlot.set(slot.name, cur);
     if (!prev || cur.mtimeMs >= prev.mtimeMs || !liveSnap) this.lastShown = cur;
 
+    // Another profile may have saved meanwhile: list them again unless only the game's state changed.
+    const userDir = this.userDir;
+    if (!fromWatcher || forceRead) this.profiles = listProfiles(userDir);
+    const newest = mostRecentSlot(slots);
+    const profiles = this.profiles.map(p => ({ id: p.id, name: p.name, lastSavedMs: p.dir === userDir ? newest.savedAtMs ?? newest.mtimeMs : p.lastSavedMs }));
+    const activeProfile = profileIdOf(userDir);
+    const chosen = this.settings.data.profile?.toUpperCase();
     const warning = read.data.warnings[0];
     const atlasNow = evaluateAtlasWithManual(this.atlasItems, cur.data, manual, this.atlasLinks);
     this.state = {
@@ -482,8 +497,9 @@ export class Controller {
       slots: slots.map((s): SlotSummary => ({ name: s.name, mtimeMs: s.savedAtMs ?? s.mtimeMs, area: this.readArea(s) })),
       slotMode: pinned ? 'manual' : 'recent',
       activeSlot: slot.name,
+      profiles, activeProfile, chosenProfile: profiles.some(p => p.id === chosen) ? chosen : undefined,
       summary, categories, lastChanges, areaRegions, available, canBeAdult,
-      companion, saveImage: image, atlasStatus: atlasNow.status, atlasManual: atlasNow.manual, atlasLinks: this.atlasLinks,
+      companion, playLog: this.readPlayLog(), saveImage: image, atlasStatus: atlasNow.status, atlasManual: atlasNow.manual, atlasLinks: this.atlasLinks,
       identify: this.settings.data.pendingIdentify,
       learnedCount: this.settings.data.learned.length,
       snapshots: this.listSnapshots(),
@@ -496,6 +512,8 @@ export class Controller {
     for (const fn of this.playerListeners) fn(this.state.player);
   }
   private lastShownBySlot = new Map<string, { mtimeMs: number; data: GameDataFile; buf: Buffer }>();
+  /** Profiles next to the current save folder (listProfiles), read again on most refreshes. */
+  private profiles: ProfileInfo[] = [];
 
   private get activityPath() { return path.join(this.paths.userData, 'activity.json'); }
   private loadActivity(): Activity[] {
@@ -514,6 +532,35 @@ export class Controller {
         value = 'data:image/jpeg;base64,' + Buffer.from(data.bytes, 'hex').toString('base64');
     } catch { /* some slots have no photo */ }
     this.lastSaveImage = { key, value };
+    return value;
+  }
+
+  /** The game's own play log from option.sav (one per user, all slots). Read-only, re-read when the file changes. */
+  private readPlayLog(): PlayLogSummary | undefined {
+    if (!this.userDir) return;
+    const file = path.join(this.userDir, 'option.sav');
+    let key: string;
+    try { const st = fs.statSync(file); key = `${file}|${st.mtimeMs}|${st.size}`; } catch { return; }
+    if (key === this.lastPlayLog?.key) return this.lastPlayLog.value;
+    let value: PlayLogSummary | undefined;
+    try {
+      const events = readPlayLog(parseGameData(fs.readFileSync(file)));
+      if (events) {
+        this.playLogNames ??= playLogNames([
+          ...this.companionData.statues.map(s => s.actor),
+          ...this.companionData.rematches.flatMap(r => r.actor ? [r.actor] : []),
+          ...this.companionData.chests.flatMap(c => c.item ? [c.item] : []),
+          // Save key names (local/names.json) hold many more actors, e.g. DefeatedEnemyNum.Enemy_Stalchild.
+          ...[...this.names.values()].flatMap(name => name.split('.')),
+        ]);
+        value = summarizePlayLog(events, this.playLogNames);
+      }
+    } catch (e) {
+      // Mid-write or an unexpected layout: keep the last summary and try again on the next change.
+      console.error('play log', e);
+      return this.lastPlayLog?.value;
+    }
+    this.lastPlayLog = { key, value };
     return value;
   }
 
@@ -658,6 +705,17 @@ export class Controller {
   async pinSlot(name: string | null) {
     this.settings.update(s => (s.pinnedSlot = name));
     await this.refresh(false);
+  }
+
+  /** Watch another profile of the same emulator or install, and keep to it; null = the most recently played one. */
+  async selectProfile(id: string | null) {
+    if (!this.userDir) return this.state;
+    const profiles = listProfiles(this.userDir);
+    const dir = id === null ? latestUserFolder(profiles.map(p => p.dir)) : profiles.find(p => p.id === id.toUpperCase())?.dir;
+    if (!dir) return this.state;
+    this.settings.update(s => (s.profile = id?.toUpperCase() ?? undefined));
+    await this.useFolder(dir, { manual: !!this.settings.data.manualSaveDir });
+    return this.state;
   }
 
   private manualKey(slot: string, pinned = this.state.slotMode === 'manual') { return `${this.userDir}|${pinned ? slot : '@recent'}`; }
