@@ -7,7 +7,7 @@ save folder. Whenever live data isn't available or doesn't match, the tracker us
 save files as before.
 
 Code: `src/gamedata/live.ts` (layout, locating, reading; tested in `test/live.test.ts`),
-`src/main/procmem.ts` (Windows access through koffi), `src/main/live.ts` (attach, poll,
+`src/main/procmem.ts` (picks the system's reader; Windows through koffi, `procmem-mac.ts` for macOS), `src/main/live.ts` (attach, poll,
 fall back).
 
 ## Memory layout (Hookshot v2.1.0, Longshot v1.0.0, NX2navi 0.12.0, ReLink v0.7.7)
@@ -25,6 +25,27 @@ v0.7.7: same mapping and layout, with the tables at the same address as Triforce
 
 Hookshot (like NX2navi and ReLink) maps the game's memory at host address `0x1000_0000_0000 + guest address`. The
 game heap is at guest `0x10_0000_0000` (about 7 GB).
+
+### macOS: nxnative
+
+nxnative runs Switch games natively on an Apple-silicon Mac. The game's data is not in the `nxnative`
+process but in its helper `dmhost` (both are inside the game's `.app`, in `Contents/MacOS`); the tracker
+looks for `dmhost` on macOS only. Checked on macOS 27.2.1 with the Ocarina of Time port:
+
+- The tables are the same ones as above (Bool, Int, Enum, String64, Int64 and the sorted 64-bit-key
+  table), found by the same search in `dmhost`'s private memory. Because the code runs natively, the
+  records start with a real host address (a vtable such as `0x10c658658`) instead of a small guest
+  pointer, so the search runs with `hostPointers` (see `findRecordRuns` and `locate`).
+- Guest address 0 is host address 0 (the location list's elements check out at base `0x0`), so Link's
+  position is read with guest base 0. The main module is found by the same `MOD0` bytes as in the
+  recomps (at host `0x107a38000` in that run) and the player chain from the section above works unchanged.
+- The game's memory is not in shared (`MAPPED`) blocks, so the whole readable memory under 8 GB is swept
+  (`readableRanges`); larger ranges are the system's shared library cache.
+- Reading another process on macOS goes through `task_for_pid`, which the system only grants to root (or
+  to a program built with the `get-task-allow` entitlement). `procmem-mac.ts` uses `task_for_pid`,
+  `mach_vm_read_overwrite` and `mach_vm_region` through koffi, read-only like the other readers. A refusal is
+  reported as `MemoryAccessDenied`. Whether building nxnative with `get-task-allow` would make root
+  unnecessary has not been tested.
 
 ### Emulators (Fritchii v5.8.4)
 
