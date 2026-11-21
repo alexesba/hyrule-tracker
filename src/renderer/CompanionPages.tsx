@@ -27,7 +27,7 @@ const EasterEggs = lazy(() => import('./EasterEggs').catch(error => {
 }));
 
 const pages = {
-  overview: 'Visão geral', todo: 'O que fazer?', map: 'Mapa de Hyrule', checklist: 'Checklist 100%', threads: 'Fios do Tempo+',
+  overview: 'Visão geral', todo: 'O que fazer?', walkthrough: 'Passo a passo', map: 'Mapa de Hyrule', checklist: 'Checklist 100%', threads: 'Fios do Tempo+',
   hall: 'Salão dos Inimigos', minigames: 'Minijogos', timeline: 'Registro do dia', medals: 'Meus dados',
   secrets: 'Easter Eggs and Secrets', quiz: 'Quiz diário', second: 'Segunda tela', settings: 'Configurações',
 };
@@ -35,6 +35,7 @@ export type Page = keyof typeof pages;
 const pageDescriptions: Record<Page, string> = {
   overview: 'Veja o progresso da sua partida e retome a jornada.',
   todo: 'O que você já consegue fazer agora com os itens que tem.',
+  walkthrough: 'Siga a história do começo ao fim, capítulo por capítulo.',
   map: 'Explore as regiões de Hyrule e localize os colecionáveis.',
   checklist: 'Acompanhe os objetivos que faltam para completar 100% do jogo.',
   threads: 'Acompanhe os capítulos da história e as missões secundárias.',
@@ -48,13 +49,14 @@ const pageDescriptions: Record<Page, string> = {
   settings: 'Configure o idioma, a origem da partida e a janela flutuante.',
 };
 const navGroups: Page[][] = [
-  ['overview', 'todo', 'map', 'checklist', 'threads', 'minigames', 'hall', 'secrets'],
+  ['overview', 'todo', 'walkthrough', 'map', 'checklist', 'threads', 'minigames', 'hall', 'secrets'],
   ['timeline', 'medals', 'quiz'],
   ['second', 'settings'],
 ];
 const iconPaths: Record<string, string> = {
   overview: 'm3 11 9-8 9 8M5 10v10h5v-6h4v6h5V10',
   todo: 'M9 18h6m-5 3h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z',
+  walkthrough: 'M4 4.5A1.5 1.5 0 0 1 5.5 3H19v15H5.5A1.5 1.5 0 0 0 4 19.5zm0 15A1.5 1.5 0 0 0 5.5 21H19v-3M8 7h7m-7 4h5',
   map: 'm3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15m6-12v15',
   checklist: 'M9 5h12M9 12h12M9 19h12M3 5l1 1 2-2m-3 8 1 1 2-2m-3 8 1 1 2-2',
   threads: 'M4 4h16v16H4zM8 8h8m-8 4h8m-8 4h5',
@@ -286,12 +288,13 @@ function SaveActions({ activeDir, notFound = false }: { activeDir?: string; notF
   </>;
 }
 
-export function CompanionPage({ page, state, onPage, onScan, scanning, onLanguage, headerActions, connectionLost, mapFocus, onShowInChecklist, todoView }: { mapFocus?: string; onShowInChecklist?: (id: string) => void; todoView?: ReactNode; page: Page; state: AppState; onPage: (page: Page) => void; onScan: () => void; scanning: boolean; onLanguage: (locale: Locale) => void; headerActions: ReactNode; connectionLost: boolean }) {
+export function CompanionPage({ page, state, onPage, onScan, scanning, onLanguage, headerActions, connectionLost, mapFocus, onShowInChecklist, todoView, walkthroughView }: { mapFocus?: string; onShowInChecklist?: (id: string) => void; todoView?: ReactNode; walkthroughView?: ReactNode; page: Page; state: AppState; onPage: (page: Page) => void; onScan: () => void; scanning: boolean; onLanguage: (locale: Locale) => void; headerActions: ReactNode; connectionLost: boolean }) {
   const view = {
     overview: <Overview state={state} onPage={onPage} onScan={onScan} scanning={scanning} />,
     checklist: <Overview state={state} onPage={onPage} onScan={onScan} scanning={scanning} />,
     // Built by App (the page uses this module's map helpers, so it can't be imported here).
     todo: todoView,
+    walkthrough: walkthroughView,
     map: <HyruleMap state={state} focus={mapFocus} onShowInChecklist={onShowInChecklist} />,
     threads: <Threads state={state} />,
     hall: <Hall state={state} />,
@@ -692,6 +695,9 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
 
   // Arriving from a checklist entry: open its region and highlight it.
   useEffect(() => {
+    // "place:<atlas id>" (from the walkthrough): open that region.
+    const placeKey = focus?.startsWith('place:') ? atlasStages[focus.slice(6)] : undefined;
+    if (placeKey) { setPicked(placeKey); setFollow(false); setFilter('all'); setEra('all'); setActive(undefined); return; }
     const row = focus ? rows.find(r => r.item.id === focus) : undefined;
     if (!row) return;
     setPicked(row.area);

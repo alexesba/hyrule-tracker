@@ -85,6 +85,14 @@ function Content({ page }: { page: Page }): ReactNode {
           </div>
         </div>
       </div>;
+    case 'walkthrough':
+      return <div className="wt-page">
+        <div className="wt-index focus-panel skeleton-stack"><Shape width={150} /><ListRows /><Shape width={130} /><ListRows /></div>
+        <div className="wt-chapter">
+          <div className="wt-hero skeleton-stack"><Shape width={110} /><Shape width={300} height={30} /><Shape width={260} /><Controls widths={[104, 118]} /></div>
+          {rows.map(section => <div className="wt-section skeleton-list-row" key={section}><Shape width={28} height={28} /><Shape width={200} height={16} /></div>)}
+        </div>
+      </div>;
     case 'map':
       return <>
         <div className="filter-bar skeleton-controls">
