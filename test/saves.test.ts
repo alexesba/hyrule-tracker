@@ -119,6 +119,49 @@ describe("an emulator's save folders", () => {
   });
 });
 
+describe('Rekarina', () => {
+  // As its runtime lays out a game folder: profile/save/<uid> is the committed save, save-tx and save-backup are not.
+  function rekarina(dir: string) {
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'Rekarina.exe'), '');
+    const user = path.join(dir, 'profile', 'save', PROFILE);
+    for (const d of [user, path.join(dir, 'profile', 'save-tx', 'ready-3'), path.join(dir, 'profile', 'save-backup', '20261121T090000Z')]) {
+      fs.mkdirSync(path.join(d, 'slot_00'), { recursive: true });
+      fs.writeFileSync(path.join(d, 'slot_00', 'progress.sav'), '');
+    }
+    return user;
+  }
+
+  it('finds the committed save in the game folder, or from the launcher\'s folder above it', () => {
+    const home = path.join(root, 'Rekarina home');
+    const user = rekarina(path.join(home, 'game'));
+    expect(resolveUserFolders(path.join(home, 'game'))).toEqual([user]);
+    expect(resolveUserFolders(home)).toEqual([user]);
+    expect(installationLabel(user)).toBe('Rekarina');
+  });
+  it('names the install by Rekarina.exe when the folder has another name', () => {
+    expect(installationLabel(rekarina(path.join(root, 'Games', 'OoT PC')))).toBe('Rekarina');
+  });
+  it("looks in the default home and in the game folder the launcher remembers", async () => {
+    const appData = path.join(root, 'rk-roaming'), localAppData = path.join(root, 'rk-local');
+    const dest = path.join(root, 'D-drive', 'Zelda', 'game');
+    fs.mkdirSync(path.join(appData, 'Rekarina'), { recursive: true });
+    fs.writeFileSync(path.join(appData, 'Rekarina', 'launcher.json'), JSON.stringify({ game: path.join(root, 'dump'), dest }));
+    const platform = Object.getOwnPropertyDescriptor(process, 'platform')!;
+    vi.stubEnv('APPDATA', appData);
+    vi.stubEnv('LOCALAPPDATA', localAppData);
+    try {
+      Object.defineProperty(process, 'platform', { value: 'win32' });
+      vi.resetModules();
+      const { knownGameFolders } = await import('../src/gamedata/saves.js');
+      expect(knownGameFolders()).toEqual(expect.arrayContaining([path.join(localAppData, 'Rekarina'), dest]));
+    } finally {
+      Object.defineProperty(process, 'platform', platform);
+      vi.unstubAllEnvs();
+    }
+  });
+});
+
 describe('macOS', () => {
   it("lists nxnative's Ocarina of Time folders (a home without them is fine), and only on macOS", async () => {
     const home = path.join(root, 'mac-home');
