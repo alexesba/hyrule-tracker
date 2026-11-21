@@ -1768,5 +1768,7 @@
   "Checklist": "清單",
   "Couldn't connect to the game: {error}": "無法連線到遊戲：{error}",
   "Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.": "在重編譯版中，林克的位置即時顯示。在模擬器中，只在存檔時更新。",
-  "NX2Saria's tracker API doesn't read this game version's progress.": "NX2Saria 的追蹤器 API 無法讀取此遊戲版本的進度。"
+  "NX2Saria's tracker API doesn't read this game version's progress.": "NX2Saria 的追蹤器 API 無法讀取此遊戲版本的進度。",
+  "Perfil": "使用者",
+  "Seguir o perfil jogado por último": "跟隨最近遊玩的使用者"
 }

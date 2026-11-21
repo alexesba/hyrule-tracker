@@ -350,7 +350,8 @@ export function autoDetectUserFolder(): string | null {
   return latestUserFolder(all);
 }
 
-export function latestSaveFoldersByProgram(folders: string[]): SaveFolderChoice[] {
+/** One save folder per program: the most recently played, or the chosen profile there (see preferredUserFolder). */
+export function latestSaveFoldersByProgram(folders: string[], profile?: string): SaveFolderChoice[] {
   const seen = new Set<string>();
   const latest = new Map<string | undefined, SaveFolderChoice>();
   for (const dir of new Set(folders.flatMap(resolveUserFolders))) {
@@ -365,7 +366,93 @@ export function latestSaveFoldersByProgram(folders: string[]): SaveFolderChoice[
     const previous = latest.get(program);
     if (!previous || lastSavedMs > previous.lastSavedMs) latest.set(program, { dir, program, lastSavedMs });
   }
-  return [...latest.values()].sort((a, b) => b.lastSavedMs - a.lastSavedMs);
+  const chosen = [...latest.values()].map(choice => {
+    const own = profile ? listProfiles(choice.dir).find(p => p.id === profile.toUpperCase()) : undefined;
+    return own ? { ...choice, dir: own.dir, lastSavedMs: own.lastSavedMs } : choice;
+  });
+  return chosen.sort((a, b) => b.lastSavedMs - a.lastSavedMs);
+}
+
+export interface ProfileInfo {
+  /** The 32-hex folder name, upper case: the emulator account, or the port's user id. */
+  id: string;
+  dir: string;
+  lastSavedMs: number;
+  /** The account's name, when the emulator keeps it readably (profiles.dat). */
+  name?: string;
+}
+
+const PROFILE_ID = /^[0-9a-f]{32}$/i;
+const isTitleFolder = (dir: string) => path.basename(dir).toUpperCase() === OOT_TITLE_ID;
+
+/** The profile a save folder belongs to: <account>\<title id> for emulators, save\<user id> for the ports. */
+export function profileIdOf(userDir: string): string | undefined {
+  const own = isTitleFolder(userDir) ? path.basename(path.dirname(userDir)) : path.basename(userDir);
+  return PROFILE_ID.test(own) ? own.toUpperCase() : undefined;
+}
+
+/**
+ * Every profile with saves next to this save folder (the same emulator or install), most recently
+ * played first. Empty when the folder isn't laid out by profile.
+ */
+export function listProfiles(userDir: string): ProfileInfo[] {
+  if (!profileIdOf(userDir)) return [];
+  const emulator = isTitleFolder(userDir);
+  const root = emulator ? path.dirname(path.dirname(userDir)) : path.dirname(userDir);
+  const names = emulator ? emulatorProfileNames(root) : new Map<string, string>();
+  const out: ProfileInfo[] = [];
+  for (const n of readdir(root)) {
+    if (!PROFILE_ID.test(n)) continue;
+    const title = emulator ? readdir(path.join(root, n)).find(t => t.toUpperCase() === OOT_TITLE_ID) : '';
+    if (title === undefined) continue;
+    const dir = path.join(root, n, title);
+    const slot = mostRecentSlot(listSlots(dir));
+    if (!slot) continue;
+    const id = n.toUpperCase();
+    out.push({ id, dir, lastSavedMs: slot.savedAtMs ?? slot.mtimeMs, name: names.get(id) });
+  }
+  return out.sort((a, b) => b.lastSavedMs - a.lastSavedMs || a.id.localeCompare(b.id));
+}
+
+const PROFILES_DAT_SIZE = 0x650, USER_RAW_SIZE = 0xc8, MAX_USERS = 8;
+
+/**
+ * Account names from <nand>\system\save\8000000000000010\su\avators\profiles.dat (the yuzu family's layout:
+ * 0x10 bytes of header, then 8 records of uuid, uuid2, timestamp, 0x20-byte UTF-8 name, 0x80 of extra data).
+ * `accounts` is <nand>\user\save\0000000000000000. A name is kept only when its uuid matches a folder there,
+ * so a file laid out differently gives no names instead of wrong ones.
+ */
+function emulatorProfileNames(accounts: string): Map<string, string> {
+  const names = new Map<string, string>();
+  const save = path.dirname(accounts), user = path.dirname(save);
+  if (path.basename(accounts) !== '0000000000000000' || path.basename(save).toLowerCase() !== 'save' || path.basename(user).toLowerCase() !== 'user') return names;
+  const file = path.join(path.dirname(user), 'system', 'save', '8000000000000010', 'su', 'avators', 'profiles.dat');
+  let buf: Buffer;
+  try { buf = fs.readFileSync(file); } catch { return names; }
+  if (buf.length !== PROFILES_DAT_SIZE) return names;
+  const folders = new Set(readdir(accounts).filter(n => PROFILE_ID.test(n)).map(n => n.toUpperCase()));
+  for (let i = 0; i < MAX_USERS; i++) {
+    const at = 0x10 + i * USER_RAW_SIZE;
+    // The save folder is the uuid as two little-endian u64s, high half first.
+    const hex = (offset: number) => buf.readBigUInt64LE(at + offset).toString(16).toUpperCase().padStart(16, '0');
+    const id = hex(8) + hex(0);
+    if (!folders.has(id) || /^0+$/.test(id)) continue;
+    const raw = buf.subarray(at + 0x28, at + 0x48);
+    const end = raw.indexOf(0);
+    const name = raw.subarray(0, end < 0 ? raw.length : end).toString('utf8').trim();
+    if (name && !/[\u0000-\u001f\u007f�]/.test(name)) names.set(id, name);
+  }
+  return names;
+}
+
+/**
+ * The most recently played save folder, or the chosen profile's folder in the same emulator or install
+ * when it has saves. Other installs' profiles don't count: ports can share one user id.
+ */
+export function preferredUserFolder(folders: string[], profile?: string): string | null {
+  const latest = latestUserFolder(folders);
+  if (!latest || !profile) return latest;
+  return listProfiles(latest).find(p => p.id === profile.toUpperCase())?.dir ?? latest;
 }
 
 /** Cheap re-check: only these folders and the default install locations, no drive walk. */

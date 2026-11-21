@@ -65,6 +65,7 @@ export function createWebApi(): TrackerApi & { onConnection: (fn: Listener<Conne
     setLanguage: async (locale: string) => { for (const fn of language) fn(locale); },
     onLanguage: fn => { language.add(fn); return () => { language.delete(fn); }; },
     pinSlot: (name: string | null) => rpc('pinSlot', name),
+    selectProfile: (id: string | null) => rpc<AppState>('selectProfile', id),
     toggleManual: (id: string) => rpc('toggleManual', id),
     setEasterEggFound: (id: string, found: boolean) => rpc<boolean>('setEasterEggFound', id, found),
     refreshProgress: () => rpc<void>('refreshProgress'),

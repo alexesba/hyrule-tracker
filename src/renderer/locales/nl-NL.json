@@ -1768,5 +1768,7 @@
   "Checklist": "Checklist",
   "Couldn't connect to the game: {error}": "Kan geen verbinding maken met de game: {error}",
   "Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.": "In recomps is de positie van Link live. In emulators wordt die alleen bijgewerkt als je opslaat.",
-  "NX2Saria's tracker API doesn't read this game version's progress.": "De tracker-API van NX2Saria leest de voortgang van deze spelversie niet."
+  "NX2Saria's tracker API doesn't read this game version's progress.": "De tracker-API van NX2Saria leest de voortgang van deze spelversie niet.",
+  "Perfil": "Profiel",
+  "Seguir o perfil jogado por último": "Het laatst gespeelde profiel volgen"
 }

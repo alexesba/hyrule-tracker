@@ -33,6 +33,7 @@ const api = {
   },
   setPrefs: (p: UiPrefs): Promise<UiPrefs> => ipcRenderer.invoke('prefs:set', p),
   pinSlot: (name: string | null) => ipcRenderer.invoke('slot:pin', name),
+  selectProfile: (id: string | null): Promise<AppState> => ipcRenderer.invoke('profile:select', id),
   toggleManual: (id: string) => ipcRenderer.invoke('manual:toggle', id),
   setEasterEggFound: (id: string, found: boolean): Promise<boolean> => ipcRenderer.invoke('easter-eggs:set', id, found),
   setDevPanel: (on: boolean) => ipcRenderer.invoke('dev:set', on),
