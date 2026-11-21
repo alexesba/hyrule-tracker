@@ -21,6 +21,24 @@ for (const match of rules.matchAll(/\{\s*hashes:\s*\[([^\]]+)\],\s*itemIds:\s*\[
 for (const match of rules.matchAll(/\{\s*hash:\s*(0x[0-9a-f]+),\s*itemId:\s*'([^']+)'\s*\}/gi)) {
   keys.get(match[2])?.hex32.push(Number(match[1]));
 }
+// Upstream gives these Gold Skulltula markers a neighbour's save keys. Each one takes the key pair
+// holding its own flag, the one data/save-mapping.json reads for the spot its name and photos show.
+const OWN_FLAG = {
+  'lonlon-gs-02': '0x7d8ec14bdd1f6341', // wetland grotto crate (issue #18)
+  'lonlon-gs-04': '0x25e6072d4df023b3', // stone tower
+  'fuego-gs-03': '0x4d1b7e35ca0c6484', // mesh wall at the top of the scarecrow climb
+  'fuego-gs-04': '0x7f498ada1c2e9c7a', // octagonal lava room
+  'sombra-gs-01': '0xeafe60e592e9a3fb', // invisible scythe room
+  'sombra-gs-02': '0xd23a7a2c9eced9ce', // falling spikes room
+  'sombra-gs-03': '0xd7ffbe169189e50d', // pit in the fan corridor
+};
+const holder = new Map([...keys.values()].flatMap(k => k.hex64.map(h => [h.toLowerCase(), k])));
+for (const [id, flag] of Object.entries(OWN_FLAG)) {
+  if (!holder.has(flag)) throw Error('No save key ' + flag + ' for ' + id);
+  keys.set(id, holder.get(flag));
+}
+// Upstream pins the wetland grotto inside Lon Lon Ranch; it is in south-east Hyrule Field.
+const MOVED = { 'lonlon-gs-02': { place: 'llanura', at: { map: 'principal', x: 0.638, y: 0.768 } } };
 const files = [source.map.image, ...source.places.flatMap(place => place.maps.map(map => map.image)),
   ...source.items.flatMap(item => item.images ?? [])];
 const output = 'src/renderer/public/images/atlas';
@@ -55,7 +73,7 @@ const places = await Promise.all(source.places.map(async ({ id, name, kind, pin,
   maps: await Promise.all(maps.map(async m => ({ id: m.id, label: m.label, image: relative(m.image), aspect: m.aspect, vb: await viewBox(m.image) }))),
 })));
 const items = source.items.map(({ id, place, cat, at, name, age, night, images = [] }) => ({
-  id, place, cat, at, name, age, night, images: images.map(relative), ...keys.get(id),
+  id, place, cat, at, name, age, night, images: images.map(relative), ...keys.get(id), ...MOVED[id],
 }));
 await fs.writeFile('data/atlas.json', JSON.stringify({ map, places, items }, null, 2) + '\n');
 await fs.writeFile('docs/atlas-license.txt', license);
