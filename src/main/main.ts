@@ -11,6 +11,7 @@ import { boundsVisible, cleanBounds, isLocale, isString, isStringArray, parseHot
 import { useX11 } from './x11.js';
 import { findPublicNetworks, lanUrls, startLanServer, type LanServer } from './lan.js';
 import { logError as writeErrorLog } from './errorlog.js';
+import { WALKTHROUGH_SOURCE_URL } from '../core/walkthrough.js';
 
 const isDev = !app.isPackaged;
 const appDir = app.getAppPath();
@@ -134,7 +135,11 @@ function createMain() {
   main.webContents.setWindowOpenHandler(({ url }) => {
     let target: URL;
     try { target = new URL(url); } catch { return { action: 'deny' }; }
-    if (target.protocol === 'https:' && (['nintendoeverything.com', 'www.nintendo.com', 'zelda.mtwildwood.net', 'github.com', 'www.nintenduo.com'].includes(target.hostname) || controller.isEasterEggSource(target.href))) void shell.openExternal(target.href);
+    if (target.protocol === 'https:' && (
+      ['nintendoeverything.com', 'www.nintendo.com', 'zelda.mtwildwood.net', 'github.com', 'www.nintenduo.com'].includes(target.hostname)
+      || controller.isEasterEggSource(target.href)
+      || target.href === WALKTHROUGH_SOURCE_URL
+    )) void shell.openExternal(target.href);
     return { action: 'deny' };
   });
   lockNavigation(main);

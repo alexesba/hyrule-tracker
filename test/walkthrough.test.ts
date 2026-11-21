@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { extendChecklist, type CompanionData } from '../src/core/companion.js';
 import {
@@ -9,6 +9,7 @@ import {
 const read = (f: string) => JSON.parse(readFileSync(f, 'utf8'));
 const guide: WalkthroughFile = read('data/walkthrough.json');
 const strings: Record<string, string[]> = read('src/renderer/walkthrough-strings.json');
+const locales = readdirSync('src/renderer/locales').filter(file => file.endsWith('.json'));
 const icons = new Set(Object.keys(read('src/renderer/item-images.json')));
 const places = new Set<string>(read('data/atlas.json').places.map((p: { id: string }) => p.id));
 const checklist = read('data/checklist.json');
@@ -71,6 +72,18 @@ describe('walkthrough data', () => {
     const texts = new Set(walkthroughTexts(guide));
     expect([...texts].filter(t => !strings[t] || strings[t].length !== 2 || strings[t].some(x => !x.trim()))).toEqual([]);
     expect(Object.keys(strings).filter(k => !texts.has(k))).toEqual([]);
+  });
+
+  it.each(locales)('translates every walkthrough text for %s', file => {
+    const texts = new Set(walkthroughTexts(guide));
+    const localized: Record<string, string> = read(`src/renderer/walkthrough-locales/${file}`);
+    const catalog: Record<string, string> = read(`src/renderer/locales/${file}`);
+    expect([...texts].filter(text => !localized[text]?.trim())).toEqual([]);
+    expect(Object.keys(localized).filter(text => !texts.has(text))).toEqual([]);
+    expect(Object.values(localized).filter(text => /[–—]|Z\s*Q\s*\d+\s*Q\s*Z/i.test(text))).toEqual([]);
+    expect(localized['Buy the Deku Shield']).toContain(catalog['Deku Shield']);
+    expect(localized['Find the Kokiri Sword']).toContain(catalog['Kokiri Sword']);
+    expect(localized['At night, Hookshot the Gold Skulltula at the top of the House of the Twins.'].replaceAll('’', "'")).toContain(catalog['Gold Skulltula']);
   });
 
   it('writes no dashes as punctuation', () => {

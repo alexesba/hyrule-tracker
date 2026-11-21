@@ -997,8 +997,8 @@ Recolher tudo||Collapse all|Plegar todo
 Encontre um save para ver no guia o que você já fez.||Find a save to see in the guide what you have already done.|Busca una partida para ver en la guía lo que ya has hecho.
 Capítulo anterior||Previous chapter|Capítulo anterior
 Próximo capítulo||Next chapter|Capítulo siguiente
-Texto escrito para o tracker. Fatos conferidos no guia da IGN:||Text written for the tracker. Facts checked against the IGN guide:|Texto escrito para el tracker. Datos comprobados con la guía de IGN:
-abrir a página do capítulo||open the chapter page|abrir la página del capítulo
+O passo a passo do Hyrule Tracker foi escrito com base no guia da IGN para Ocarina of Time Remake.||The Hyrule Tracker walkthrough is based on IGN’s guide to Ocarina of Time Remake.|El paso a paso de Hyrule Tracker se basa en la guía de IGN para Ocarina of Time Remake.
+Consultar o guia da IGN||Read the IGN guide|Consultar la guía de IGN
 Opcional||Optional|Opcional
 {n} passo||{n} step|{n} paso
 {n} passos||{n} steps|{n} pasos

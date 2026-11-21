@@ -195,7 +195,7 @@ export function App() {
         <CompanionPage mapFocus={mapFocus} onShowInChecklist={showInChecklist} page={page}
           todoView={page === 'todo' ? <WhatToDo state={state} onShowInChecklist={showInChecklist} onShowOnMap={showOnMap} /> : undefined}
           walkthroughView={page === 'walkthrough' ? <Suspense fallback={<PageSkeleton page="walkthrough" />}>
-            <Walkthrough state={state} onShowInChecklist={showInChecklist} onShowOnMap={showOnMap} onShowPlace={id => showOnMap('place:' + id)} />
+            <Walkthrough state={state} onShowPlace={id => showOnMap('place:' + id)} />
           </Suspense> : undefined} state={state} onPage={setPage} onScan={scan} scanning={scanning} onLanguage={changeLanguage} headerActions={headerActions} connectionLost={lost} />
       ) : state.status !== 'ok' ? (
         <CompanionPage page="checklist" state={state} onPage={setPage} onScan={scan} scanning={scanning} onLanguage={changeLanguage} headerActions={headerActions} connectionLost={lost} />

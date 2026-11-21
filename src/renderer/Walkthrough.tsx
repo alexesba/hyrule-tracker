@@ -1,26 +1,43 @@
-import { useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react';
-import type { AppState, TrackedItem } from '../shared/types';
+import { use, useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react';
+import type { AppState, TrackedCategory, TrackedItem } from '../shared/types';
 import guide from '../../data/walkthrough.json';
-import translations from './walkthrough-strings.json';
 import {
   chapterProgress, currentChapter, sectionStatuses, type ChapterProgress, type DoneLookup, type StepStatus,
   type WalkthroughChapter, type WalkthroughFile, type WalkthroughPart, type WalkthroughSection, type WalkthroughStep,
 } from '../core/walkthrough';
-import { areaShot, atlasStages, MAP_CATEGORIES } from './CompanionPages';
+import { areaShot, atlasKinds, atlasStages, categoryIcons, rowMarkers } from './CompanionPages';
 import { GameItemIcon, trackedItemIcon } from './GameItemIcon';
-import { currentLocale, message, percent, plural, t, tail } from './i18n';
+import { currentLocale, message, percent, plural, t, tail, type Locale } from './i18n';
+import { MarkerDetails, trackedMarkerDetails, type MarkerDetailsData } from './MarkerDetails';
+import { useModalDialog } from './useModalDialog';
 import { useNarrow } from './WhatToDo';
 import './walkthrough.css';
 
 const chapters = (guide as WalkthroughFile).chapters;
-const strings: Record<string, string[]> = translations;
+const localGuideFiles = import.meta.glob<Record<string, string>>('./walkthrough-locales/*.json', { import: 'default' });
+const guideLoads = new Map<Locale, Promise<Record<string, string> | undefined>>();
 
-/** The guide's own text in pt-BR or es-ES; every other language reads the English source (marked with its lang). */
-function guideLanguage() {
+type GuideText = (source: string) => string;
+
+function useGuideLanguage(): { translate: GuideText; lang?: string } {
   const locale = currentLocale();
-  return locale === 'pt-BR' ? { index: 0, lang: undefined } : locale === 'es-ES' ? { index: 1, lang: undefined } : { index: -1, lang: locale === 'en-US' ? undefined : 'en-US' };
+  if (locale === 'en-US') return { translate: source => source };
+  let loading = guideLoads.get(locale);
+  if (!loading) {
+    const load = locale === 'pt-BR' || locale === 'es-ES'
+      ? import('./walkthrough-strings.json').then(({ default: strings }) => Object.fromEntries(
+        Object.entries(strings).map(([source, translations]) => [source, translations[locale === 'pt-BR' ? 0 : 1]]),
+      ))
+      : localGuideFiles[`./walkthrough-locales/${locale}.json`]?.();
+    loading = load?.catch(error => {
+      console.error(error);
+      return undefined;
+    }) ?? Promise.resolve(undefined);
+    guideLoads.set(locale, loading);
+  }
+  const dictionary = use(loading);
+  return dictionary ? { translate: source => dictionary[source] ?? source } : { translate: source => source, lang: 'en-US' };
 }
-const g = (text: string, index: number) => (index >= 0 ? strings[text]?.[index] : undefined) ?? text;
 
 const partTitles: Record<WalkthroughPart, string> = {
   stones: 'Parte 1: as Pedras Espirituais',
@@ -31,30 +48,34 @@ const partTitles: Record<WalkthroughPart, string> = {
 const parts = Object.keys(partTitles) as WalkthroughPart[];
 const ageLabel = { child: 'Criança', adult: 'Adulto', both: 'Criança e adulto' } as const;
 
-/**
- * "Walkthrough": the whole story step by step, chapter by chapter, with each step ticked from the save
- * (its checklist rows), the chapter the player is on picked out, and links to the checklist and the map.
- */
-export default function Walkthrough({ state, onShowInChecklist, onShowOnMap, onShowPlace }: {
+export default function Walkthrough({ state, onShowPlace }: {
   state: AppState;
-  onShowInChecklist: (id: string) => void;
-  onShowOnMap: (id: string) => void;
   onShowPlace: (placeId: string) => void;
 }) {
-  const rows = useMemo(() => new Map(state.categories.flatMap(c => c.items.map(i => [i.id, { item: i, category: c.id }] as const))), [state.categories]);
+  const rows = useMemo(() => new Map(state.categories.flatMap(c => c.items.map(i => [i.id, { item: i, category: c }] as const))), [state.categories]);
+  const markers = useMemo(() => rowMarkers(state.atlasLinks), [state.atlasLinks]);
   const hasSave = !!state.summary;
   const done = useMemo<DoneLookup>(() => id => (hasSave ? rows.get(id)?.item.done : false), [rows, hasSave]);
   const progress = useMemo(() => chapters.map(c => chapterProgress(c, done)), [done]);
   const current = useMemo(() => (hasSave ? currentChapter(chapters, done) : -1), [done, hasSave]);
 
   const [picked, setPicked] = useState<string>();
+  const [objectiveId, setObjectiveId] = useState<string>();
   const index = Math.max(0, picked ? chapters.findIndex(c => c.id === picked) : current);
   const chapter = chapters[index];
   const [page, setPage] = useState<HTMLDivElement | null>(null);
   const compact = useNarrow(page, 760);
   const top = useRef<HTMLElement>(null);
   const sheet = useRef<HTMLDetailsElement>(null);
-  const language = guideLanguage();
+  const { translate, lang } = useGuideLanguage();
+  const objective = objectiveId ? rows.get(objectiveId) : undefined;
+  const marker = objectiveId ? markers.get(objectiveId) : undefined;
+
+  const showObjective = (id: string) => {
+    // Marking an objective can advance the save's current chapter while the player is still reading this one.
+    setPicked(chapter.id);
+    setObjectiveId(id);
+  };
 
   const pick = (id: string) => {
     setPicked(id);
@@ -63,24 +84,31 @@ export default function Walkthrough({ state, onShowInChecklist, onShowOnMap, onS
     requestAnimationFrame(() => top.current?.scrollIntoView({ block: 'start', behavior: reducedMotion ? 'auto' : 'smooth' }));
   };
 
-  const list = <ChapterIndex hasSave={hasSave} progress={progress} current={current} selected={index} language={language.index} lang={language.lang} onPick={pick} />;
+  const list = <ChapterIndex hasSave={hasSave} progress={progress} current={current} selected={index} translate={translate} lang={lang} onPick={pick} />;
   return <div ref={setPage} className={`wt-page ${compact ? 'compact' : ''}`}>
     {compact ? <details ref={sheet} className="wt-index-sheet">
       <summary>
         <span className="wt-index-sheet-label">{t('Capítulos')}</span>
-        <b lang={language.lang}>{index + 1}. {g(chapter.title, language.index)}</b>
+        <b lang={lang}>{index + 1}. {translate(chapter.title)}</b>
       </summary>
       {list}
     </details> : <aside className="wt-index" aria-label={t('Capítulos')}>{list}</aside>}
     <ChapterView key={chapter.id} chapterRef={top} chapter={chapter} number={index + 1} progress={progress[index]} isCurrent={index === current}
-      hasSave={hasSave} done={done} rows={rows} language={language.index} lang={language.lang}
-      onShowInChecklist={onShowInChecklist} onShowOnMap={onShowOnMap} onShowPlace={onShowPlace}
+      hasSave={hasSave} done={done} rows={rows} translate={translate} lang={lang}
+      onShowObjective={showObjective} onShowPlace={onShowPlace}
       previous={chapters[index - 1]} next={chapters[index + 1]} onPick={pick} />
+    {objective && <ObjectivePopup key={objective.item.id} onClose={() => setObjectiveId(undefined)} marker={{
+      ...trackedMarkerDetails(objective.item, marker && state.atlasStatus?.[marker.id]),
+      name: marker?.name ?? objective.item.name,
+      kind: t((marker && atlasKinds[marker.cat]) || objective.category.label),
+      icon: categoryIcons[objective.category.id] ?? trackedItemIcon(objective.item),
+      images: marker?.images ?? [],
+    }} />}
   </div>;
 }
 
-function ChapterIndex({ hasSave, progress, current, selected, language, lang, onPick }: {
-  hasSave: boolean; progress: ChapterProgress[]; current: number; selected: number; language: number; lang?: string; onPick: (id: string) => void;
+function ChapterIndex({ hasSave, progress, current, selected, translate, lang, onPick }: {
+  hasSave: boolean; progress: ChapterProgress[]; current: number; selected: number; translate: GuideText; lang?: string; onPick: (id: string) => void;
 }) {
   return <nav className="wt-index-list">{parts.map(part => (
     <section key={part}>
@@ -91,7 +119,7 @@ function ChapterIndex({ hasSave, progress, current, selected, language, lang, on
             className={`${progress[i].complete ? 'complete' : ''} ${i === current ? 'here' : ''}`}>
             <span className="wt-index-number" aria-hidden="true">{progress[i].complete ? <Check /> : i + 1}</span>
             <span className="wt-index-text">
-              <b lang={lang}>{g(c.title, language)}</b>
+              <b lang={lang}>{translate(c.title)}</b>
               <small>
                 {i === current ? t('Você está aqui') : progress[i].complete ? t('Concluído') : hasSave && progress[i].total ? `${progress[i].done}/${progress[i].total}` : t(ageLabel[c.age])}
               </small>
@@ -106,12 +134,12 @@ function ChapterIndex({ hasSave, progress, current, selected, language, lang, on
 
 const rate = (p: ChapterProgress) => (p.complete ? 100 : p.total ? Math.floor(p.done / p.total * 100) : 0);
 
-type Rows = Map<string, { item: TrackedItem; category: string }>;
+type Rows = Map<string, { item: TrackedItem; category: TrackedCategory }>;
 
-function ChapterView({ chapter, chapterRef, number, progress, isCurrent, hasSave, done, rows, language, lang, onShowInChecklist, onShowOnMap, onShowPlace, previous, next, onPick }: {
+function ChapterView({ chapter, chapterRef, number, progress, isCurrent, hasSave, done, rows, translate, lang, onShowObjective, onShowPlace, previous, next, onPick }: {
   chapter: WalkthroughChapter; chapterRef: RefObject<HTMLElement | null>; number: number; progress: ChapterProgress; isCurrent: boolean; hasSave: boolean;
-  done: DoneLookup; rows: Rows; language: number; lang?: string;
-  onShowInChecklist: (id: string) => void; onShowOnMap: (id: string) => void; onShowPlace: (placeId: string) => void;
+  done: DoneLookup; rows: Rows; translate: GuideText; lang?: string;
+  onShowObjective: (id: string) => void; onShowPlace: (placeId: string) => void;
   previous?: WalkthroughChapter; next?: WalkthroughChapter; onPick: (id: string) => void;
 }) {
   const statuses = useMemo(() => new Map(chapter.sections.map(s => [s.id, sectionStatuses(s, done, progress.complete)])), [chapter, done, progress.complete]);
@@ -128,8 +156,8 @@ function ChapterView({ chapter, chapterRef, number, progress, isCurrent, hasSave
   return <article className="wt-chapter" ref={chapterRef} aria-labelledby="wt-chapter-title">
     <header className={`wt-hero ${shot ? 'has-shot' : ''}`} style={shot ? { '--wt-shot': `url("${shot}")` } as CSSProperties : undefined}>
       <span className={`wt-eyebrow ${isCurrent ? 'here' : ''}`}>{isCurrent ? t('Você está aqui') : t(partTitles[chapter.part])}</span>
-      <h2 id="wt-chapter-title" lang={lang}><span className="wt-hero-number">{number}.</span> {g(chapter.title, language)}</h2>
-      <p lang={lang}>{g(chapter.summary, language)}</p>
+      <h2 id="wt-chapter-title" lang={lang}><span className="wt-hero-number">{number}.</span> {translate(chapter.title)}</h2>
+      <p lang={lang}>{translate(chapter.summary)}</p>
       {hasSave && <div className="wt-hero-progress">
         <span className="wt-hero-rate" aria-hidden="true"><i style={{ width: `${rate(progress)}%` }} /></span>
         <small>
@@ -148,28 +176,27 @@ function ChapterView({ chapter, chapterRef, number, progress, isCurrent, hasSave
     <div className="wt-sections">{chapter.sections.map((section, i) => (
       <Section key={section.id} section={section} number={i + 1} statuses={statuses.get(section.id)!} open={isOpen(section)}
         onToggle={() => setOpen(o => ({ ...o, [section.id]: !isOpen(section) }))} rows={rows} hasSave={hasSave}
-        language={language} lang={lang} onShowInChecklist={onShowInChecklist} onShowOnMap={onShowOnMap} onShowPlace={onShowPlace} />
+        translate={translate} lang={lang} onShowPlace={onShowPlace} onShowObjective={id => {
+          setOpen(o => ({ ...o, [section.id]: true }));
+          onShowObjective(id);
+        }} />
     ))}</div>
 
-    <footer className="wt-chapter-footer">
-      <div className="wt-pager">
-        {previous ? <button type="button" className="action" onClick={() => onPick(previous.id)}>
-          <small>{t('Capítulo anterior')}</small><span lang={lang}>{g(previous.title, language)}</span>
-        </button> : <span />}
-        {next && <button type="button" className="action next" onClick={() => onPick(next.id)}>
-          <small>{t('Próximo capítulo')}</small><span lang={lang}>{g(next.title, language)}</span>
-        </button>}
-      </div>
-      <p className="wt-credit">{t('Texto escrito para o tracker. Fatos conferidos no guia da IGN:')}{' '}
-        <a href={chapter.source} target="_blank" rel="noreferrer">{t('abrir a página do capítulo')}</a></p>
+    <footer className="wt-pager">
+      {previous && <button type="button" className="action" onClick={() => onPick(previous.id)}>
+          <small>{t('Capítulo anterior')}</small><span lang={lang}>{translate(previous.title)}</span>
+      </button>}
+      {next && <button type="button" className="action next" onClick={() => onPick(next.id)}>
+          <small>{t('Próximo capítulo')}</small><span lang={lang}>{translate(next.title)}</span>
+      </button>}
     </footer>
   </article>;
 }
 
-function Section({ section, number, statuses, open, onToggle, rows, hasSave, language, lang, onShowInChecklist, onShowOnMap, onShowPlace }: {
+function Section({ section, number, statuses, open, onToggle, rows, hasSave, translate, lang, onShowObjective, onShowPlace }: {
   section: WalkthroughSection; number: number; statuses: { status: StepStatus; passed: boolean }[]; open: boolean; onToggle: () => void;
-  rows: Rows; hasSave: boolean; language: number; lang?: string;
-  onShowInChecklist: (id: string) => void; onShowOnMap: (id: string) => void; onShowPlace: (placeId: string) => void;
+  rows: Rows; hasSave: boolean; translate: GuideText; lang?: string;
+  onShowObjective: (id: string) => void; onShowPlace: (placeId: string) => void;
 }) {
   const checked = statuses.filter(s => s.status !== 'plain');
   const finished = statuses.every(s => s.passed);
@@ -179,7 +206,7 @@ function Section({ section, number, statuses, open, onToggle, rows, hasSave, lan
       <button type="button" aria-expanded={open} aria-controls={body} onClick={onToggle}>
         <span className="wt-section-number" aria-hidden="true">{hasSave && finished ? <Check /> : section.optional ? '+' : number}</span>
         <span className="wt-section-title">
-          <span lang={lang}>{g(section.title, language)}</span>
+          <span lang={lang}>{translate(section.title)}</span>
           <small>{section.optional ? t('Opcional') : null}{section.optional && hasSave && checked.length > 0 ? ' · ' : null}
             {hasSave && checked.length > 0 ? `${checked.filter(s => s.status === 'done').length}/${checked.length}` : null}
             {!section.optional && !(hasSave && checked.length) ? plural(section.steps.length, '{n} passo', '{n} passos') : null}</small>
@@ -190,16 +217,16 @@ function Section({ section, number, statuses, open, onToggle, rows, hasSave, lan
     {open && <div id={body} className="wt-section-body">
       {section.place && <button type="button" className="small-btn wt-section-map" onClick={() => onShowPlace(section.place!)}>{t('Ver no mapa')}</button>}
       <ol className="wt-steps">{section.steps.map((step, i) => (
-        <Step key={i} step={step} number={i + 1} state={statuses[i]} rows={rows} hasSave={hasSave} language={language} lang={lang}
-          onShowInChecklist={onShowInChecklist} onShowOnMap={onShowOnMap} />
+        <Step key={i} step={step} number={i + 1} state={statuses[i]} rows={rows} hasSave={hasSave} translate={translate} lang={lang}
+          onShowObjective={onShowObjective} />
       ))}</ol>
     </div>}
   </section>;
 }
 
-function Step({ step, number, state, rows, hasSave, language, lang, onShowInChecklist, onShowOnMap }: {
-  step: WalkthroughStep; number: number; state: { status: StepStatus; passed: boolean }; rows: Rows; hasSave: boolean; language: number; lang?: string;
-  onShowInChecklist: (id: string) => void; onShowOnMap: (id: string) => void;
+function Step({ step, number, state, rows, hasSave, translate, lang, onShowObjective }: {
+  step: WalkthroughStep; number: number; state: { status: StepStatus; passed: boolean }; rows: Rows; hasSave: boolean; translate: GuideText; lang?: string;
+  onShowObjective: (id: string) => void;
 }) {
   const objectives = (step.objectives ?? []).map(id => rows.get(id)).filter((r): r is NonNullable<typeof r> => !!r);
   const shown = new Set(objectives.map(o => trackedItemIcon(o.item)));
@@ -212,29 +239,37 @@ function Step({ step, number, state, rows, hasSave, language, lang, onShowInChec
       {mark === 'done' || mark === 'passed' ? <Check /> : <span aria-hidden="true">{number}</span>}
     </span>
     <div className="wt-step-body">
-      <p lang={lang}>{g(step.text, language)}
+      <p lang={lang}>{translate(step.text)}
         {(step.age || step.night) && <span className="todo-badges wt-step-badges">
           {step.age && <span className={`age ${step.age}`}>{t(ageLabel[step.age])}</span>}
           {step.night && <span className="age night">{t('night')}</span>}
         </span>}
       </p>
-      {step.tip && <p className="wt-tip" lang={lang}>{g(step.tip, language)}</p>}
+      {step.tip && <p className="wt-tip" lang={lang}>{translate(step.tip)}</p>}
       {(items.length > 0 || objectives.length > 0) && <div className="wt-step-links">
         {items.map(i => <span key={i} className="wt-item"><GameItemIcon id={i} size={22} /></span>)}
-        {objectives.map(({ item, category }) => <span key={item.id} className={`wt-objective ${hasSave && item.done ? 'done' : ''}`}>
-          <button type="button" onClick={() => onShowInChecklist(item.id)} title={t('Ver na checklist')}>
-            <GameItemIcon id={trackedItemIcon(item)} size={20} />
-            <span>{category === 'gold_skulltulas' ? `#${item.number} · ` : ''}{tail(item.name)}</span>
-            {hasSave && item.done && <Check />}
-          </button>
-          {MAP_CATEGORIES.has(category) && <button type="button" className="wt-objective-map" onClick={() => onShowOnMap(item.id)}
-            aria-label={`${t('Ver no mapa')}: ${tail(item.name)}`} title={t('Ver no mapa')}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15m6-12v15" /></svg>
-          </button>}
-        </span>)}
+        {objectives.map(({ item, category }) => <button key={item.id} type="button" aria-haspopup="dialog"
+          className={`wt-objective ${hasSave && item.done ? 'done' : ''}`} onClick={() => onShowObjective(item.id)}>
+          <GameItemIcon id={trackedItemIcon(item)} size={20} />
+          <span>{category.id === 'gold_skulltulas' ? `#${item.number} · ` : ''}{tail(item.name)}</span>
+          {hasSave && item.done && <Check />}
+        </button>)}
       </div>}
     </div>
   </li>;
+}
+
+function ObjectivePopup({ marker, onClose }: { marker: MarkerDetailsData; onClose: () => void }) {
+  const dialog = useModalDialog(true);
+  return <dialog ref={dialog} className="marker-card wt-objective-popup" aria-label={t(marker.name)}
+    onCancel={e => { e.preventDefault(); onClose(); }}
+    onClick={e => {
+      if (e.target !== e.currentTarget) return;
+      const { left, right, top, bottom } = e.currentTarget.getBoundingClientRect();
+      if (e.clientX < left || e.clientX > right || e.clientY < top || e.clientY > bottom) onClose();
+    }}>
+    <MarkerDetails marker={marker} onClose={onClose} />
+  </dialog>;
 }
 
 function Check() {

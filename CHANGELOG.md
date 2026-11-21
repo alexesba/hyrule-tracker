@@ -4,6 +4,25 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [1.5.0] - 2026-11-21
+
+### New
+- **Walkthrough.** Follow the 20 story chapters and six side quests in any of the tracker's 12 languages. With a save connected, the guide highlights your chapter and checks off steps as you progress. Click an objective to see its location, available photos and completion status in the same card used by the map, right inside the chapter. The nine new guide translations were machine-assisted and reviewed by sample.
+- **Save profiles.** Pick a profile from the save menu when a game or emulator has more than one. You can switch between players without browsing for their save folders. Thanks to raphael-s-souza for requesting this. [#16](https://github.com/jv-prado/hyrule-tracker/issues/16)
+- **Game activity and counters.** Daily Log can show enemies defeated, damage taken, songs played and estimated time by area from the game's own log, including play while the tracker was closed. My Data shows the save's jump, roll and sword swing totals. Thanks to Kabosune for documenting the save fields. [#15](https://github.com/jv-prado/hyrule-tracker/issues/15)
+- **Rekarina saves on Windows.** The tracker finds Rekarina's save folders and updates progress when you save. Thanks to PainKiller2k for suggesting support. [#20](https://github.com/jv-prado/hyrule-tracker/issues/20)
+- **Experimental live tracking on macOS.** On Apple silicon, a self-built tracker can read progress and show Link's live position when playing through nxnative. Live tracking requires administrator privileges. Thanks to Daniel Rijavec (driajvec) for proposing, building and testing it. [#17](https://github.com/jv-prado/hyrule-tracker/issues/17) · [#19](https://github.com/jv-prado/hyrule-tracker/pull/19)
+
+### Improved
+- **Brazilian Portuguese and Spanish names.** Item, place, song, enemy and character names across the tracker and walkthrough follow the remake's localizations.
+- **Collectible and quest guides.** Checked locations, requirements and instructions against the remake guides. Updated hints for heart pieces, upgrades, Great Fairy rewards, the trading quests and other objectives.
+
+### Fixed
+- **Gold Skulltula #99.** The map pin and guide now point to the grotto in southeastern Hyrule Field. The guide explains what to do there as Child Link and how to collect the token as Adult Link. Thanks to unleed-l for reporting the incorrect location and supplying both steps. [#18](https://github.com/jv-prado/hyrule-tracker/issues/18)
+
+### Known
+- **Rekarina and macOS.** Rekarina support is save-based. The macOS overlay is untested, and macOS builds are available from source.
+
 ## [1.4.8] - 2026-11-19
 
 ### Improved

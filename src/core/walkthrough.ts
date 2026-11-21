@@ -1,6 +1,8 @@
 // The step-by-step guide (data/walkthrough.json) and how far the player is in it, from the checklist rows.
 // No imports from Electron, Node or React: the renderer and the tests use it as is.
 
+export const WALKTHROUGH_SOURCE_URL = 'https://www.ign.com/wikis/ocarina-of-time-remake/Walkthrough';
+
 export type Age = 'child' | 'adult';
 
 export interface WalkthroughStep {
