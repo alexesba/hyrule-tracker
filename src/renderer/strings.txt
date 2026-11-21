@@ -26,61 +26,61 @@ Fontes||Sources|Fuentes
 Voltar às regiões||Back to regions|Volver a las regiones
 Configurações||Settings|Ajustes
 Idioma||Language|Idioma
-Flying Pot|Vaso voador|Flying Pot|Vasija voladora
+Flying Pot|Vaso voador|Flying Pot|Cántaro volante
 Deku Nut Bundle|Porção de nozes Deku|Deku Nut Bundle|Manojo de nueces deku
 Deku Scrub|Deku|Deku Scrub|Deku
 Dodongo Cavern|Caverna dos Dodongos|Dodongo Cavern|Cueva de los Dodongos
-Gohma Larva|Larva de Gohma|Gohma Larva|Larva de Gohma
-Megaton Hammer|Martelo Megaton|Megaton Hammer|Martillo Megatón
-Great Moblin|Moblin gigante|Great Moblin|Moblin gigante
-Poe Sisters|Irmãs Poe|Poe Sisters|Hermanas Poe
-White Wolfos|Wolfos branco|White Wolfos|Wolfos blanco
+Gohma Larva|Larva de Gohma|Gohma Larva|Larva gohma
+Megaton Hammer|Martelo megaton|Megaton Hammer|Martillo Megatón
+Great Moblin|Grande moblin|Great Moblin|Gran moblin
+Poe Sisters|Irmãs pectro|Poe Sisters|Hermanas Poe
+White Wolfos|Lupulfos branco|White Wolfos|Wolfos blanco
 Switched to the saves of the game that's running ({game}).|Acompanhando os saves do jogo em execução ({game}).|Switched to the saves of the game that's running ({game}).|Siguiendo las partidas guardadas del juego en ejecución ({game}).
 Collected {item}|Coletado: {item}|Collected {item}|Recogido: {item}
-+{count} · Gold Skulltulas ({total} total)|+{count} · Skulltulas douradas ({total} no total)|+{count} · Gold Skulltulas ({total} total)|+{count} · Skulltulas doradas ({total} en total)
++{count} · Gold Skulltulas ({total} total)|+{count} · cranítulas de ouro ({total} no total)|+{count} · Gold Skulltulas ({total} total)|+{count} · Skulltulas doradas ({total} en total)
 Recognised {category} #{number} in {area}. You can undo it in the item details.|Registro de {category} nº {number} em {area}. Você pode desfazer nos detalhes do item.|Recognised {category} #{number} in {area}. You can undo it in the item details.|Registro de {category} n.º {number} en {area}. Puedes deshacerlo en los detalles.
 Man on the roof|Homem no telhado|Man on the roof|Hombre del tejado
-A man lying on a rooftop gives it to you. As a child, carry a Cucco up to the ledge behind the windmill and glide over; as an adult, Hookshot up.|O homem deitado no telhado entrega o pedaço. Como criança, leve um Cucco até a plataforma atrás do moinho e plane até o telhado. Como adulto, suba com o gancho.|A man lying on a rooftop gives it to you. As a child, carry a Cucco up to the ledge behind the windmill and glide over; as an adult, Hookshot up.|El hombre tumbado en el tejado te da la pieza. De niño, lleva un cuco al saliente tras el molino y planea hasta el tejado. De adulto, sube con el gancho.
+A man lying on a rooftop gives it to you. As a child, carry a Cucco up to the ledge behind the windmill and glide over; as an adult, Hookshot up.|O homem deitado no telhado entrega o pedaço. Como criança, leve um coricó até a plataforma atrás do moinho e plane até o telhado. Como adulto, suba com o gancho.|A man lying on a rooftop gives it to you. As a child, carry a Cucco up to the ledge behind the windmill and glide over; as an adult, Hookshot up.|El hombre tumbado en el tejado te da la pieza. De niño, lleva un cuco al saliente tras el molino y planea hasta el tejado. De adulto, sube con el gancho.
 Dampé's gravedigging tour|Escavação de Dampé|Dampé's gravedigging tour|Excavación de Dampé
 As a child at night, pay Dampé to dig in the graveyard's soft ground. Keep paying for digs until the piece turns up.|Como criança, vá ao cemitério à noite e pague Dampé para cavar na terra fofa até encontrar o pedaço.|As a child at night, pay Dampé to dig in the graveyard's soft ground. Keep paying for digs until the piece turns up.|De niño, ve al cementerio de noche y paga a Dampé para que cave en tierra blanda hasta encontrar la pieza.
 Inside the stone tower|Dentro da torre de pedra|Inside the stone tower|Dentro de la torre de piedra
 As a child, push the crates aside in the ranch's stone tower and crawl through to the round room behind them.|Como criança, empurre os caixotes na torre de pedra do rancho e rasteje até a sala redonda atrás deles.|As a child, push the crates aside in the ranch's stone tower and crawl through to the round room behind them.|De niño, aparta las cajas de la torre de piedra del rancho y gatea hasta la sala circular que hay detrás.
-Chest on the Cucco ledge|Baú na plataforma dos Cuccos|Chest on the Cucco ledge|Cofre en el saliente de los cucos
-In a chest on a ledge partway down the valley. Glide there with a Cucco as a child, or Longshot over as an adult.|O baú fica em uma plataforma no meio do vale. Plane até lá com um Cucco quando criança ou use o gancho longo quando adulto.|In a chest on a ledge partway down the valley. Glide there with a Cucco as a child, or Longshot over as an adult.|El cofre está en un saliente a media altura del valle. Planea con un cuco de niño o usa el supergancho de adulto.
+Chest on the Cucco ledge|Baú na plataforma dos coricós|Chest on the Cucco ledge|Cofre en el saliente de los cucos
+In a chest on a ledge partway down the valley. Glide there with a Cucco as a child, or Longshot over as an adult.|O baú fica em uma plataforma no meio do vale. Plane até lá com um coricó quando criança ou use o gancho longo quando adulto.|In a chest on a ledge partway down the valley. Glide there with a Cucco as a child, or Longshot over as an adult.|El cofre está en un saliente a media altura del valle. Planea con un cuco de niño o usa el supergancho de adulto.
 Behind the waterfall|Atrás da cachoeira|Behind the waterfall|Detrás de la cascada
-Glide down with a Cucco to the riverside alcove at the bottom of the valley, walk up towards the big waterfall and climb the path behind it.|Plane com um Cucco até a reentrância à beira do rio, no fundo do vale, siga em direção à grande cachoeira e suba pelo caminho atrás dela.|Glide down with a Cucco to the riverside alcove at the bottom of the valley, walk up towards the big waterfall and climb the path behind it.|Planea con un cuco hasta el hueco junto al río, en el fondo del valle, camina hacia la gran cascada y sube por el camino que hay detrás.
+Glide down with a Cucco to the riverside alcove at the bottom of the valley, walk up towards the big waterfall and climb the path behind it.|Plane com um coricó até a reentrância à beira do rio, no fundo do vale, siga em direção à grande cachoeira e suba pelo caminho atrás dela.|Glide down with a Cucco to the riverside alcove at the bottom of the valley, walk up towards the big waterfall and climb the path behind it.|Planea con un cuco hasta el hueco junto al río, en el fondo del valle, camina hacia la gran cascada y sube por el camino que hay detrás.
 Fishing pond (child prize)|Lago de pesca (prêmio de criança)|Fishing pond (child prize)|Estanque de pesca (premio de niño)
 Catch a big enough fish as a child at the fishing pond by Lake Hylia.|Como criança, pesque um peixe grande o suficiente no lago de pesca perto do Lago Hylia.|Catch a big enough fish as a child at the fishing pond by Lake Hylia.|De niño, atrapa un pez lo bastante grande en el estanque de pesca junto al lago Hylia.
 Richard the lost dog|Richard, o cachorro perdido|Richard the lost dog|Richard, el perro perdido
 As a child at night, find the dog Richard running around the back alley and lead him home to his owner.|Como criança, encontre Richard no beco à noite e acompanhe o cachorro até a casa da dona.|As a child at night, find the dog Richard running around the back alley and lead him home to his owner.|De niño, encuentra a Richard de noche en el callejón y guía al perro hasta la casa de su dueña.
 Skull Kid's ocarina game|Jogo de ocarina dos Skull Kids|Skull Kid's ocarina game|Juego de ocarina de los Skull Kids
 As a child, stand on the stump near the entrance to the Lost Woods and repeat the Skull Kid's tunes. Win three rounds.|Como criança, suba no toco perto da entrada do Bosque Perdido, repita as melodias dos Skull Kids e vença três rodadas.|As a child, stand on the stump near the entrance to the Lost Woods and repeat the Skull Kid's tunes. Win three rounds.|De niño, sube al tocón cerca de la entrada del Bosque Perdido, repite las melodías de los Skull Kids y gana tres rondas.
-Skull Kid's song|Canção do Skull Kid|Skull Kid's song|Canción del Skull Kid
-As a child, play Saria's Song for the Skull Kid sitting on a stump in the Lost Woods.|Como criança, toque a Canção de Saria para o Skull Kid sentado em um toco no Bosque Perdido.|As a child, play Saria's Song for the Skull Kid sitting on a stump in the Lost Woods.|De niño, toca la Canción de Saria para el Skull Kid sentado en un tocón del Bosque Perdido.
+Skull Kid's song|Canção do caveirino|Skull Kid's song|Canción del Skull Kid
+As a child, play Saria's Song for the Skull Kid sitting on a stump in the Lost Woods.|Como criança, toque a Canção da Saria para o caveirino sentado em um toco no Bosque Perdido.|As a child, play Saria's Song for the Skull Kid sitting on a stump in the Lost Woods.|De niño, toca la Canción de Saria para el Skull Kid sentado en un tocón del Bosque Perdido.
 Spinning pot|Vaso giratório|Spinning pot|Vasija giratoria
 As a child, throw a Bomb into the big spinning pot on Goron City's bottom floor (if it isn't spinning, light the torches around it first). You get the piece when it stops on the happy face.|Como criança, jogue uma Bomba no grande pote giratório do andar mais baixo da Cidade Goron (se ele não estiver girando, acenda antes as tochas em volta). O pedaço sai quando ele para na cara feliz.|As a child, throw a Bomb into the big spinning pot on Goron City's bottom floor (if it isn't spinning, light the torches around it first). You get the piece when it stops on the happy face.|De niño, lanza una bomba a la gran vasija giratoria de la planta baja de la Ciudad Goron (si no gira, enciende antes las antorchas de alrededor). La pieza sale cuando se para en la cara feliz.
 Ledge below the crater entrance|Plataforma abaixo da entrada da cratera|Ledge below the crater entrance|Saliente bajo la entrada del cráter
-From the summit entrance, climb down the wall to a hidden ledge. A child can grab it before the heat gets too much; as an adult, wear the Goron Tunic.|A partir da entrada do cume, desça pela parede até a plataforma escondida. Link criança consegue pegar o pedaço antes de o calor ficar insuportável. Como adulto, vista a Túnica Goron.|From the summit entrance, climb down the wall to a hidden ledge. A child can grab it before the heat gets too much; as an adult, wear the Goron Tunic.|Desde la entrada de la cima, baja por la pared hasta el saliente oculto. Link niño puede recoger la pieza antes de que el calor sea insoportable. De adulto, usa la túnica goron.
+From the summit entrance, climb down the wall to a hidden ledge. A child can grab it before the heat gets too much; as an adult, wear the Goron Tunic.|A partir da entrada do cume, desça pela parede até a plataforma escondida. Link criança consegue pegar o pedaço antes de o calor ficar insuportável. Como adulto, vista a túnica goron.|From the summit entrance, climb down the wall to a hidden ledge. A child can grab it before the heat gets too much; as an adult, wear the Goron Tunic.|Desde la entrada de la cima, baja por la pared hasta el saliente oculto. Link niño puede recoger la pieza antes de que el calor sea insoportable. De adulto, usa la túnica goron.
 Rooftop behind Impa's house|Telhado atrás da casa da Impa|Rooftop behind Impa's house|Tejado tras la casa de Impa
-On the roof above Impa's cow pen. As a child, let Kaepora Gaebora carry you down from the Death Mountain summit (he only offers once you have Din's Fire); as an adult, Hookshot up.|O pedaço está no telhado acima do curral da Impa. Como criança, peça a Kaepora Gaebora para levar você do cume da Montanha da Morte ao telhado após obter o Fogo de Din. Como adulto, suba com o gancho.|On the roof above Impa's cow pen. As a child, let Kaepora Gaebora carry you down from the Death Mountain summit (he only offers once you have Din's Fire); as an adult, Hookshot up.|La pieza está sobre el corral de Impa. De niño, pide a Kaepora Gaebora que te lleve desde la cima de la Montaña de la Muerte cuando tengas el Fuego de Din. De adulto, sube con el gancho.
-Bombchu Bowling|Boliche de Bombchu|Bombchu Bowling|Bolos Bombchu
-The prize for your third win at the Bombchu Bowling Alley; the first two give Bombchus and the Biggest Bomb Bag. The alley opens after you defeat King Dodongo.|O prêmio da sua terceira vitória no Boliche de Bombchu; as duas primeiras dão Bombchus e a Bolsa de Bombas Máxima. O boliche abre após você derrotar o King Dodongo.|The prize for your third win at the Bombchu Bowling Alley; the first two give Bombchus and the Biggest Bomb Bag. The alley opens after you defeat King Dodongo.|El premio de tu tercera victoria en la bolera Bombchu; las dos primeras dan Bombchus y el saco de bombas gigante. La bolera abre después de derrotar al King Dodongo.
+On the roof above Impa's cow pen. As a child, let Kaepora Gaebora carry you down from the Death Mountain summit (he only offers once you have Din's Fire); as an adult, Hookshot up.|O pedaço está no telhado acima do curral da Impa. Como criança, peça a Kaepora Gaebora para levar você do cume da Montanha da Morte ao telhado após obter a Flama de Din. Como adulto, suba com o gancho.|On the roof above Impa's cow pen. As a child, let Kaepora Gaebora carry you down from the Death Mountain summit (he only offers once you have Din's Fire); as an adult, Hookshot up.|La pieza está sobre el corral de Impa. De niño, pide a Kaepora Gaebora que te lleve desde la cima de la Montaña de la Muerte cuando tengas el Fuego de Din. De adulto, sube con el gancho.
+Bombchu Bowling|Boliche Roebomba|Bombchu Bowling|Bolos bombuchu
+The prize for your third win at the Bombchu Bowling Alley; the first two give Bombchus and the Biggest Bomb Bag. The alley opens after you defeat King Dodongo.|O prêmio da sua terceira vitória no Boliche Roebomba; as duas primeiras dão roebombas e a bolsa de bombas enorme. O boliche abre após você derrotar o Rei Dodongo.|The prize for your third win at the Bombchu Bowling Alley; the first two give Bombchus and the Biggest Bomb Bag. The alley opens after you defeat King Dodongo.|El premio de tu tercera victoria en la bolera bombuchu; las dos primeras dan bombuchus y el saco de bombas gigante. La bolera abre después de derrotar al Rey Dodongo.
 Raised platform|Plataforma elevada|Raised platform|Plataforma elevada
-On the last of a row of small islets near the start of the river. As a child, bomb open the grotto on the big island's high ledge, take the Cucco inside and glide from islet to islet. As an adult, use the Hover Boots.|Na última de uma fileira de ilhotas perto do início do rio. Como criança, exploda a entrada da gruta na borda alta da ilha grande, pegue o Cucco lá dentro e plane de ilhota em ilhota. Como adulto, use as Botas Flutuantes.|On the last of a row of small islets near the start of the river. As a child, bomb open the grotto on the big island's high ledge, take the Cucco inside and glide from islet to islet. As an adult, use the Hover Boots.|En el último de una fila de islotes cerca del inicio del río. De niño, abre con una bomba la gruta del saliente alto de la isla grande, coge el cuco de dentro y planea de islote en islote. De adulto, usa las botas flotantes.
+On the last of a row of small islets near the start of the river. As a child, bomb open the grotto on the big island's high ledge, take the Cucco inside and glide from islet to islet. As an adult, use the Hover Boots.|Na última de uma fileira de ilhotas perto do início do rio. Como criança, exploda a entrada da gruta na borda alta da ilha grande, pegue o coricó lá dentro e plane de ilhota em ilhota. Como adulto, use as botas aladas.|On the last of a row of small islets near the start of the river. As a child, bomb open the grotto on the big island's high ledge, take the Cucco inside and glide from islet to islet. As an adult, use the Hover Boots.|En el último de una fila de islotes cerca del inicio del río. De niño, abre con una bomba la gruta del saliente alto de la isla grande, coge el cuco de dentro y planea de islote en islote. De adulto, usa las botas voladoras.
 Ledge by the waterfall|Plataforma perto da cachoeira|Ledge by the waterfall|Saliente junto a la cascada
-On a ledge near the waterfall to Zora's Domain. Glide there with a Cucco as a child, or use the Hover Boots as an adult.|O pedaço fica em uma plataforma perto da cachoeira que dá acesso ao Domínio Zora. Plane até lá com um Cucco quando criança ou use as Botas Flutuantes quando adulto.|On a ledge near the waterfall to Zora's Domain. Glide there with a Cucco as a child, or use the Hover Boots as an adult.|La pieza está en un saliente cerca de la cascada que lleva a la Región de los Zora. Planea con un cuco de niño o usa las botas flotantes de adulto.
+On a ledge near the waterfall to Zora's Domain. Glide there with a Cucco as a child, or use the Hover Boots as an adult.|O pedaço fica em uma plataforma perto da cachoeira que dá acesso ao Território Zora. Plane até lá com um coricó quando criança ou use as botas aladas quando adulto.|On a ledge near the waterfall to Zora's Domain. Glide there with a Cucco as a child, or use the Hover Boots as an adult.|La pieza está en un saliente cerca de la cascada que lleva a la Región de los Zora. Planea con un cuco de niño o usa las botas voladoras de adulto.
 Torch chest|Baú das tochas|Torch chest|Cofre de las antorchas
-Light a Deku Stick at the torches by King Zora and carry the flame down, lighting every torch on the way. The last two braziers, behind the waterfall, make a chest appear.|Acenda um Galho Deku nas tochas perto do Rei Zora e leve a chama para baixo, acendendo todas as tochas no caminho. Os dois últimos braseiros, atrás da cachoeira, fazem aparecer um baú.|Light a Deku Stick at the torches by King Zora and carry the flame down, lighting every torch on the way. The last two braziers, behind the waterfall, make a chest appear.|Enciende un palo deku en las antorchas junto al rey Zora y baja con la llama, encendiendo todas las antorchas del camino. Los dos últimos braseros, detrás de la cascada, hacen aparecer un cofre.
+Light a Deku Stick at the torches by King Zora and carry the flame down, lighting every torch on the way. The last two braziers, behind the waterfall, make a chest appear.|Acenda um graveto deko nas tochas perto do Rei Zora e leve a chama para baixo, acendendo todas as tochas no caminho. Os dois últimos braseiros, atrás da cachoeira, fazem aparecer um baú.|Light a Deku Stick at the torches by King Zora and carry the flame down, lighting every torch on the way. The last two braziers, behind the waterfall, make a chest appear.|Enciende un palo deku en las antorchas junto al rey Zora y baja con la llama, encendiendo todas las antorchas del camino. Los dos últimos braseros, detrás de la cascada, hacen aparecer un cofre.
 Magic Bean platform|Plataforma do feijão mágico|Magic Bean platform|Plataforma de la judía mágica
 Plant a Magic Bean in the soft soil by the graveyard wall as a child, then ride the plant as an adult to the platform with the piece.|Como criança, plante um feijão mágico na terra fofa junto ao muro do cemitério. Como adulto, suba na planta para alcançar a plataforma com o pedaço.|Plant a Magic Bean in the soft soil by the graveyard wall as a child, then ride the plant as an adult to the platform with the piece.|De niño, planta una judía mágica en la tierra blanda junto al muro del cementerio. De adulto, sube a la planta para alcanzar la plataforma con la pieza.
 Inside the windmill|Dentro do moinho|Inside the windmill|Dentro del molino
 On a ledge high inside the windmill. As a child, the Boomerang can fetch it; as an adult, come up through the tunnel from Dampé's grave.|O pedaço fica no alto do moinho. Como criança, pegue-o com o bumerangue. Como adulto, chegue pelo túnel do túmulo de Dampé.|On a ledge high inside the windmill. As a child, the Boomerang can fetch it; as an adult, come up through the tunnel from Dampé's grave.|La pieza está en lo alto del molino. De niño, recógela con el bumerán. De adulto, entra por el túnel de la tumba de Dampé.
 Dampé's race|Corrida de Dampé|Dampé's race|Carrera de Dampé
 As an adult, race Dampé's ghost through his tomb in under a minute. The chest at the end holds the piece.|Como adulto, siga o fantasma de Dampé pela tumba e termine a corrida em menos de um minuto. O pedaço está no baú ao final.|As an adult, race Dampé's ghost through his tomb in under a minute. The chest at the end holds the piece.|De adulto, sigue al fantasma de Dampé por la tumba y termina en menos de un minuto. La pieza está en el cofre al final.
-House of Skulltula: 50 tokens|Casa das Skulltulas (50 fichas)|House of Skulltula: 50 tokens|Casa de las Skulltulas (50 fichas)
-The reward for bringing 50 Gold Skulltula tokens to the House of Skulltula.|Leve 50 fichas de Skulltula dourada à Casa das Skulltulas para ganhar o pedaço.|The reward for bringing 50 Gold Skulltula tokens to the House of Skulltula.|Lleva 50 fichas de Skulltula dorada a la Casa de las Skulltulas para obtener la pieza.
+House of Skulltula: 50 tokens|Casa das cranítulas (50 fichas)|House of Skulltula: 50 tokens|Casa de las Skulltulas (50 fichas)
+The reward for bringing 50 Gold Skulltula tokens to the House of Skulltula.|Leve 50 fichas de cranítula de ouro à Casa das cranítulas para ganhar o pedaço.|The reward for bringing 50 Gold Skulltula tokens to the House of Skulltula.|Lleva 50 fichas de Skulltula dorada a la Casa de las Skulltulas para obtener la pieza.
 Laboratory roof|Telhado do laboratório|Laboratory roof|Tejado del laboratorio
-On the roof of the Lakeside Laboratory. Ride the Magic Bean planted beside the lab as an adult, or play the Scarecrow's Song by the lab and Longshot up.|No telhado do Laboratório do Lago. Como adulto, suba no Feijão mágico plantado ao lado do laboratório, ou toque a Canção do Espantalho perto do laboratório e suba com o Longshot.|On the roof of the Lakeside Laboratory. Ride the Magic Bean planted beside the lab as an adult, or play the Scarecrow's Song by the lab and Longshot up.|En el tejado del Laboratorio del Lago. De adulto, sube en la judía mágica plantada junto al laboratorio, o toca la Canción del Espantapájaros junto al laboratorio y sube con el gancho largo.
+On the roof of the Lakeside Laboratory. Ride the Magic Bean planted beside the lab as an adult, or play the Scarecrow's Song by the lab and Longshot up.|No telhado do Laboratório do Lago. Como adulto, suba no Feijão mágico plantado ao lado do laboratório, ou toque a Canção do Espantalho perto do laboratório e suba com o supergancho.|On the roof of the Lakeside Laboratory. Ride the Magic Bean planted beside the lab as an adult, or play the Scarecrow's Song by the lab and Longshot up.|En el tejado del Laboratorio del Lago. De adulto, sube en la judía mágica plantada junto al laboratorio, o toca la Canción del Espantapájaros junto al laboratorio y sube con el gancho largo.
 Laboratory diving game|Mergulho no laboratório|Laboratory diving game|Buceo en el laboratorio
 Reach the bottom of the laboratory's deep pool for the scientist. You'll need the Golden Scale.|Use a Escama Dourada para chegar ao fundo do tanque do laboratório e mostrar ao cientista que conseguiu.|Reach the bottom of the laboratory's deep pool for the scientist. You'll need the Golden Scale.|Usa la Escama de Oro para llegar al fondo del tanque del laboratorio y demostrarlo al científico.
 Above Dodongo's Cavern|Acima da Caverna dos Dodongos|Above Dodongo's Cavern|Sobre la Cueva de los Dodongos
@@ -88,59 +88,59 @@ On a ledge above the cavern entrance. Plant a Magic Bean in the soil there as a 
 Bean pillar|Pilar do feijão mágico|Bean pillar|Pilar de la judía mágica
 On a tall pillar in the middle of the crater. Plant a Magic Bean in the crater's soil as a child (warp in with the Bolero of Fire), then ride it as an adult.|O pedaço está num pilar alto no centro da cratera. Como criança, chegue com o Bolero do Fogo e plante um feijão mágico. Volte como adulto e use a planta.|On a tall pillar in the middle of the crater. Plant a Magic Bean in the crater's soil as a child (warp in with the Bolero of Fire), then ride it as an adult.|La pieza está en un pilar alto en el centro del cráter. De niño, llega con el Bolero del Fuego y planta una judía mágica. Vuelve de adulto y sube a la planta.
 Iceberg|Iceberg|Iceberg|Iceberg
-As an adult, hop across the floating ice to the farthest iceberg in Zora's Fountain.|Como adulto, pule entre os blocos de gelo até alcançar o iceberg mais distante da Fonte Zora.|As an adult, hop across the floating ice to the farthest iceberg in Zora's Fountain.|De adulto, salta sobre los témpanos hasta llegar al más lejano de la Fuente Zora.
+As an adult, hop across the floating ice to the farthest iceberg in Zora's Fountain.|Como adulto, pule entre os blocos de gelo até alcançar o iceberg mais distante da Nascente Zora.|As an adult, hop across the floating ice to the farthest iceberg in Zora's Fountain.|De adulto, salta sobre los témpanos hasta llegar al más lejano de la Fuente Zora.
 Bottom of the fountain|Fundo da fonte|Bottom of the fountain|Fondo de la fuente
-As an adult, sink to the bottom of Zora's Fountain with the Iron Boots, wearing the Zora Tunic.|Como adulto, vista a Túnica Zora e use as Botas de Ferro para descer até o fundo da Fonte Zora.|As an adult, sink to the bottom of Zora's Fountain with the Iron Boots, wearing the Zora Tunic.|De adulto, ponte la túnica zora y usa las botas de hierro para bajar al fondo de la Fuente Zora.
-Frogs: Song of Storms|Sapos (Canção das Tempestades)|Frogs: Song of Storms|Ranas (Canción de las Tormentas)
-As a child, play the Song of Storms to the frogs on the log in Zora's River.|Como criança, toque a Canção das Tempestades para os sapos no tronco do Rio Zora.|As a child, play the Song of Storms to the frogs on the log in Zora's River.|De niño, toca la Canción de las Tormentas para las ranas del tronco en el Río Zora.
+As an adult, sink to the bottom of Zora's Fountain with the Iron Boots, wearing the Zora Tunic.|Como adulto, vista a túnica zora e use as Botas de Ferro para descer até o fundo da Nascente Zora.|As an adult, sink to the bottom of Zora's Fountain with the Iron Boots, wearing the Zora Tunic.|De adulto, ponte la túnica zora y usa las botas de hierro para bajar al fondo de la Fuente Zora.
+Frogs: Song of Storms|Sapos (Trova da Tempestade)|Frogs: Song of Storms|Ranas (Canción de la tormenta)
+As a child, play the Song of Storms to the frogs on the log in Zora's River.|Como criança, toque a Trova da Tempestade para os sapos no tronco do Rio Zora.|As a child, play the Song of Storms to the frogs on the log in Zora's River.|De niño, toca la Canción de la tormenta para las ranas del tronco en el Río Zora.
 Frogs: bug-catching game|Sapos (jogo dos insetos)|Frogs: bug-catching game|Ranas (juego de los insectos)
-As a child, play the frogs Zelda's Lullaby, Epona's Song, Saria's Song, the Sun's Song and the Song of Time, then win their bug-catching game.|Como criança, toque para os sapos a Canção de Ninar da Zelda, a Canção de Epona, a Canção de Saria, a Canção do Sol e a Canção do Tempo, e vença o jogo de pegar insetos.|As a child, play the frogs Zelda's Lullaby, Epona's Song, Saria's Song, the Sun's Song and the Song of Time, then win their bug-catching game.|De niño, toca a las ranas la Nana de Zelda, la Canción de Epona, la Canción de Saria, la Canción del Sol y la Canción del Tiempo, y gana el juego de atrapar insectos.
+As a child, play the frogs Zelda's Lullaby, Epona's Song, Saria's Song, the Sun's Song and the Song of Time, then win their bug-catching game.|Como criança, toque para os sapos o Acalanto da Zelda, a Canção da Epona, a Canção da Saria, a Canção do Sol e a Canção do Tempo, e vença o jogo de pegar insetos.|As a child, play the frogs Zelda's Lullaby, Epona's Song, Saria's Song, the Sun's Song and the Song of Time, then win their bug-catching game.|De niño, toca a las ranas la Nana de Zelda, la Canción de Epona, la Canción de Saria, la Canción del Sol y la Canción del Tiempo, y gana el juego de atrapar insectos.
 Treasure Chest Shop|Loja de baús|Treasure Chest Shop|Tienda de cofres
-As a child at night, win the Treasure Chest Shop's game. The Lenses of Truth show which chests to open.|Como criança, vença o jogo da Loja de Baús à noite. A Lente da Verdade indica quais baús abrir.|As a child at night, win the Treasure Chest Shop's game. The Lenses of Truth show which chests to open.|De niño, gana el juego de la Tienda de Cofres por la noche. La Lupa de la Verdad revela qué cofres abrir.
+As a child at night, win the Treasure Chest Shop's game. The Lenses of Truth show which chests to open.|Como criança, vença o jogo da Loja de Baús à noite. As lentes da verdade indicam quais baús abrir.|As a child at night, win the Treasure Chest Shop's game. The Lenses of Truth show which chests to open.|De niño, gana el juego de la Tienda de Cofres por la noche. Las gafas de la verdad revelan qué cofres abrir.
 Rooftop chest|Baú no telhado|Rooftop chest|Cofre en el tejado
-In a chest on a high rooftop of the fortress. From the terrace above it, play the Scarecrow's Song and Longshot to the scarecrow.|Num baú num telhado alto da fortaleza. Do terraço acima dele, toque a Canção do Espantalho e use o Longshot até o espantalho.|In a chest on a high rooftop of the fortress. From the terrace above it, play the Scarecrow's Song and Longshot to the scarecrow.|En un cofre en un tejado alto de la fortaleza. Desde la terraza de arriba, toca la Canción del Espantapájaros y engánchate al espantapájaros con el gancho largo.
+In a chest on a high rooftop of the fortress. From the terrace above it, play the Scarecrow's Song and Longshot to the scarecrow.|Num baú num telhado alto da fortaleza. Do terraço acima dele, toque a Canção do Espantalho e use o supergancho até o espantalho.|In a chest on a high rooftop of the fortress. From the terrace above it, play the Scarecrow's Song and Longshot to the scarecrow.|En un cofre en un tejado alto de la fortaleza. Desde la terraza de arriba, toca la Canción del Espantapájaros y engánchate al espantapájaros con el gancho largo.
 Horseback archery|Tiro a cavalo|Horseback archery|Tiro con arco a caballo
 Score 750 points at the Gerudo horseback archery range, riding Epona.|Faça 750 pontos no campo de tiro da Fortaleza Gerudo montando Epona.|Score 750 points at the Gerudo horseback archery range, riding Epona.|Consigue 750 puntos en el campo de tiro de la Fortaleza Gerudo montando a Epona.
 Bean platform|Plataforma do feijão mágico|Bean platform|Plataforma de la judía mágica
 Plant a Magic Bean in the soil by the Spirit Temple as a child (warp in with the Requiem of Spirit), then ride it as an adult to the piece.|Como criança, chegue ao Templo dos Espíritos usando o Réquiem do Espírito e plante um feijão mágico. Como adulto, use a planta para chegar ao pedaço.|Plant a Magic Bean in the soil by the Spirit Temple as a child (warp in with the Requiem of Spirit), then ride it as an adult to the piece.|De niño, llega al Templo del Espíritu con el Réquiem del Espíritu y planta una judía mágica. De adulto, sube a la planta para alcanzar la pieza.
 Hidden grave chest|Baú no túmulo escondido|Hidden grave chest|Cofre de la tumba oculta
 Pull back one of the graveyard's gravestones (as a child, only at night) and drop into the grave. The chest is at the end.|Puxe uma das lápides do cemitério e desça pelo buraco. Como criança, faça isso à noite. O baú está no final.|Pull back one of the graveyard's gravestones (as a child, only at night) and drop into the grave. The chest is at the end.|Mueve una lápida del cementerio y baja por el agujero. De niño, hazlo de noche. El cofre está al final.
-Password Business Scrub|Deku Mercador que pede a senha|Password Business Scrub|Deku comerciante que pide la contraseña
-As an adult, read the fairy thought on the tree near the castle drawbridge for a password. Then, as a child, bomb the cracked ground nearby and buy the piece from the scrub for 100 Rupees.|Como adulto, leia a senha no Pensamento de Fada da árvore perto da ponte levadiça. Volte como criança, exploda o chão rachado ali perto e compre o pedaço do Deku Mercador por 100 rupees.|As an adult, read the fairy thought on the tree near the castle drawbridge for a password. Then, as a child, bomb the cracked ground nearby and buy the piece from the scrub for 100 Rupees.|De adulto, lee la contraseña en la nota de hada del árbol junto al puente levadizo. Vuelve de niño, vuela el suelo agrietado cercano y compra la pieza al Deku comerciante por 100 rupias.
+Password Business Scrub|Dekomerciante que pede a senha|Password Business Scrub|Matorral mercader que pide la contraseña
+As an adult, read the fairy thought on the tree near the castle drawbridge for a password. Then, as a child, bomb the cracked ground nearby and buy the piece from the scrub for 100 Rupees.|Como adulto, leia a senha no Pensamento de Fada da árvore perto da ponte levadiça. Volte como criança, exploda o chão rachado ali perto e compre o pedaço do dekomerciante por 100 rupias.|As an adult, read the fairy thought on the tree near the castle drawbridge for a password. Then, as a child, bomb the cracked ground nearby and buy the piece from the scrub for 100 Rupees.|De adulto, lee la contraseña en el pensamiento de hada del árbol junto al puente levadizo. Vuelve de niño, vuela el suelo agrietado cercano y compra la pieza al matorral mercader por 100 rupias.
 Chest by the Gerudo Valley road|Baú na estrada para o Vale Gerudo|Chest by the Gerudo Valley road|Cofre del camino al Valle Gerudo
-As an adult, read the fairy thought beside the chest under the red cliffs near Gerudo Valley. Then open the chest as a child.|Como adulto, leia o Pensamento de Fada ao lado do baú sob as falésias vermelhas perto do Vale Gerudo. Depois abra o baú como criança.|As an adult, read the fairy thought beside the chest under the red cliffs near Gerudo Valley. Then open the chest as a child.|De adulto, lee la nota de hada junto al cofre bajo los acantilados rojos cerca del Valle Gerudo. Después abre el cofre de niño.
+As an adult, read the fairy thought beside the chest under the red cliffs near Gerudo Valley. Then open the chest as a child.|Como adulto, leia o Pensamento de Fada ao lado do baú sob as falésias vermelhas perto do Vale Gerudo. Depois abra o baú como criança.|As an adult, read the fairy thought beside the chest under the red cliffs near Gerudo Valley. Then open the chest as a child.|De adulto, lee el pensamiento de hada junto al cofre bajo los acantilados rojos cerca del Valle Gerudo. Después abre el cofre de niño.
 {n} floor|{n}º andar|Floor {n}|Planta {n}
 {n} basement|{n}º subsolo|Basement {n}|Sótano {n}
-{n} Gold Skulltula tokens|{n} fichas de Skulltula dourada|{n} Gold Skulltula tokens|{n} fichas de Skulltula dorada
-The scrub sells it for 100 Rupees (the starting wallet holds 200).|O Deku Mercador cobra 100 Rupias. A carteira inicial comporta 200.|The scrub sells it for 100 Rupees (the starting wallet holds 200).|El Deku comerciante cobra 100 rupias. La bolsa inicial admite 200.
-As a child, from the summit entrance go left and drop down to the ledge below. The scrub there sells the piece for 100 Rupees.|Como criança, entre pela passagem do cume, vire à esquerda e desça até a plataforma. O Deku Mercador vende o pedaço por 100 rupees.|As a child, from the summit entrance go left and drop down to the ledge below. The scrub there sells the piece for 100 Rupees.|De niño, entra por la cima, gira a la izquierda y baja al saliente. El Deku comerciante vende la pieza por 100 rupias.
-A child can grab it before the heat gets too much; as adult, wear the Goron Tunic. No Hookshot needed.|Link criança consegue pegar o pedaço antes de o calor ficar insuportável. Como adulto, vista a Túnica Goron. Dá para chegar sem o gancho.|A child can grab it before the heat gets too much; as adult, wear the Goron Tunic. No Hookshot needed.|Link niño puede recoger la pieza antes de que el calor sea insoportable. De adulto, usa la túnica goron. Puedes llegar sin el gancho.
-Child: the owl at the Death Mountain summit drops you on Impa's roof, but only once you have Din's Fire. Adult: Hookshot.|Como criança, peça à coruja do cume da Montanha da Morte para levar você ao telhado da Impa. É preciso ter o Fogo de Din. Como adulto, use o gancho.|Child: the owl at the Death Mountain summit drops you on Impa's roof, but only once you have Din's Fire. Adult: Hookshot.|De niño, la lechuza de la cima de la Montaña de la Muerte te lleva al tejado de Impa cuando ya tienes el Fuego de Din. De adulto, usa el gancho.
-The Bombchu Bowling Alley opens only after King Dodongo.|O Boliche de Bombchu abre depois que você derrota o King Dodongo.|The Bombchu Bowling Alley opens only after King Dodongo.|La bolera Bombchu abre después de derrotar al King Dodongo.
+{n} Gold Skulltula tokens|{n} fichas de cranítula de ouro|{n} Gold Skulltula tokens|{n} fichas de Skulltula dorada
+The scrub sells it for 100 Rupees (the starting wallet holds 200).|O dekomerciante cobra 100 Rupias. A carteira inicial comporta 200.|The scrub sells it for 100 Rupees (the starting wallet holds 200).|El matorral mercader cobra 100 rupias. La bolsa inicial admite 200.
+As a child, from the summit entrance go left and drop down to the ledge below. The scrub there sells the piece for 100 Rupees.|Como criança, entre pela passagem do cume, vire à esquerda e desça até a plataforma. O dekomerciante vende o pedaço por 100 rupias.|As a child, from the summit entrance go left and drop down to the ledge below. The scrub there sells the piece for 100 Rupees.|De niño, entra por la cima, gira a la izquierda y baja al saliente. El matorral mercader vende la pieza por 100 rupias.
+A child can grab it before the heat gets too much; as adult, wear the Goron Tunic. No Hookshot needed.|Link criança consegue pegar o pedaço antes de o calor ficar insuportável. Como adulto, vista a túnica goron. Dá para chegar sem o gancho.|A child can grab it before the heat gets too much; as adult, wear the Goron Tunic. No Hookshot needed.|Link niño puede recoger la pieza antes de que el calor sea insoportable. De adulto, usa la túnica goron. Puedes llegar sin el gancho.
+Child: the owl at the Death Mountain summit drops you on Impa's roof, but only once you have Din's Fire. Adult: Hookshot.|Como criança, peça à coruja do cume da Montanha da Morte para levar você ao telhado da Impa. É preciso ter a Flama de Din. Como adulto, use o gancho.|Child: the owl at the Death Mountain summit drops you on Impa's roof, but only once you have Din's Fire. Adult: Hookshot.|De niño, la lechuza de la cima de la Montaña de la Muerte te lleva al tejado de Impa cuando ya tienes el Fuego de Din. De adulto, usa el gancho.
+The Bombchu Bowling Alley opens only after King Dodongo.|O Boliche Roebomba abre depois que você derrota o Rei Dodongo.|The Bombchu Bowling Alley opens only after King Dodongo.|La bolera bombuchu abre después de derrotar al Rey Dodongo.
 Child: the Boomerang. Adult: through Dampé's grave (Song of Time).|Como criança, use o bumerangue. Como adulto, entre pelo túmulo de Dampé e use a Canção do Tempo.|Child: the Boomerang. Adult: through Dampé's grave (Song of Time).|De niño, usa el bumerán. De adulto, entra por la tumba de Dampé con la Canción del Tiempo.
-The soil is behind the Dodongo's Cavern boulder, which the bracelet's bomb flower opens.|A terra fofa fica atrás da rocha da Caverna dos Dodongos. Com o Bracelete Goron, use uma Flor-Bomba para destruir a rocha.|The soil is behind the Dodongo's Cavern boulder, which the bracelet's bomb flower opens.|La tierra blanda está detrás de la roca de la Cueva de los Dodongos. Con el brazalete goron, usa una flor bomba para destruir la roca.
+The soil is behind the Dodongo's Cavern boulder, which the bracelet's bomb flower opens.|A terra fofa fica atrás da rocha da Caverna dos Dodongos. Com o Bracelete Goron, use uma flor-bomba para destruir a rocha.|The soil is behind the Dodongo's Cavern boulder, which the bracelet's bomb flower opens.|La tierra blanda está detrás de la roca de la Cueva de los Dodongos. Con el brazalete de los goron, usa una flor bomba para destruir la roca.
 No Sun's Song in the remake. As a child the grave can only be pulled at night.|O remake permite abrir esse túmulo sem tocar a Canção do Sol. Como criança, puxe a lápide durante a noite.|No Sun's Song needed in the remake. As a child the grave can only be pulled at night.|En el remake puedes abrir esa tumba sin tocar la Canción del Sol. De niño, mueve la lápida de noche.
-Read the password on the fairy thought by the hole as adult, then buy it as a child for 100 Rupees.|Como adulto, leia a senha no Pensamento de Fada perto da entrada. Depois volte como criança e compre o pedaço por 100 rupees.|Read the password on the fairy thought by the hole as adult, then buy it as a child for 100 Rupees.|De adulto, lee la contraseña en la nota de hada junto a la entrada. Vuelve de niño y compra la pieza por 100 rupias.
-Read the fairy thought as adult first; the chest is opened as a child.|Leia o Pensamento de Fada como adulto antes de abrir o baú como criança.|Read the fairy thought as adult first; the chest is opened as a child.|Lee la nota de hada de adulto antes de abrir el cofre de niño.
+Read the password on the fairy thought by the hole as adult, then buy it as a child for 100 Rupees.|Como adulto, leia a senha no Pensamento de Fada perto da entrada. Depois volte como criança e compre o pedaço por 100 rupias.|Read the password on the fairy thought by the hole as adult, then buy it as a child for 100 Rupees.|De adulto, lee la contraseña en el pensamiento de hada junto a la entrada. Vuelve de niño y compra la pieza por 100 rupias.
+Read the fairy thought as adult first; the chest is opened as a child.|Leia o Pensamento de Fada como adulto antes de abrir o baú como criança.|Read the fairy thought as adult first; the chest is opened as a child.|Lee el pensamiento de hada de adulto antes de abrir el cofre de niño.
 Burn the web, bomb the wall, then the Boomerang.|Queime a teia, exploda a parede e recolha a ficha com o bumerangue.|Burn the web, bomb the wall, then the Boomerang.|Quema la telaraña, vuela la pared y recoge la ficha con el bumerán.
-The soil is behind the boulder that the bracelet's bomb flower opens.|A terra fofa fica atrás da rocha. Use o Bracelete Goron para levantar uma Flor-Bomba e explodir a rocha.|The soil is behind the boulder that the bracelet's bomb flower opens.|La tierra blanda está detrás de la roca. Usa el brazalete goron para levantar una flor bomba y destruir la roca.
+The soil is behind the boulder that the bracelet's bomb flower opens.|A terra fofa fica atrás da rocha. Use o Bracelete Goron para levantar uma flor-bomba e explodir a rocha.|The soil is behind the boulder that the bracelet's bomb flower opens.|La tierra blanda está detrás de la roca. Usa el brazalete de los goron para levantar una flor bomba y destruir la roca.
 Out of reach on the house wall: the Boomerang brings the token back.|Na parede da casa, fora de alcance. Use o bumerangue para trazer a ficha.|Out of reach on the house wall: the Boomerang brings the token back.|Está fuera de alcance en la pared de la casa. Usa el bumerán para recoger la ficha.
-Kill the Skulltula in the marsh grotto as a child; as adult, break the crate for the token.|Como criança, derrote a Skulltula na gruta do pântano. Como adulto, quebre o caixote para pegar a ficha.|Kill the Skulltula in the marsh grotto as a child; as adult, break the crate for the token.|De niño, derrota a la Skulltula en la gruta del pantano. De adulto, rompe la caja para obtener la ficha.
-Talon has to be back at the ranch first: get the Weird Egg from Malon at Hyrule Castle, let it hatch, and wake Talon there with the Cucco.|Talon precisa voltar ao rancho. Pegue o Ovo Estranho com Malon no Castelo de Hyrule, espere nascer o Cucco e use-o para acordar Talon.|Talon has to be back at the ranch first: get the Weird Egg from Malon at Hyrule Castle, let it hatch, and wake Talon there with the Cucco.|Talon debe volver al rancho. Consigue el Huevo Raro de Malon en el castillo de Hyrule, espera a que nazca el cuco y úsalo para despertar a Talon.
-Zelda's Lullaby opens Darunia's door; he gives the bracelet after you play Saria's Song.|Toque a Canção de Ninar da Zelda para abrir a porta de Darunia. Ele entrega o bracelete depois que você toca a Canção de Saria.|Zelda's Lullaby opens Darunia's door; he gives the bracelet after you play Saria's Song.|Toca la Nana de Zelda para abrir la puerta de Darunia. Te da el brazalete cuando tocas la Canción de Saria.
-The Bombchu Shop opens at night, after King Dodongo.|A Loja de Bombchus abre à noite após você derrotar o King Dodongo.|The Bombchu Shop opens at night, after King Dodongo.|La tienda de bombchus abre de noche después de derrotar al King Dodongo.
-Available as soon as you reach Castle Town; no other requirement.|Disponível assim que você chega à Cidade do Castelo.|Available as soon as you reach Castle Town; no other requirement.|Disponible en cuanto llegas a la Ciudadela.
-Appears only once you have Din's Fire. 50 Rupees.|Aparece após obter o Fogo de Din. Custa 50 rupees.|Appears only once you have Din's Fire. 50 Rupees.|Aparece cuando consigues el Fuego de Din. Cuesta 50 rupias.
-Appears only once you have Din's Fire. 100 Rupees.|Aparece após obter o Fogo de Din. Custa 100 rupees.|Appears only once you have Din's Fire. 100 Rupees.|Aparece cuando consigues el Fuego de Din. Cuesta 100 rupias.
-Appears only once you have Din's Fire. 200 Rupees.|Aparece após obter o Fogo de Din. Custa 200 rupees.|Appears only once you have Din's Fire. 200 Rupees.|Aparece cuando consigues el Fuego de Din. Cuesta 200 rupias.
-Appears only once you have Din's Fire. 300 Rupees: more than the starting wallet holds.|Aparece após obter o Fogo de Din. Custa 300 Rupias, acima da capacidade da carteira inicial.|Appears only once you have Din's Fire. 300 Rupees: more than the starting wallet holds.|Aparece cuando consigues el Fuego de Din. Cuesta 300 rupias, más de lo que admite la bolsa inicial.
-Appears only once you have Din's Fire. 500 Rupees: needs the Adult's Wallet.|Aparece após obter o Fogo de Din. Custa 500 Rupias e exige a Carteira de Adulto.|Appears only once you have Din's Fire. 500 Rupees: needs the Adult's Wallet.|Aparece cuando consigues el Fuego de Din. Cuesta 500 rupias y requiere la bolsa de adulto.
-King Dodongo|King Dodongo|King Dodongo|King Dodongo
-Phantom Ganon|Phantom Ganon|Phantom Ganon|Phantom Ganon
-Din's Fire|Fogo de Din|Din's Fire|Fuego de Din
+Kill the Skulltula in the marsh grotto as a child; as adult, break the crate for the token.|Como criança, derrote a cranítula na gruta do pântano. Como adulto, quebre o caixote para pegar a ficha.|Kill the Skulltula in the marsh grotto as a child; as adult, break the crate for the token.|De niño, derrota a la Skulltula en la gruta del pantano. De adulto, rompe la caja para obtener la ficha.
+Talon has to be back at the ranch first: get the Weird Egg from Malon at Hyrule Castle, let it hatch, and wake Talon there with the Cucco.|Talon precisa voltar ao rancho. Pegue o ovo esquisito com Malon no Castelo de Hyrule, espere nascer o coricó e use-o para acordar Talon.|Talon has to be back at the ranch first: get the Weird Egg from Malon at Hyrule Castle, let it hatch, and wake Talon there with the Cucco.|Talon debe volver al rancho. Consigue el huevo extraño de Malon en el castillo de Hyrule, espera a que nazca el cuco y úsalo para despertar a Talon.
+Zelda's Lullaby opens Darunia's door; he gives the bracelet after you play Saria's Song.|Toque o Acalanto da Zelda para abrir a porta de Darunia. Ele entrega o bracelete depois que você toca a Canção da Saria.|Zelda's Lullaby opens Darunia's door; he gives the bracelet after you play Saria's Song.|Toca la Nana de Zelda para abrir la puerta de Darunia. Te da el brazalete cuando tocas la Canción de Saria.
+The Bombchu Shop opens at night, after King Dodongo.|A Loja de roebombas abre à noite após você derrotar o Rei Dodongo.|The Bombchu Shop opens at night, after King Dodongo.|La tienda de bombchus abre de noche después de derrotar al Rey Dodongo.
+Available as soon as you reach Castle Town; no other requirement.|Disponível assim que você chega à Burgo de Hyrule.|Available as soon as you reach Castle Town; no other requirement.|Disponible en cuanto llegas a la Ciudadela.
+Appears only once you have Din's Fire. 50 Rupees.|Aparece após obter a Flama de Din. Custa 50 rupias.|Appears only once you have Din's Fire. 50 Rupees.|Aparece cuando consigues el Fuego de Din. Cuesta 50 rupias.
+Appears only once you have Din's Fire. 100 Rupees.|Aparece após obter a Flama de Din. Custa 100 rupias.|Appears only once you have Din's Fire. 100 Rupees.|Aparece cuando consigues el Fuego de Din. Cuesta 100 rupias.
+Appears only once you have Din's Fire. 200 Rupees.|Aparece após obter a Flama de Din. Custa 200 rupias.|Appears only once you have Din's Fire. 200 Rupees.|Aparece cuando consigues el Fuego de Din. Cuesta 200 rupias.
+Appears only once you have Din's Fire. 300 Rupees: more than the starting wallet holds.|Aparece após obter a Flama de Din. Custa 300 Rupias, acima da capacidade da carteira inicial.|Appears only once you have Din's Fire. 300 Rupees: more than the starting wallet holds.|Aparece cuando consigues el Fuego de Din. Cuesta 300 rupias, más de lo que admite la bolsa inicial.
+Appears only once you have Din's Fire. 500 Rupees: needs the Adult's Wallet.|Aparece após obter a Flama de Din. Custa 500 Rupias e exige a rupieira de adulto.|Appears only once you have Din's Fire. 500 Rupees: needs the Adult's Wallet.|Aparece cuando consigues el Fuego de Din. Cuesta 500 rupias y requiere la bolsa de adulto.
+King Dodongo|Rei Dodongo|King Dodongo|Rey Dodongo
+Phantom Ganon|Ganon Espectral|Phantom Ganon|Ganon fantasma
+Din's Fire|Flama de Din|Din's Fire|Fuego de Din
 Nayru's Love|Amor de Nayru|Nayru's Love|Amor de Nayru
-Zora Tunic|Túnica Zora|Zora Tunic|Túnica zora
-Goron Tunic|Túnica Goron|Goron Tunic|Túnica goron
+Zora Tunic|túnica zora|Zora Tunic|Sayo zora
+Goron Tunic|túnica goron|Goron Tunic|Sayo goron
 Silver Scale|Escama Prateada|Silver Scale|Escama de plata
 Golden Scale|Escama Dourada|Golden Scale|Escama de oro
 Fire Arrow|Flecha de Fogo|Fire Arrow|Flecha de Fuego
@@ -186,22 +186,22 @@ Cliff above the log|Penhasco acima do tronco|Cliff above the log|Acantilado sobr
 Entrance alcove crate|Caixote no nicho da entrada|Entrance alcove crate|Caja del nicho de la entrada
 Soft soil by Dodongo's Cavern|Terra fofa perto da Caverna dos Dodongos|Soft soil by Dodongo's Cavern|Tierra blanda junto a la Cueva de los Dodongos
 Cave behind a cracked rock|Gruta atrás da pedra rachada|Cave behind a cracked rock|Gruta tras la roca agrietada
-Business Scrub|Deku Mercador|Business Scrub|Deku comerciante
+Business Scrub|Dekomerciante|Business Scrub|Matorral mercader
 Farore's Wind|Vento de Farore|Farore's Wind|Viento de Farore
-Kokiri Tunic|Túnica Kokiri|Kokiri Tunic|Túnica Kokiri
+Kokiri Tunic|túnica kokiri|Kokiri Tunic|Sayo kokiri
 Hyrule Castle|Castelo de Hyrule|Hyrule Castle|Castillo de Hyrule
-Hyrule Castle Town|Cidade do Castelo de Hyrule|Hyrule Castle Town|Ciudadela de Hyrule
+Hyrule Castle Town|Burgo de Hyrule|Hyrule Castle Town|Ciudadela de Hyrule
 Ganon's Castle|Castelo de Ganon|Ganon's Castle|Castillo de Ganon
-Hyrule Field|Campo de Hyrule|Hyrule Field|Llanura de Hyrule
+Hyrule Field|Pradaria de Hyrule|Hyrule Field|Llanura de Hyrule
 Kokiri Forest|Floresta Kokiri|Kokiri Forest|Bosque Kokiri
 Kakariko Village|Vila Kakariko|Kakariko Village|Aldea Kakariko
 Lost Woods|Bosque Perdido|Lost Woods|Bosque Perdido
 Death Mountain Crater|Cratera da Montanha da Morte|Death Mountain Crater|Cráter de la Montaña de la Muerte
 Death Mountain Trail|Trilha da Montanha da Morte|Death Mountain Trail|Sendero de la Montaña de la Muerte
-Zora's Fountain|Fonte Zora|Zora's Fountain|Fuente Zora
-Zora Fountain|Fonte Zora|Zora Fountain|Fuente Zora
-Zora's Domain|Domínio Zora|Zora's Domain|Región de los Zora
-Zora Domain|Domínio Zora|Zora Domain|Región de los Zora
+Zora's Fountain|Nascente Zora|Zora's Fountain|Fuente Zora
+Zora Fountain|Nascente Zora|Zora Fountain|Fuente Zora
+Zora's Domain|Território Zora|Zora's Domain|Región de los Zora
+Zora Domain|Território Zora|Zora Domain|Región de los Zora
 Zora's River|Rio Zora|Zora's River|Río Zora
 Zora River|Rio Zora|Zora River|Río Zora
 Lake Hylia|Lago Hylia|Lake Hylia|Lago Hylia
@@ -210,7 +210,7 @@ Gerudo Fortress|Fortaleza Gerudo|Gerudo Fortress|Fortaleza Gerudo
 Lon Lon Ranch|Rancho Lon Lon|Lon Lon Ranch|Rancho Lon Lon
 Goron City|Cidade Goron|Goron City|Ciudad Goron
 Temple of Time|Templo do Tempo|Temple of Time|Templo del Tiempo
-Great Deku Tree|Grande Árvore Deku|Great Deku Tree|Gran Árbol Deku
+Great Deku Tree|Grande Árvore Deko|Great Deku Tree|Gran Árbol Deku
 Dodongo's Cavern|Caverna dos Dodongos|Dodongo's Cavern|Cueva de los Dodongos
 Lord Jabu-Jabu's Belly|Barriga de Jabu-Jabu|Lord Jabu-Jabu's Belly|Interior de Jabu-Jabu
 Sacred Forest Meadow|Clareira Sagrada|Sacred Forest Meadow|Prado Sagrado del Bosque
@@ -221,27 +221,27 @@ Shadow Temple|Templo das Sombras|Shadow Temple|Templo de las Sombras
 Spirit Temple|Templo dos Espíritos|Spirit Temple|Templo del Espíritu
 Bottom of the Well|Fundo do Poço|Bottom of the Well|Fondo del Pozo
 Ice Cavern|Caverna de Gelo|Ice Cavern|Caverna de Hielo
-Haunted Wasteland|Deserto Assombrado|Haunted Wasteland|Desierto Encantado
+Haunted Wasteland|Deserto das Miragens|Haunted Wasteland|Desierto Encantado
 Desert Colossus|Colosso do Deserto|Desert Colossus|Coloso del Desierto
-Gerudo Training Ground|Campo de Treinamento Gerudo|Gerudo Training Ground|Campo de Entrenamiento Gerudo
+Gerudo Training Ground|Centro de Treinamento Gerudo|Gerudo Training Ground|Campo de Entrenamiento Gerudo
 Ocarina of Time|Ocarina do Tempo|Ocarina of Time|Ocarina del Tiempo
 Kokiri Sword|Espada Kokiri|Kokiri Sword|Espada Kokiri
 Master Sword|Espada Mestra|Master Sword|Espada Maestra
 Fairy Slingshot|Estilingue das Fadas|Fairy Slingshot|Tirachinas de las hadas
-Fairy Bow|Arco das Fadas|Fairy Bow|Arco de las hadas
+Fairy Bow|Arco feérico|Fairy Bow|Arco de las Hadas
 Hookshot|Gancho|Hookshot|Gancho
 Longshot|Gancho longo|Longshot|Supergancho
 Boomerang|Bumerangue|Boomerang|Bumerán
-Deku Sticks|Gravetos Deku|Deku Sticks|Palos Deku
-Deku Nuts|Nozes Deku|Deku Nuts|Nueces Deku
-Lens of Truth|Lente da Verdade|Lens of Truth|Lupa de la Verdad
-Lenses of Truth|Lente da Verdade|Lenses of Truth|Lupa de la Verdad
+Deku Sticks|Gravetos dekos|Deku Sticks|Palos Deku
+Deku Nuts|Nozes dekos|Deku Nuts|Nueces Deku
+Lens of Truth|Lentes da verdade|Lens of Truth|Gafas de la verdad
+Lenses of Truth|Lentes da verdade|Lenses of Truth|Gafas de la verdad
 Rupee Red|Rupia vermelha|Red Rupee|Rupia roja
 Rupee Purple|Rupia roxa|Purple Rupee|Rupia morada
 Rupee Blue|Rupia azul|Blue Rupee|Rupia azul
 Rupee Green|Rupia verde|Green Rupee|Rupia verde
 Rupee Gold|Rupia dourada|Gold Rupee|Rupia dorada
-Scrub Business Seed|Semente de Deku Mercador|Business Scrub Seed|Semilla del Deku comerciante
+Scrub Business Seed|Semente de dekomerciante|Business Scrub Seed|Semilla del matorral mercader
 Heart Piece|Pedaço de coração|Piece of Heart|Pieza de corazón
 Menu principal||Main menu|Menú principal
 Aguardando partida||Waiting for a game|Esperando una partida
@@ -269,7 +269,7 @@ Resumo da partida||Save summary|Resumen de la partida
 Corações||Hearts|Corazones
 Capacidade máxima||Maximum capacity|Capacidad máxima
 pedaços para o próximo||pieces to the next heart|piezas para el siguiente corazón
-Skulltulas douradas||Gold Skulltulas|Skulltulas doradas
+Skulltulas douradas|Cranítulas de ouro|Gold Skulltulas|Skulltulas doradas
 Recompensa disponível||Reward ready|Recompensa disponible
 Próxima recompensa aos||Next reward at|Próxima recompensa al llegar a
 Todas as recompensas alcançadas||All rewards reached|Todas las recompensas alcanzadas
@@ -319,7 +319,7 @@ Vendida||Sold|Vendida
 Encontre um save para ver a história.||Load a save to reveal the story.|Carga una partida para ver la historia.
 Encontre um save para ver as missões secundárias.||Load a save to see the side quests.|Carga una partida para ver las misiones secundarias.
 Detalhes da missão indisponíveis.||Quest details unavailable.|Detalles de la misión no disponibles.
-In Kakariko Graveyard, play Zelda's Lullaby at the Royal Family's Tomb to open it. Read the inscription at the back of the tomb to learn the Sun's Song.|No cemitério de Kakariko, toque a Canção de Ninar da Zelda diante do Túmulo da Família Real para abri-lo. Leia a inscrição no fundo do túmulo para aprender a Canção do Sol.|In Kakariko Graveyard, play Zelda's Lullaby at the Royal Family's Tomb to open it. Read the inscription at the back of the tomb to learn the Sun's Song.|En el cementerio de Kakariko, toca la Nana de Zelda ante la Tumba de la Familia Real para abrirla. Lee la inscripción al fondo de la tumba para aprender la Canción del Sol.
+In Kakariko Graveyard, play Zelda's Lullaby at the Royal Family's Tomb to open it. Read the inscription at the back of the tomb to learn the Sun's Song.|No cemitério de Kakariko, toque o Acalanto da Zelda diante do Túmulo da Família Real para abri-lo. Leia a inscrição no fundo do túmulo para aprender a Canção do Sol.|In Kakariko Graveyard, play Zelda's Lullaby at the Royal Family's Tomb to open it. Read the inscription at the back of the tomb to learn the Sun's Song.|En el cementerio de Kakariko, toca la Nana de Zelda ante la Tumba de la Familia Real para abrirla. Lee la inscripción al fondo de la tumba para aprender la Canción del Sol.
 Missões principais||Main quests|Misiones principales
 Missões secundárias||Side quests|Misiones secundarias
 Concluído||Complete|Completado
@@ -540,8 +540,8 @@ to identify: open the tracker|para identificar no tracker|to identify in the tra
 Nothing to get right now|Nada disponível agora|Nothing to get right now|Nada disponible ahora
 Nothing left here 🎉|Nada pendente aqui|Nothing left here|Nada pendiente aquí
 Heart Pieces|Pedaços de coração|Heart Pieces|Piezas de corazón
-Heart Containers|Recipientes de coração|Heart Containers|Contenedores de corazón
-Gold Skulltulas|Skulltulas douradas|Gold Skulltulas|Skulltulas doradas
+Heart Containers|Porta-corações|Heart Containers|Contenedores de corazón
+Gold Skulltulas|Cranítulas de ouro|Gold Skulltulas|Skulltulas doradas
 Songs|Canções|Songs|Canciones
 Equipment|Equipamento|Equipment|Equipo
 Items|Itens|Items|Objetos
@@ -555,8 +555,8 @@ Dungeons Cleared|Masmorras concluídas|Dungeons cleared|Mazmorras completadas
 Bosses|Chefes|Bosses|Jefes
 Mini-bosses|Minichefes|Mini-bosses|Minijefes
 Side Quests|Missões secundárias|Side quests|Misiones secundarias
-Big Poes Sold|Grandes Poes vendidos|Big Poes sold|Grandes Poes vendidos
-House of Skulltula Rewards|Recompensas das Skulltulas|House of Skulltula rewards|Recompensas de las Skulltulas
+Big Poes Sold|Pectros grandes vendidos|Big Poes sold|Grandes Poes vendidos
+House of Skulltula Rewards|Recompensas das cranítulas|House of Skulltula rewards|Recompensas de las Skulltulas
 Child Trading Sequence|Trocas na infância|Child trading sequence|Intercambios de niño
 Adult Trading Sequence|Trocas na idade adulta|Adult trading sequence|Intercambios de adulto
 Maps, Compasses & Boss Keys|Mapas, bússolas e chaves de chefe|Maps, compasses and boss keys|Mapas, brújulas y llaves del jefe
@@ -579,18 +579,18 @@ Filtrar minijogos||Filter minigames|Filtrar minijuegos
 com conclusão registrada||with a recorded result|con resultado registrado
 Melhor pontuação||Best score|Mejor puntuación
 Nenhum minijogo neste filtro.||No minigames match this filter.|No hay minijuegos para este filtro.
-Boliche de Bombchu||Bombchu Bowling|Bolos Bombchu
+Boliche de Bombchu|Boliche Roebomba|Bombchu Bowling|Bolos bombuchu
 Tiro a cavalo||Horseback Archery|Tiro con arco a caballo
 Corrida de Dampé||Dampé's Race|Carrera de Dampé
 Mergulho dos Zora||Zora Diving Game|Juego de buceo zora
 Sapos do Rio Zora||Zora River Frogs|Ranas del río Zora
 Teatro Deku||Deku Theater|Teatro deku
 Corrida de Dampé: primeira vitória||Dampé's Race: first win|Carrera de Dampé: primera victoria
-Modo especialista no Mercado||Castle Town Expert Mode|Modo experto del Mercado
+Modo especialista no Mercado|Modo especialista no Burgo de Hyrule|Castle Town Expert Mode|Modo experto del Mercado
 Modo especialista em Kakariko||Kakariko Expert Mode|Modo experto de Kakariko
 Complete a corrida com o corredor||Finish the Running Man race|Termina la carrera con el Corredor
 Eventos e descobertas||Events and discoveries|Eventos y descubrimientos
-Locais de feijão mágico||Magic bean spots|Lugares de judías mágicas
+Locais de feijão mágico||Magic bean spots|Lugares de judía mágica
 Pensamentos de fada||Fairy Thoughts|Pensamientos de hada
 Pensamento de fada||Fairy Thought|Pensamiento de hada
 Chamadas de Pierre||Pierre summons|Invocaciones de Pierre
@@ -600,7 +600,7 @@ Entrada de gruta||Grotto entrance|Entrada a gruta
 Provação das Pedras Espirituais||Trial of the Spiritual Stones|Prueba de las Piedras Espirituales
 Provação dos Cinco Sábios||Trial of the Five Sages|Prueba de los Cinco Sabios
 Provação do Herói do Tempo||Trial of the Hero of Time|Prueba del Héroe del Tiempo
-A Grande Árvore Deku||The Great Deku Tree|El Gran Árbol Deku
+A Grande Árvore Deku|A Grande Árvore Deko|The Great Deku Tree|El Gran Árbol Deku
 Acorde na floresta Kokiri||Wake up in Kokiri Forest|Despierta en el Bosque Kokiri
 Conquiste a Pedra da Floresta||Claim the Spiritual Stone of the Forest|Consigue la Piedra Espiritual del Bosque
 A princesa de Hyrule||The Princess of Hyrule|La princesa de Hyrule
@@ -640,8 +640,8 @@ Vila Kakariko||Kakariko Village|Aldea Kakariko
 Cidade Goron||Goron City|Ciudad Goron
 Graveyard|Cemitério|Graveyard|Cementerio
 Cemitério||Graveyard|Cementerio
-Domínio Zora||Zora's Domain|Región de los Zora
-Fonte Zora||Zora's Fountain|Fuente Zora
+Domínio Zora|Território Zora|Zora's Domain|Región de los Zora
+Fonte Zora|Nascente Zora|Zora's Fountain|Fuente Zora
 Rio Zora||Zora's River|Río Zora
 Templo do Tempo||Temple of Time|Templo del Tiempo
 Templo da Floresta||Forest Temple|Templo del Bosque
@@ -653,7 +653,7 @@ Covil dos Dodongos||Dodongo Cavern|Cueva de los Dodongos
 Caverna dos Dodongos||Dodongo Cavern|Cueva de los Dodongos
 Caverna de Gelo||Ice Cavern|Caverna de Hielo
 Fundo do Poço||Bottom of the Well|Fondo del Pozo
-Grande Árvore Deku||Great Deku Tree|Gran Árbol Deku
+Grande Árvore Deku|Grande Árvore Deko|Great Deku Tree|Gran Árbol Deku
 Barriga de Jabu-Jabu||Jabu-Jabu's Belly|Interior de Jabu-Jabu
 Lago Hylia||Lake Hylia|Lago Hylia
 Rancho Lon Lon||Lon Lon Ranch|Rancho Lon Lon
@@ -661,20 +661,20 @@ Clareira Sagrada||Sacred Forest Meadow|Prado Sagrado del Bosque
 Bosque Perdido||Lost Woods|Bosque Perdido
 Fortaleza Gerudo||Gerudo Fortress|Fortaleza Gerudo
 Vale Gerudo||Gerudo Valley|Valle Gerudo
-Campo de Treinamento Gerudo||Gerudo Proving Grounds|Campo de Entrenamiento Gerudo
-Deserto Assombrado||Haunted Wasteland|Desierto Encantado
+Campo de Treinamento Gerudo|Centro de Treinamento Gerudo|Gerudo Proving Grounds|Campo de Entrenamiento Gerudo
+Deserto Assombrado|Deserto das Miragens|Haunted Wasteland|Desierto Encantado
 Colosso do Deserto||Desert Colossus|Coloso del Desierto
-Campo de Hyrule||Hyrule Field|Llanura de Hyrule
+Campo de Hyrule|Pradaria de Hyrule|Hyrule Field|Llanura de Hyrule
 Castelo de Hyrule||Hyrule Castle|Castillo de Hyrule
 Castelo de Ganon||Ganon's Castle|Castillo de Ganon
-Mercado||Market|Mercado
-Tiro ao alvo no Mercado||Market Shooting Gallery|Galería de tiro del Mercado
+Mercado|Burgo de Hyrule|Market|Mercado
+Tiro ao alvo no Mercado|Tiro ao alvo no Burgo de Hyrule|Market Shooting Gallery|Galería de tiro del Mercado
 Bolsa de sementes do tiro ao alvo||Shooting Gallery Seed Bag|Bolsa de semillas de la galería de tiro
 Tiro ao alvo em Kakariko||Kakariko Shooting Gallery|Galería de tiro de Kakariko
 Aljava do tiro ao alvo||Shooting Gallery Quiver|Carcaj de la galería de tiro
-Boliche de Bombchu: primeira vitória||Bombchu Bowling: first win|Bolos Bombchu: primera victoria
-Boliche de Bombchu: segunda vitória||Bombchu Bowling: second win|Bolos Bombchu: segunda victoria
-Boliche de Bombchu: terceira vitória||Bombchu Bowling: third win|Bolos Bombchu: tercera victoria
+Boliche de Bombchu: primeira vitória|Boliche Roebomba: primeira vitória|Bombchu Bowling: first win|Bolos bombuchu: primera victoria
+Boliche de Bombchu: segunda vitória|Boliche Roebomba: segunda vitória|Bombchu Bowling: second win|Bolos bombuchu: segunda victoria
+Boliche de Bombchu: terceira vitória|Boliche Roebomba: terceira vitória|Bombchu Bowling: third win|Bolos bombuchu: tercera victoria
 Jogo dos baús||Treasure Chest Game|Juego de los cofres
 Pesca: pedaço de coração||Fishing: Piece of Heart|Pesca: pieza de corazón
 Pesca: Escala Dourada|Pesca: Escama Dourada|Fishing: Golden Scale|Pesca: Escama Dorada
@@ -683,15 +683,15 @@ Tiro a cavalo: 1.400 pontos||Horseback Archery: 1,400 points|Tiro a caballo: 140
 Escavação de Dampé||Dampé's Gravedigging|Excavación de Dampé
 Corrida de Dampé: pedaço de coração||Dampé Race: Piece of Heart|Carrera de Dampé: pieza de corazón
 Mergulho: Escala Prateada|Mergulho: Escama Prateada|Diving: Silver Scale|Buceo: Escama Plateada
-Sapos: Canção das Tempestades||Frogs: Song of Storms|Ranas: Canción de las Tormentas
+Sapos: Canção das Tempestades|Sapos: Trova da Tempestade|Frogs: Song of Storms|Ranas: Canción de la tormenta
 Sapos: sequência musical||Frogs: music sequence|Ranas: secuencia musical
 Corrida de Ingo||Ingo's Race|Carrera de Ingo
 Pista com obstáculos do Rancho Lon Lon||Lon Lon Ranch obstacle course|Circuito de obstáculos del Rancho Lon Lon
 Alvo do Bosque Perdido||Lost Woods target|Blanco del Bosque Perdido
 Teatro Deku: Máscara de Caveira||Deku Theater: Skull Mask|Teatro Deku: Máscara de Calavera
 Teatro Deku: Máscara da Verdade||Deku Theater: Mask of Truth|Teatro Deku: Máscara de la Verdad
-Encontre o Super Cucco||Find the Super Cucco|Encuentra al Supercuco
-Reúna os Cuccos de Kakariko||Round up the Kakariko Cuccos|Reúne a los cucos de Kakariko
+Encontre o Super Cucco|Encontre o Super coricó|Find the Super Cucco|Encuentra al Supercuco
+Reúna os Cuccos de Kakariko|Reúna os coricós de Kakariko|Round up the Kakariko Cuccos|Reúne a los cucos de Kakariko
 Sessão musical dos Skull Kids||Skull Kids' music session|Sesión musical de los Skull Kids
 Corrida com o corredor||Race the Running Man|Compite con el Corredor
 O Sábio da Luz||The Sage of Light|El Sabio de la Luz
@@ -699,22 +699,22 @@ Fuga do Castelo de Ganon||Escape Ganon's Castle|Escapa del Castillo de Ganon
 Encontre Richard||Find Richard|Encuentra a Richard
 Aprenda a usar uma garrafa||Learn to use a bottle|Aprende a usar una botella
 Conquiste as Flechas de Fogo||Obtain the Fire Arrows|Consigue las Flechas de Fuego
-Encontre a Lente da Verdade||Find the Lens of Truth|Encuentra la Lupa de la Verdad
+Encontre a Lente da Verdade|Encontre as lentes da verdade|Find the Lens of Truth|Encuentra las gafas de la verdad
 Conquiste as Flechas de Gelo||Obtain the Ice Arrows|Consigue las Flechas de Hielo
 Colecionador de fantasmas||Ghost collector|Coleccionista de fantasmas
-Libere a Casa das Skulltulas||Lift the House of Skulltula curse|Rompe la maldición de la Casa Skulltula
+Libere a Casa das Skulltulas|Libere a Casa das cranítulas|Lift the House of Skulltula curse|Rompe la maldición de la Casa Skulltula
 Complete os combates do Salão||Complete the Hall battles|Completa los combates del salón
-Canção de ninar de Zelda|Canção de Ninar da Zelda|Zelda's Lullaby|Nana de Zelda
-Canção de Epona||Epona's Song|Canción de Epona
-Canção de Saria||Saria's Song|Canción de Saria
+Canção de ninar de Zelda|Acalanto da Zelda|Zelda's Lullaby|Nana de Zelda
+Canção de Epona|Canção da Epona|Epona's Song|Canción de Epona
+Canção de Saria|Canção da Saria|Saria's Song|Canción de Saria
 Canção do Sol||Sun's Song|Canción del Sol
 Canção do Tempo||Song of Time|Canción del Tiempo
-Canção das Tempestades||Song of Storms|Canción de las Tormentas
+Canção das Tempestades|Trova da Tempestade|Song of Storms|Canción de la tormenta
 Minueto da Floresta||Minuet of Forest|Minueto del Bosque
 Bolero do Fogo||Bolero of Fire|Bolero del Fuego
-Serenata da Água||Serenade of Water|Serenata del Agua
+Serenata da Água|Serenata das Águas|Serenade of Water|Serenata del Agua
 Réquiem dos Espíritos||Requiem of Spirit|Réquiem del Espíritu
-Noturno das Sombras||Nocturne of Shadow|Nocturno de las Sombras
+Noturno das Sombras||Nocturne of Shadow|Nocturno de la sombra
 Prelúdio da Luz||Prelude of Light|Preludio de la Luz
 Caminho de Hyrule||Hyrule Trail|Camino de Hyrule
 Estrelas de Kokiri||Kokiri Stars|Estrellas de Kokiri
@@ -728,11 +728,11 @@ Quem ensina a canção de Epona?||Who teaches Epona's Song?|¿Quién enseña la 
 Qual arma pode voltar depois de arremessada?||Which weapon returns when thrown?|¿Qué arma vuelve después de lanzarla?
 Qual instrumento Link aprende a tocar?||Which instrument does Link learn to play?|¿Qué instrumento aprende a tocar Link?
 Quantos pedaços formam um coração inteiro?||How many pieces make a full heart?|¿Cuántas piezas forman un corazón entero?
-Quantas Skulltulas douradas podem ser coletadas?||How many Gold Skulltulas can be collected?|¿Cuántas Skulltulas doradas se pueden recoger?
+Quantas Skulltulas douradas podem ser coletadas?|Quantas cranítulas de ouro podem ser coletadas?|How many Gold Skulltulas can be collected?|¿Cuántas Skulltulas doradas se pueden recoger?
 Onde Zelda é encontrada pela primeira vez?||Where do you first meet Zelda?|¿Dónde encuentras a Zelda por primera vez?
 Qual é o nome do cavalo de Link?||What is the name of Link's horse?|¿Cómo se llama el caballo de Link?
 Qual é a terra natal dos Kokiri?||What is the Kokiri homeland?|¿Cuál es la tierra natal de los kokiri?
-Que raça vive no Domínio Zora?||Which people live in Zora's Domain?|¿Qué pueblo vive en la Región de los Zora?
+Que raça vive no Domínio Zora?|Que raça vive no Território Zora?|Which people live in Zora's Domain?|¿Qué pueblo vive en la Región de los Zora?
 Quem é o antagonista principal?||Who is the main antagonist?|¿Quién es el antagonista principal?
 Que item abre caminho explodindo pedras rachadas?||Which item blasts cracked boulders out of the way?|¿Qué objeto abre paso al hacer explotar rocas agrietadas?
 Onde fica o Rancho Lon Lon?||Where is Lon Lon Ranch located?|¿Dónde se encuentra el Rancho Lon Lon?
@@ -741,7 +741,7 @@ O que Link usa para refletir ataques?||What does Link use to deflect attacks?|¿
 Qual chefe espera no Templo da Floresta?||Which boss awaits in the Forest Temple?|¿Qué jefe espera en el Templo del Bosque?
 Quem guarda a Pedra Espiritual da Água?||Who holds the Spiritual Stone of Water?|¿Quién guarda la Piedra Espiritual del Agua?
 Qual é a arma encontrada no Templo do Fogo?||Which weapon is found in the Fire Temple?|¿Qué arma se encuentra en el Templo del Fuego?
-Em que templo aparece Dark Link?||Which temple features Dark Link?|¿En qué templo aparece Dark Link?
+Em que templo aparece Dark Link?|Em que templo aparece Link Sombrio?|Which temple features Dark Link?|¿En qué templo aparece Link oscuro?
 Qual a primeira masmorra de Link criança?||What is young Link's first dungeon?|¿Cuál es la primera mazmorra de Link niño?
 Quem se torna o Sábio do Fogo?||Who becomes the Sage of Fire?|¿Quién se convierte en el Sabio del Fuego?
 Qual chefe é combatido no Templo das Sombras?||Which boss do you fight in the Shadow Temple?|¿Contra qué jefe luchas en el Templo de las Sombras?
@@ -755,7 +755,7 @@ Qual é o nome do deserto entre a fortaleza e o Colosso?||What is the desert bet
 Quem é a Sábia dos Espíritos?||Who is the Sage of Spirit?|¿Quién es la Sabia del Espíritu?
 Bumerangue||Boomerang|Bumerán
 Estilingue||Slingshot|Tirachinas
-Martelo Megaton||Megaton Hammer|Martillo Megatón
+Martelo Megaton|Martelo megaton|Megaton Hammer|Martillo Megatón
 Espada Kokiri||Kokiri Sword|Espada kokiri
 Harpa||Harp|Arpa
 Flauta de Pã||Pan flute|Flauta de pan
@@ -770,12 +770,12 @@ Pedra espiritual||Spiritual Stone|Piedra espiritual
 Escudo||Shield|Escudo
 Martelo||Hammer|Martillo
 Botas de Ferro||Iron Boots|Botas de hierro
-Arco das Fadas||Fairy Bow|Arco de las Hadas
-Lente da Verdade||Lens of Truth|Lupa de la Verdad
+Arco das Fadas|Arco feérico|Fairy Bow|Arco de las Hadas
+Lente da Verdade|Lentes da verdade|Lens of Truth|Gafas de la verdad
 Pesca||Fishing|Pesca
 Tiro ao alvo||Target shooting|Tiro al blanco
 Corrida de cavalos||Horse racing|Carrera de caballos
-Caça aos Poes||Poe hunt|Caza de poes
+Caça aos Poes|Caça aos pectros|Poe hunt|Caza de poes
 Deserto Lanayru||Lanayru Desert|Desierto de Lanayru
 Vale de Ikana||Ikana Valley|Valle de Ikana
 Areias de Nayru||Sands of Nayru|Arenas de Nayru
@@ -789,9 +789,9 @@ Escolha um marcador||Choose a marker|Elige un marcador
 Local no jogo||In-game location|Ubicación en el juego
 Foto anterior||Previous photo|Foto anterior
 Próxima foto||Next photo|Foto siguiente
-Big Poes do Campo de Hyrule|Grandes Poes do Campo de Hyrule|Big Poes of Hyrule Field|Grandes poes de la Llanura de Hyrule
-Pedras falantes||Gossip Stones|Piedras chismosas
-Pedra falante||Gossip Stone|Piedra chismosa
+Big Poes do Campo de Hyrule|Pectros grandes da Pradaria de Hyrule|Big Poes of Hyrule Field|Grandes poes de la Llanura de Hyrule
+Pedras falantes|Pedras fuxiqueiras|Gossip Stones|Piedras chismosas
+Pedra falante|Pedra fuxiqueira|Gossip Stone|Piedra chismosa
 Desafios das rupees prateadas|Desafios das Rupias prateadas|Silver Rupee challenges|Desafíos de rupias plateadas
 Rupees prateadas|Rupias prateadas|Silver Rupees|Rupias plateadas
 Vacas e leite||Cows and milk|Vacas y leche
@@ -854,7 +854,7 @@ You can get this now as {ages}, at night.|Disponível agora como {ages}, à noit
 +{n} inimigos||+{n} enemies|+{n} enemigos
 +{n} Rupee|+{n} Rupia|+{n} Rupee|+{n} Rupia
 +{n} Rupees|+{n} Rupias|+{n} Rupees|+{n} Rupias
-{n} Gold Skulltula token|{n} ficha de Skulltula dourada|{n} Gold Skulltula token|{n} ficha de Skulltula dorada
+{n} Gold Skulltula token|{n} ficha de cranítula de ouro|{n} Gold Skulltula token|{n} ficha de Skulltula dorada
 Link (ao vivo)||Link (live)|Link (en vivo)
 Link (último save)||Link (last save)|Link (última partida)
 Link ao vivo||Link live on the map|Link en vivo en el mapa
@@ -866,15 +866,15 @@ Ao vivo: aguardando o jogo||Live: waiting for the game|En vivo: esperando el jue
 Abra o jogo para o rastreio ao vivo começar.||Open the game to start live tracking.|Abre el juego para empezar el seguimiento en vivo.
 Ao vivo: procurando o Link||Live: looking for Link|En vivo: buscando a Link
 Carregue seu arquivo no jogo.||Load your file in the game.|Carga tu partida en el juego.
-Skulltula dourada||Gold Skulltula|Skulltula dorada
+Skulltula dourada|Cranítula de ouro|Gold Skulltula|Skulltula dorada
 Pedaço de coração||Piece of Heart|Pieza de corazón
-Recipiente de coração||Heart Container|Contenedor de corazón
+Recipiente de coração|Porta-coração|Heart Container|Contenedor de corazón
 Grande Fada||Great Fairy|Gran Hada
 Mostrar no mapa||Show on map|Mostrar en el mapa
 Faltam||Remaining|Faltan
 Coletados||Collected|Recogidos
 Grandes Fadas||Great Fairies|Grandes Hadas
-Defeated in Hyrule Field: {done}/{total}|Derrotados no Campo de Hyrule: {done}/{total}|Defeated in Hyrule Field: {done}/{total}|Derrotados en el Campo de Hyrule: {done}/{total}
+Defeated in Hyrule Field: {done}/{total}|Derrotados na Pradaria de Hyrule: {done}/{total}|Defeated in Hyrule Field: {done}/{total}|Derrotados en el llanura de Hyrule: {done}/{total}
 Conclusão da área||Area completion|Progreso del área
 Progresso de conclusão||Completion progress|Progreso de finalización
 {done} de {total} objetivos concluídos||{done} of {total} objectives completed|{done} de {total} objetivos completados
@@ -894,10 +894,10 @@ Esta região não tem mapa próprio.||This region has no map of its own.|Esta re
 Hyrule||Hyrule|Hyrule
 Filtrar a lista por esta categoria||Filter the list by this category|Filtrar la lista por esta categoría
 Fique ao lado da pedra falante e toque a ocarina. Veja o ponto exato no mapa.||Stand next to the Gossip Stone and play the Ocarina. See the exact spot on the map.|Colócate junto a la piedra chismosa y toca la ocarina. Mira el lugar exacto en el mapa.
-Como adulto, com uma garrafa vazia, derrote o Big Poe no Campo de Hyrule com o Arco das Fadas e capture-o na garrafa. Venda-o ao Coletor de Poes nas ruínas do Mercado. Veja o ponto exato no mapa.||As an adult with an empty bottle, defeat the Big Poe in Hyrule Field with the Fairy Bow and catch it in the bottle. Sell it to the Poe Collector in the Market ruins. See the exact spot on the map.|Como adulto, con una botella vacía, derrota al Gran Poe en el Campo de Hyrule con el Arco de las Hadas y captúralo en la botella. Véndelo al Coleccionista de Poes en las ruinas del Mercado. Mira el lugar exacto en el mapa.
+Como adulto, com uma garrafa vazia, derrote o Big Poe no Campo de Hyrule com o Arco das Fadas e capture-o na garrafa. Venda-o ao Coletor de Poes nas ruínas do Mercado. Veja o ponto exato no mapa.|Como adulto, com uma garrafa vazia, derrote o Big pectro na Pradaria de Hyrule com o Arco feérico e capture-o na garrafa. Venda-o ao Coletor de pectros nas ruínas do Burgo de Hyrule. Veja o ponto exato no mapa.|As an adult with an empty bottle, defeat the Big Poe in Hyrule Field with the Fairy Bow and catch it in the bottle. Sell it to the Poe Collector in the Market ruins. See the exact spot on the map.|Como adulto, con una botella vacía, derrota al Gran Poe en el llanura de Hyrule con el Arco de las Hadas y captúralo en la botella. Véndelo al Coleccionista de Poes en las ruinas del Mercado. Mira el lugar exacto en el mapa.
 View on map|Ver no mapa|View on map|Ver en el mapa
-Toque a Canção de Epona ao lado da vaca na casa de Link, na Floresta Kokiri, e pegue o leite.||Play Epona's Song next to the cow in Link's house in Kokiri Forest and take the milk.|Toca la Canción de Epona junto a la vaca de la casa de Link, en el Bosque Kokiri, y toma la leche.
-Toque a Canção de Epona ao lado de qualquer vaca para ganhar leite.||Play Epona's Song next to any cow to get milk.|Toca la Canción de Epona junto a cualquier vaca para conseguir leche.
+Toque a Canção de Epona ao lado da vaca na casa de Link, na Floresta Kokiri, e pegue o leite.|Toque a Canção da Epona ao lado da vaca na casa de Link, na Floresta Kokiri, e pegue o leite.|Play Epona's Song next to the cow in Link's house in Kokiri Forest and take the milk.|Toca la Canción de Epona junto a la vaca de la casa de Link, en el Bosque Kokiri, y toma la leche.
+Toque a Canção de Epona ao lado de qualquer vaca para ganhar leite.|Toque a Canção da Epona ao lado de qualquer vaca para ganhar leite.|Play Epona's Song next to any cow to get milk.|Toca la Canción de Epona junto a cualquier vaca para conseguir leche.
 Abra o baú indicado no mapa da região.||Open the chest marked on the region map.|Abre el cofre marcado en el mapa de la región.
 Entre na gruta indicada no mapa da região e marque como concluída aqui.||Enter the grotto marked on the region map and mark it as done here.|Entra en la gruta marcada en el mapa de la región y márcala como completada aquí.
 Ver na checklist||View in checklist|Ver en la lista
