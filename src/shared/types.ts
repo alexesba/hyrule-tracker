@@ -179,6 +179,8 @@ export interface AppState {
   /** Marker id -> checklist row it shares a save flag with; ticking one ticks the other. */
   atlasLinks?: Record<string, string>;
   activity?: Activity[];
+  /** The game's own play log (option.sav), summarized by day. */
+  playLog?: import('../core/playlog.js').PlayLogSummary;
   saveImage?: string;
   slots: SlotSummary[];
   /** Profiles with saves in the current emulator or install, most recently played first */

@@ -4,7 +4,7 @@ import { LOCAL_NAMES, MASK_SALE_NAMES } from '../core/companion';
 import { api, isRemote } from './api';
 import { enemyPhoto, regionPhoto } from './referenceImages';
 import { LanguageSwitch } from './LanguageFlags';
-import { currentLocale, date, day, hour, languages, number, plural, t, tv, type Locale } from './i18n';
+import { currentLocale, date, day, hour, languages, message, number, plural, t, tv, type Locale } from './i18n';
 import { ObjectiveName } from './ObjectiveName';
 import { GameItemIcon, trackedItemIcon } from './GameItemIcon';
 import { Minigames } from './Minigames';
@@ -1140,9 +1140,35 @@ function Timeline({ state }: { state: AppState }) {
   const day = picked ?? dayStamp();
   const events = (state.activity ?? []).filter(a => dayStamp(a.ms) === day);
   const totals = events.reduce((a, e) => [a[0] + (e.enemies ?? 0), a[1] + (e.rupees ?? 0), a[2] + (e.pieces ?? 0)], [0, 0, 0]);
-  return <section className="focus-panel timeline-panel"><div className="section-line"><h2>{t("Atividade da partida")}</h2><label className="inline-field">{t("Dia")}{' '}<input type="date" value={day} onChange={e => setDay(e.target.value)} /></label></div>
-    <div className="timeline-stats"><span><b>{totals[0]}</b>{t("inimigos contabilizados")}</span><span><b><GameItemIcon id="rupee" /> {totals[1]}</b>{t("rupees de ganhos observados")}</span><span><b><GameItemIcon id="heart_piece" /> {totals[2]}</b>{t("pedaços registrados")}</span></div>
-    {events.length ? <ActivityList activity={events} photos /> : <p className="quiet">{t("Nenhum avanço foi registrado neste dia com o tracker aberto.")}</p>}
+  return <>
+    <section className="focus-panel timeline-panel"><div className="section-line"><h2>{t("Atividade da partida")}</h2><label className="inline-field">{t("Dia")}{' '}<input type="date" value={day} onChange={e => setDay(e.target.value)} /></label></div>
+      <div className="timeline-stats"><span><b>{totals[0]}</b>{t("inimigos contabilizados")}</span><span><b><GameItemIcon id="rupee" /> {totals[1]}</b>{t("rupees de ganhos observados")}</span><span><b><GameItemIcon id="heart_piece" /> {totals[2]}</b>{t("pedaços registrados")}</span></div>
+      {events.length ? <ActivityList activity={events} photos /> : <p className="quiet">{t("Nenhum avanço foi registrado neste dia com o tracker aberto.")}</p>}
+    </section>
+    {state.playLog && <GameLog log={state.playLog} day={day} />}
+  </>;
+}
+
+/** The game's own log (option.sav) for one day: it covers play with the tracker closed, too. */
+function GameLog({ log, day }: { log: NonNullable<AppState['playLog']>; day: string }) {
+  const d = log.days[day];
+  const counted = (rows: { name: string; count: number }[], unknown: string) => <ul className="game-log-list">{rows.slice(0, 6).map(r =>
+    <li key={r.name}><span>{r.name ? t(r.name) : t(unknown)}</span><b>{number(r.count)}</b></li>)}</ul>;
+  return <section className="focus-panel game-log">
+    <h2>{t("Registro do jogo")}</h2>
+    <p className="quiet">{message("O jogo guarda os últimos 1.024 eventos em option.sav. Este registro vai de {from} a {to}.", { from: date(log.fromMs), to: date(log.toMs) })}</p>
+    {!d ? <p className="quiet">{t("O registro do jogo não tem eventos deste dia.")}</p> : <div className="game-log-grid">
+      <div><h3>{t("Inimigos derrotados")} <b>{number(d.enemies)}</b></h3>{counted(d.enemyNames, 'Não identificado')}</div>
+      <div><h3>{t("Dano recebido")} <b>{plural(d.damage / 4, '{n} coração', '{n} corações')}</b></h3>
+        <p className="quiet">{plural(d.hits, '{n} golpe', '{n} golpes')}</p></div>
+      <div><h3>{t("Canções tocadas")} <b>{number(d.songs.reduce((n, s) => n + s.count, 0))}</b></h3>
+        {d.songs.length ? counted(d.songs, '') : <p className="quiet">{t("Nenhuma canção tocada.")}</p>}</div>
+      <div><h3>{t("Tempo por área")}</h3>
+        {d.areas.length ? <ul className="game-log-list">{d.areas.slice(0, 6).map(a =>
+          <li key={a.name}><span>{a.name ? t(a.name) : t('Outros lugares')}</span><b>{playTime(Math.max(60, a.seconds))}</b></li>)}</ul>
+          : <p className="quiet">{t("Nenhuma mudança de área registrada.")}</p>}
+        <p className="quiet">{t("Aproximado, pelas mudanças de área.")}</p></div>
+    </div>}
   </section>;
 }
 
@@ -1155,12 +1181,24 @@ function Medals({ state }: { state: AppState }) {
     ['Baús abertos', chests?.done, [20,50,100,chests?.total ?? 206]], ['Estátuas', statues?.done, [20,40,60,84]],
     ['Inimigos derrotados', state.companion?.enemies, [50,100,250,500]], ['Checklist (%)', s?.percent, [25,50,75,100]],
   ] as const;
-  return <section className="focus-panel"><h2>{t("Medalhas da jornada")}</h2><p className="quiet">{t("Marcos locais calculados a partir do seu progresso.")}</p>
-    <div className="medal-list">{milestones.map(([name, n, thresholds]) => <div className="medal-row" key={name}>
-      <div><b>{t(name)}</b><small>{value(n)}</small></div>{thresholds.map(x => {
-        const earned = n != null && n >= x;
-        return <span className={earned ? 'medal earned' : 'medal'} key={x} title={t(earned ? 'Medalha conquistada' : 'Medalha pendente')}><Icon name="medals" /><ObjectiveName done={earned}>{x}</ObjectiveName></span>;
-      })}
-    </div>)}</div>
-  </section>;
+  const c = state.companion;
+  const counters = [['Pulos', c?.jumps], ['Rolamentos', c?.rolls], ['Golpes de espada', c?.swings]] as const;
+  return <>
+    {c && <section className="focus-panel"><h2>{t("Contadores do jogo")}</h2>
+      {counters.some(([, n]) => n != null) ? <>
+        <p className="quiet">{t("Totais que o próprio jogo guarda no save.")}</p>
+        <div className="metric-strip counter-strip">{counters.map(([label, n]) => <div className="metric" key={label}>
+          <span className="metric-label">{t(label)}</span><strong>{value(n)}</strong>
+        </div>)}</div>
+      </> : <p className="quiet">{t("Este save não tem esses contadores.")}</p>}
+    </section>}
+    <section className="focus-panel"><h2>{t("Medalhas da jornada")}</h2><p className="quiet">{t("Marcos locais calculados a partir do seu progresso.")}</p>
+      <div className="medal-list">{milestones.map(([name, n, thresholds]) => <div className="medal-row" key={name}>
+        <div><b>{t(name)}</b><small>{value(n)}</small></div>{thresholds.map(x => {
+          const earned = n != null && n >= x;
+          return <span className={earned ? 'medal earned' : 'medal'} key={x} title={t(earned ? 'Medalha conquistada' : 'Medalha pendente')}><Icon name="medals" /><ObjectiveName done={earned}>{x}</ObjectiveName></span>;
+        })}
+      </div>)}</div>
+    </section>
+  </>;
 }

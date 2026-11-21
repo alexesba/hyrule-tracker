@@ -76,7 +76,7 @@ The game keeps the same GameData store that saves are written from:
 | Bool | `0x18` | u8 at `+0x16` | a copy at `+0x17` |
 | Int | `0x28` | i32 at `+0x1C` | a copy at `+0x20` |
 | Enum | `0x38` | u32 at `+0x1C` | hash of the value name, as in saves |
-| Int64 | `0x30` | i64 at `+0x20` | a copy at `+0x28`; only the day/night counter is used |
+| Int64 | `0x30` | i64 at `+0x20` | a copy at `+0x28`; used for the jump, roll and sword swing totals (see save-format.md; not yet checked with the game running) |
 | String64 | `0x108` | text at `+0x74` | three 64-byte buffers, each after a pointer + capacity; the second is current |
 | 64-bit keys | `0x10` | u8 at `+0x0C` | `{u64 key, …}` sorted by key; class byte at `+0x08` |
 

@@ -962,3 +962,24 @@ Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando
 NX2Saria's tracker API doesn't read this game version's progress.|A API de tracker do NX2Saria não lê o progresso desta versão do jogo.|NX2Saria's tracker API doesn't read this game version's progress.|La API de tracker de NX2Saria no lee el progreso de esta versión del juego.
 Perfil||Profile|Perfil
 Seguir o perfil jogado por último||Follow the last played profile|Seguir el último perfil jugado
+Contadores do jogo||Game counters|Contadores del juego
+Pulos||Jumps|Saltos
+Rolamentos||Rolls|Volteretas
+Golpes de espada||Sword swings|Golpes de espada
+Totais que o próprio jogo guarda no save.||Totals the game itself keeps in the save.|Totales que el propio juego guarda en la partida.
+Este save não tem esses contadores.||This save doesn't have these counters.|Esta partida no tiene estos contadores.
+Registro do jogo||The game's own log|Registro del juego
+O jogo guarda os últimos 1.024 eventos em option.sav. Este registro vai de {from} a {to}.||The game keeps its last 1,024 events in option.sav. This log runs from {from} to {to}.|El juego guarda sus últimos 1024 eventos en option.sav. Este registro va del {from} al {to}.
+O registro do jogo não tem eventos deste dia.||The game's log has no events from this day.|El registro del juego no tiene eventos de este día.
+Dano recebido||Damage taken|Daño recibido
+{n} coração||{n} heart|{n} corazón
+{n} corações||{n} hearts|{n} corazones
+{n} golpe||{n} hit|{n} golpe
+{n} golpes||{n} hits|{n} golpes
+Canções tocadas||Songs played|Canciones tocadas
+Nenhuma canção tocada.||No songs played.|No se tocó ninguna canción.
+Tempo por área||Time per area|Tiempo por zona
+Nenhuma mudança de área registrada.||No area changes recorded.|No hay cambios de zona registrados.
+Aproximado, pelas mudanças de área.||Approximate, from the area changes.|Aproximado, según los cambios de zona.
+Não identificado||Unidentified|Sin identificar
+Outros lugares||Other places|Otros lugares
