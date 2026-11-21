@@ -20,7 +20,7 @@
     "40 fichas: Bombuchus (20)"
   ],
   "50 tokens: Piece of Heart": [
-    "50 fichas: Pedaço de coração",
+    "50 fichas: Fragmento de coração",
     "50 fichas: Pieza de corazón"
   ],
   "The prize for your second Bombchu Bowling win. Whichever bag upgrade you get second is the biggest.": [
@@ -45,7 +45,7 @@
   ],
   "a weapon or Deku Nuts": [
     "uma arma ou nozes dekos",
-    "un arma o Nueces Deku"
+    "un arma o nueces deku"
   ],
   "Above Impa's House": [
     "Acima da casa de Impa",
@@ -228,7 +228,7 @@
     "De niño, suelta bichos en la tierra blanda junto al vendedor de judías."
   ],
   "As a child, drop bugs on the soil in the little cave by the cavern entrance. The boulder in front of it breaks with a Bomb Flower, which needs the Goron Bracelet.": [
-    "Como criança, solte insetos na terra da pequena caverna perto da entrada da Caverna dos Dodongos. A rocha na frente dela se quebra com uma flor-bomba, que exige o Bracelete Goron.",
+    "Como criança, solte insetos na terra da pequena caverna perto da entrada da Caverna dos Dodongos. A rocha na frente dela se quebra com uma flor-bomba, que exige o bracelete goron.",
     "De niño, suelta bichos en la tierra de la pequeña cueva junto a la entrada de la Cueva de los Dodongos. La roca que la tapa se rompe con una flor bomba, que requiere el brazalete de los goron."
   ],
   "As a child, glide with a Cucco into the cave beside the waterfall and drop bugs on the soil there.": [
@@ -977,7 +977,7 @@
   ],
   "Deku Shield": [
     "Escudo deko",
-    "Escudo Deku"
+    "Escudo deku"
   ],
   "Deku Stick Bundle Small": [
     "Porção pequena de gravetos dekos",
@@ -993,7 +993,7 @@
   ],
   "Deku Sticks or Din's Fire": [
     "Gravetos dekos ou Flama de Din",
-    "Palos Deku o Fuego de Din"
+    "Palos deku o Fuego de Din"
   ],
   "Desert Colossus: Nayru's Love": [
     "Colosso do Deserto: Amor de Nayru",
@@ -1104,7 +1104,7 @@
     "Témpano de hielo más lejano"
   ],
   "Visit all six Great Fairy fountains: Death Mountain summit, Hyrule Castle, Zora's Fountain, Death Mountain Crater, Desert Colossus and outside Ganon's Castle.": [
-    "Visite as seis fontes das Grandes Fadas: cume da Montanha da Morte, Castelo de Hyrule, Nascente Zora, Cratera da Montanha da Morte, Colosso do Deserto e fora do Castelo de Ganon.",
+    "Visite as seis fontes das fadas grandiosas: cume da Montanha da Morte, Castelo de Hyrule, Nascente Zora, Cratera da Montanha da Morte, Colosso do Deserto e fora do Castelo de Ganon.",
     "Visita las seis fuentes de las Grandes Hadas: cima de la Montaña de la Muerte, Castillo de Hyrule, Fuente Zora, Cráter de la Montaña de la Muerte, Coloso del Desierto y fuera del Castillo de Ganon."
   ],
   "Fire Arrows": [
@@ -1340,7 +1340,7 @@
     "Guantes de oro"
   ],
   "Goron Bracelet": [
-    "Bracelete Goron",
+    "Bracelete goron",
     "Brazalete de los goron"
   ],
   "Goron's Ruby": [
@@ -1380,28 +1380,28 @@
     "Mapa del Gran Árbol Deku"
   ],
   "Great Fairy: Gift of Halved Damage": [
-    "Grande Fada: Dom do Dano Reduzido pela Metade",
-    "Gran Hada: Don del daño reducido a la mitad"
+    "Fada grandiosa: Dom do dano à metade",
+    "Gran Hada: Don de la coraza doble"
   ],
   "Great Fairy: Gift of Doubled Magic": [
-    "Grande Fada: Dom da magia em dobro",
+    "Fada grandiosa: Dom da magia em dobro",
     "Gran Hada: Don de la magia doble"
   ],
   "Great Fairy: Farore's Wind": [
-    "Grande Fada: Vento de Farore",
+    "Fada grandiosa: Vento de Farore",
     "Gran Hada: Viento de Farore"
   ],
   "Great Fairy: magic": [
-    "Grande Fada: magia",
+    "Fada grandiosa: magia",
     "Gran Hada: magia"
   ],
   "Great Fairy: Nayru's Love": [
-    "Grande Fada: Amor de Nayru",
+    "Fada grandiosa: Amor de Nayru",
     "Gran Hada: Amor de Nayru"
   ],
   "Great Fairy: Gift of Improved Spin": [
-    "Grande Fada: Dom do Giro Aprimorado",
-    "Gran Hada: Don del giro mejorado"
+    "Fada grandiosa: Dom do ataque giratório",
+    "Gran Hada: Don del ataque circular"
   ],
   "Great Moblin": [
     "Grande moblin",
@@ -1580,8 +1580,8 @@
     "Castillo de Hyrule (fuera del Castillo de Ganon)"
   ],
   "Hyrule Castle grounds (child): Gift of Improved Spin": [
-    "Arredores do Castelo de Hyrule (criança): Dom do Giro Aprimorado",
-    "Exterior del Castillo de Hyrule (niño): Don del giro mejorado"
+    "Arredores do Castelo de Hyrule (criança): Dom do ataque giratório",
+    "Exterior del Castillo de Hyrule (niño): Don del ataque circular"
   ],
   "Hyrule Field (near Gerudo Valley)": [
     "Pradaria de Hyrule (perto do Vale Gerudo)",
@@ -1937,7 +1937,7 @@
   ],
   "Kokiri Sword or Deku Sticks": [
     "Espada Kokiri ou gravetos dekos",
-    "Espada Kokiri o Palos Deku"
+    "Espada Kokiri o palos deku"
   ],
   "Kokiri Tunic (Hero's Clothes)": [
     "túnica kokiri (Roupa do Herói)",
@@ -2272,8 +2272,8 @@
     "En la sala grande antes del jefe, en las enredaderas detrás del pilar alto. Bumerán o tirachinas."
   ],
   "Outside Ganon's Castle (adult): Gift of Halved Damage": [
-    "Fora do Castelo de Ganon (adulto): Dom do Dano Reduzido pela Metade",
-    "Fuera del Castillo de Ganon (adulto): Don del daño reducido a la mitad"
+    "Fora do Castelo de Ganon (adulto): Dom do dano à metade",
+    "Fuera del Castillo de Ganon (adulto): Don de la coraza doble"
   ],
   "Paradox of the chest from the past": [
     "O paradoxo do baú do passado",
@@ -2904,19 +2904,19 @@
     "El Gran Árbol Deku te la da después de derrotar a Gohma."
   ],
   "The Great Fairy at the Desert Colossus gives it.": [
-    "Entregue pela Grande Fada do Colosso do Deserto.",
+    "Entregue pela fada grandiosa do Colosso do Deserto.",
     "Te lo da la Gran Hada del Coloso del Desierto."
   ],
   "The Great Fairy at Zora's Fountain gives it.": [
-    "Entregue pela Grande Fada da Nascente Zora.",
+    "Entregue pela fada grandiosa da Nascente Zora.",
     "Te lo da la Gran Hada de la Fuente Zora."
   ],
   "The Great Fairy in Death Mountain Crater doubles your magic.": [
-    "A Grande Fada da Cratera da Montanha da Morte dobra sua magia.",
+    "A fada grandiosa da Cratera da Montanha da Morte dobra sua magia.",
     "La Gran Hada del Cráter de la Montaña de la Muerte duplica tu magia."
   ],
   "The Great Fairy on the Death Mountain summit gives it. She's the first fairy you can meet.": [
-    "Entregue pela Grande Fada do cume da Montanha da Morte. Ela é a primeira Grande Fada que você pode encontrar.",
+    "Entregue pela fada grandiosa do cume da Montanha da Morte. Ela é a primeira fada grandiosa que você pode encontrar.",
     "Te lo da la Gran Hada de la cima de la Montaña de la Muerte. Es la primera Gran Hada que puedes encontrar."
   ],
   "The Happy Mask Shop lends it once you've paid for the Bunny Hood. The Goron, Zora and Gerudo Masks unlock with it.": [
