@@ -20,6 +20,8 @@ import type { Activity, AppState, ChangeRow, Summary, Toast, SlotSummary } from 
 import { canonicalStage, companionProgress, extendChecklist, RUPEES, type CompanionData, type WorldMarker } from '../core/companion.js';
 import { evaluateAtlasWithManual, joinMarkerFlags, linkAtlas, type AtlasRule } from '../core/atlas.js';
 import { locatePlayer, type AtlasPlace, type PlayerPosition } from '../core/position.js';
+import { readPlayLog } from '../gamedata/playlog.js';
+import { playLogNames, summarizePlayLog, type PlayLogNames, type PlayLogSummary } from '../core/playlog.js';
 import type { PlayerState } from '../shared/types.js';
 
 /** caption.sav keys: Link's position (Vector3) and facing (Float, degrees) when the game saved. */
@@ -57,6 +59,8 @@ export class Controller {
   private lastActivityStats?: ReturnType<typeof companionProgress>;
   private lastHeartStats?: { hearts: number | null; pieces: number | null };
   private lastSaveImage?: { key: string; value?: string };
+  private playLogNames?: PlayLogNames;
+  private lastPlayLog?: { key: string; value?: PlayLogSummary };
   /** last parsed save per slot, for "just collected" and the change list */
   private lastParsed = new Map<string, { mtimeMs: number; data: GameDataFile; buf: Buffer }>();
   /** the save shown last (any slot) */
@@ -369,7 +373,7 @@ export class Controller {
   }
 
   private fail(status: AppState['status'], message: string, values?: Record<string, string | number>) {
-    this.state = { ...this.state, status, message, messageValues: values, saveReadError: false, slots: [], categories: [], summary: undefined, companion: undefined, atlasStatus: undefined, atlasManual: undefined,
+    this.state = { ...this.state, status, message, messageValues: values, saveReadError: false, slots: [], categories: [], summary: undefined, companion: undefined, playLog: undefined, atlasStatus: undefined, atlasManual: undefined,
       saveDir: this.userDir, sourceLabel: undefined, saveImage: undefined };
     this.emit();
   }
@@ -483,7 +487,7 @@ export class Controller {
       slotMode: pinned ? 'manual' : 'recent',
       activeSlot: slot.name,
       summary, categories, lastChanges, areaRegions, available, canBeAdult,
-      companion, saveImage: image, atlasStatus: atlasNow.status, atlasManual: atlasNow.manual, atlasLinks: this.atlasLinks,
+      companion, playLog: this.readPlayLog(), saveImage: image, atlasStatus: atlasNow.status, atlasManual: atlasNow.manual, atlasLinks: this.atlasLinks,
       identify: this.settings.data.pendingIdentify,
       learnedCount: this.settings.data.learned.length,
       snapshots: this.listSnapshots(),
@@ -514,6 +518,35 @@ export class Controller {
         value = 'data:image/jpeg;base64,' + Buffer.from(data.bytes, 'hex').toString('base64');
     } catch { /* some slots have no photo */ }
     this.lastSaveImage = { key, value };
+    return value;
+  }
+
+  /** The game's own play log from option.sav (one per user, all slots). Read-only, re-read when the file changes. */
+  private readPlayLog(): PlayLogSummary | undefined {
+    if (!this.userDir) return;
+    const file = path.join(this.userDir, 'option.sav');
+    let key: string;
+    try { const st = fs.statSync(file); key = `${file}|${st.mtimeMs}|${st.size}`; } catch { return; }
+    if (key === this.lastPlayLog?.key) return this.lastPlayLog.value;
+    let value: PlayLogSummary | undefined;
+    try {
+      const events = readPlayLog(parseGameData(fs.readFileSync(file)));
+      if (events) {
+        this.playLogNames ??= playLogNames([
+          ...this.companionData.statues.map(s => s.actor),
+          ...this.companionData.rematches.flatMap(r => r.actor ? [r.actor] : []),
+          ...this.companionData.chests.flatMap(c => c.item ? [c.item] : []),
+          // Save key names (local/names.json) hold many more actors, e.g. DefeatedEnemyNum.Enemy_Stalchild.
+          ...[...this.names.values()].flatMap(name => name.split('.')),
+        ]);
+        value = summarizePlayLog(events, this.playLogNames);
+      }
+    } catch (e) {
+      // Mid-write or an unexpected layout: keep the last summary and try again on the next change.
+      console.error('play log', e);
+      return this.lastPlayLog?.value;
+    }
+    this.lastPlayLog = { key, value };
     return value;
   }
 
