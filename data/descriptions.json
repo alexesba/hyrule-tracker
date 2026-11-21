@@ -5,7 +5,7 @@
     "heart_pieces.002": { "title": "Dampé's gravedigging tour", "where": "As a child at night, pay Dampé to dig in the graveyard's soft ground. Keep paying for digs until the piece turns up." },
     "heart_pieces.003": { "title": "Inside the stone tower", "where": "As a child, push the crates aside in the ranch's stone tower and crawl through to the round room behind them." },
     "heart_pieces.004": { "title": "Chest on the Cucco ledge", "where": "In a chest on a ledge partway down the valley. Glide there with a Cucco as a child, or Longshot over as an adult." },
-    "heart_pieces.005": { "title": "Behind the waterfall", "where": "On a ledge behind the waterfall near the valley's entrance. Drop down to it from the path above." },
+    "heart_pieces.005": { "title": "Behind the waterfall", "where": "Glide down with a Cucco to the riverside alcove at the bottom of the valley, walk up towards the big waterfall and climb the path behind it." },
     "heart_pieces.006": { "title": "Fishing pond (child prize)", "where": "Catch a big enough fish as a child at the fishing pond by Lake Hylia." },
     "heart_pieces.007": { "title": "Richard the lost dog", "where": "As a child at night, find the dog Richard running around the back alley and lead him home to his owner." },
     "heart_pieces.008": { "title": "Skull Kid's ocarina game", "where": "As a child, stand on the stump near the entrance to the Lost Woods and repeat the Skull Kid's tunes. Win three rounds." },
@@ -218,7 +218,7 @@
     "bottles.poe_collector_bottle": { "where": "The Poe Collector in Castle Town's ruins gives it once you've sold him five Big Poes." },
 
     "great_fairies.death_mountain_summit_magic_meter_dins_fire": { "where": "In the fountain behind the cracked wall on the Death Mountain summit. Play Zelda's Lullaby. She gives magic and Din's Fire. Her fee is 25 Rupees." },
-    "great_fairies.hyrule_castle_grounds_child_enhanced_charged_spin_attack": { "where": "In the fountain behind a boulder near Hyrule Castle, as a child. Play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 50 Rupees." },
+    "great_fairies.hyrule_castle_grounds_child_enhanced_charged_spin_attack": { "where": "In the fountain behind a cracked rock wall near Hyrule Castle, as a child. Bomb the wall and play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 50 Rupees." },
     "great_fairies.zoras_fountain_farores_wind": { "where": "In the fountain behind a cracked wall in Zora's Fountain. Play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 100 Rupees." },
     "great_fairies.death_mountain_crater_double_magic": { "where": "In the fountain behind a wall in Death Mountain Crater that the Megaton Hammer breaks. Play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 200 Rupees." },
     "great_fairies.desert_colossus_nayrus_love": { "where": "In the fountain behind a cracked wall at the Desert Colossus. Play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 300 Rupees." },
@@ -236,7 +236,7 @@
     "capacity.biggest_quiver": { "where": "Score high at the Gerudo horseback archery range. Whichever quiver upgrade you get second is the biggest." },
     "capacity.deku_stick_capacity_20": { "where": "Buy it from the Business Scrub near the Lost Woods bridge, as a child." },
     "capacity.deku_stick_capacity_30": { "where": "Wear the Skull Mask on the Deku Theater stage in the Lost Woods." },
-    "capacity.deku_nut_capacity_30": { "where": "Buy it from the Business Scrub in the Sacred Forest Meadow grotto that the Song of Storms opens." },
+    "capacity.deku_nut_capacity_30": { "where": "Buy it for 40 Rupees from a Business Scrub in the Lost Woods grotto beside the way into the Sacred Forest Meadow. Bomb the rock over the hole first." },
     "capacity.deku_nut_capacity_40": { "where": "Wear the Mask of Truth on the Deku Theater stage in the Lost Woods." },
 
     "stones_medallions.kokiris_emerald": { "where": "The Great Deku Tree gives it after you defeat Gohma." },
