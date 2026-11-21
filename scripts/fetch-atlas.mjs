@@ -39,6 +39,18 @@ for (const [id, flag] of Object.entries(OWN_FLAG)) {
 }
 // Upstream pins the wetland grotto inside Lon Lon Ranch; it is in south-east Hyrule Field.
 const MOVED = { 'lonlon-gs-02': { place: 'llanura', at: { map: 'principal', x: 0.638, y: 0.768 } } };
+// Remake facts upstream has wrong (IGN's and QuestFern's remake guides): the archery piece needs
+// 750 points, the rooftop man is reached as a child, the lab dive and the crater bean pillar are
+// adult-only, and the Great Fairies' gifts carry the remake's names.
+const CORRECTED = {
+  'fortaleza-heart-01': { name: 'Horseback archery - 750 points' },
+  'kakariko-heart-03': { age: 'child' },
+  'lago-heart-01': { age: 'adult' },
+  'crater-heart-02': { age: 'adult' },
+  'castillo-fairy-01': { name: 'Great Fairy: Gift of Improved Spin' },
+  'crater-fairy-01': { name: 'Great Fairy: Gift of Doubled Magic' },
+  'castillo-fairy-02': { name: 'Great Fairy: Gift of Halved Damage' },
+};
 const files = [source.map.image, ...source.places.flatMap(place => place.maps.map(map => map.image)),
   ...source.items.flatMap(item => item.images ?? [])];
 const output = 'src/renderer/public/images/atlas';
@@ -73,7 +85,7 @@ const places = await Promise.all(source.places.map(async ({ id, name, kind, pin,
   maps: await Promise.all(maps.map(async m => ({ id: m.id, label: m.label, image: relative(m.image), aspect: m.aspect, vb: await viewBox(m.image) }))),
 })));
 const items = source.items.map(({ id, place, cat, at, name, age, night, images = [] }) => ({
-  id, place, cat, at, name, age, night, images: images.map(relative), ...keys.get(id), ...MOVED[id],
+  id, place, cat, at, name, age, night, images: images.map(relative), ...keys.get(id), ...MOVED[id], ...CORRECTED[id],
 }));
 await fs.writeFile('data/atlas.json', JSON.stringify({ map, places, items }, null, 2) + '\n');
 await fs.writeFile('docs/atlas-license.txt', license);

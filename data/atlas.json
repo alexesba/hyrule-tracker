@@ -1644,7 +1644,7 @@
         "x": 0.9146,
         "y": 0.6046
       },
-      "name": "Great Fairy: Spin Attack",
+      "name": "Great Fairy: Gift of Improved Spin",
       "age": "child",
       "night": false,
       "images": [
@@ -1708,7 +1708,7 @@
         "y": 0.425
       },
       "name": "The man on the roof",
-      "age": "adult",
+      "age": "child",
       "night": false,
       "images": [
         "images/atlas/da95819214f58d65.webp",
@@ -2245,7 +2245,7 @@
         "y": 0.4469
       },
       "name": "Domed rock in the Crater",
-      "age": "both",
+      "age": "adult",
       "night": false,
       "images": [
         "images/atlas/6b2ecd0a4ff9c8c9.webp",
@@ -2329,7 +2329,7 @@
         "x": 0.3326,
         "y": 0.602
       },
-      "name": "Great Fairy: double magic",
+      "name": "Great Fairy: Gift of Doubled Magic",
       "age": "adult",
       "night": false,
       "images": [
@@ -2694,7 +2694,7 @@
         "y": 0.2122
       },
       "name": "Diving in the laboratory",
-      "age": "both",
+      "age": "adult",
       "night": false,
       "images": [
         "images/atlas/d5dbbd9a135e4978.webp",
@@ -3036,7 +3036,7 @@
         "x": 0.5054,
         "y": 0.7148
       },
-      "name": "Horseback archery - 1,000 points",
+      "name": "Horseback archery - 750 points",
       "age": "adult",
       "night": false,
       "images": [
@@ -4383,7 +4383,7 @@
         "x": 0.7921,
         "y": 0.5987
       },
-      "name": "Great Fairy: Double Defense",
+      "name": "Great Fairy: Gift of Halved Damage",
       "age": "adult",
       "night": false,
       "images": [
