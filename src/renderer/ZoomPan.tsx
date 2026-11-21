@@ -51,7 +51,7 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
     if (!el) return;
     const wheel = (e: WheelEvent) => {
       // Scrolling a card or the progress list on the map should move that list, not zoom.
-      if (e.target instanceof Element && e.target.closest('.map-side, .marker-card, .map-hud')) return;
+      if (e.target instanceof Element && e.target.closest('.map-side, .map-cats, .marker-card, .map-hud')) return;
       if (e.deltaY > 0 && drawnZoom.current <= MIN_ZOOM) return;
       e.preventDefault();
       const r = el.getBoundingClientRect();
@@ -176,7 +176,7 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
   function startDrag(e: PointerEvent<HTMLDivElement>) {
     // Fingers are handled by the touch listeners above. Controls drawn on the map are not the map.
     if (e.pointerType === 'touch' || !e.isPrimary || e.button !== 0) return;
-    if (e.target instanceof Element && e.target.closest('.zoom-controls, .map-side, .marker-filter, .marker-card, .map-panel-show, .map-back, .map-hud')) return;
+    if (e.target instanceof Element && e.target.closest('.zoom-controls, .map-side, .map-cats, .map-cats-toggle, .marker-filter, .marker-card, .map-panel-show, .map-back, .map-hud')) return;
     gesture.current?.abort();
     dragged.current = false;
     if (view.z <= MIN_ZOOM) return;

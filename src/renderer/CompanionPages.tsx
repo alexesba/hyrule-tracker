@@ -663,6 +663,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   // On by default: the map opens where Link is and keeps up with him.
   const [follow, setFollow] = useStored('map.follow', true);
   const [panelOpen, setPanelOpen] = useStored('map.panel', true);
+  const [catsOpen, setCatsOpen] = useState(false);
   const [hudOpen, setHudOpen] = useStored('map.hud', false);
   const [active, setActive] = useState<TrackedItem>();
   const mapView = useRef<HTMLDivElement>(null);
@@ -742,7 +743,6 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
         {!inRegion ? <div className="map-side-body">
           <div className="side-score"><span className="side-region">{t('Hyrule')}</span></div>
           <SplitScore rows={rows.filter(r => LOCAL_NAMES[r.area])} overall={state.summary ? { done: state.summary.doneA, total: state.summary.totalA } : undefined} />
-          {!narrowMap && <CategoryCounters rows={rows} filter={filter} onFilter={pickFilter} />}
           <p className="side-sub">{t('Taxa de conclusão por região')}</p>
           <div className="region-rates">
             {listed.map(r => <button key={r.key} type="button" className="region-rate" style={areaShot(r.key) ? { backgroundImage: `linear-gradient(90deg, #14121100 0%, #141211a0 52%, #141211 88%), url("${areaShot(r.key)}")` } : undefined} onClick={() => open(r.key)}>
@@ -778,25 +778,28 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const scoped = useMemo(() => counts.filter(r => filter === 'all' || r.catId === filter), [counts, filter]);
   const scopeLeft = scoped.reduce((n, r) => n + (r.done ? 0 : 1), 0);
   const statusFilter = <StatusFilter show={show} onShow={pickShow} total={scoped.length} left={scopeLeft} />;
-  const phoneBar = narrowMap && !inRegion;
-  const categoryMenu = phoneBar && <label className="map-region map-category">
-    <span>{t('Mostrar no mapa')}</span>
-    <select value={filter} aria-label={t('Mostrar no mapa')} onChange={e => pickFilter(e.target.value)}>
-      <option value="all">{t('Todas')}</option>
-      {tallyCounters(rows).map(c => <option key={c.cat.id} value={c.cat.id}>{t(c.cat.label)} {number(c.done)}/{number(c.total)}</option>)}
-    </select>
-  </label>;
   const mapModes = <div className="map-hud-modes">
     <label className="map-switch"><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} /><span>{t("Ocultar regiões não vistas")}</span></label>
     <label className="map-switch"><input type="checkbox" checked={follow} onChange={e => { setFollow(e.target.checked); setActive(undefined); }} /><span>{t("Seguir Link")}</span></label>
   </div>;
+  const chosenCat = filter === 'all' ? undefined : tallyCounters(rows).find(c => c.cat.id === filter);
+  const catDrawer = !inRegion && (catsOpen ? <aside className="map-cats" aria-label={t('Mostrar no mapa')}>
+    <div className="map-cats-head">
+      <button type="button" className="map-cats-collapse" aria-expanded="true" aria-label={t('Mostrar no mapa')} onClick={() => setCatsOpen(false)}><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.9 2.2 4.1 6l3.8 3.8" /></svg></button>
+      <b>{t('Mostrar no mapa')}</b>
+    </div>
+    {statusFilter}
+    <CategoryCounters rows={rows} filter={filter} onFilter={pickFilter} />
+  </aside> : <button type="button" className={chosenCat ? 'map-cats-toggle is-set' : 'map-cats-toggle'} aria-expanded="false" aria-label={t('Mostrar no mapa')} onClick={() => setCatsOpen(true)}>
+    {chosenCat ? <GameItemIcon id={chosenCat.icon} size={18} /> : <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.1 2.2 7.9 6 4.1 9.8" /></svg>}
+  </button>);
 
 
   return <div ref={mapView} className={mapOnly ? 'map-view map-only' : 'map-view'}>
     {player?.source === 'save' && <p className="map-note">{t(SAVE_POSITION_NOTE)}</p>}
     <div className={panelOpen ? 'map-stage' : 'map-stage no-panel'}>
       <section className="map-main">
-        {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={<><MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<>{regionMenu}{categoryMenu}</>} how={<>{statusFilter}<span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} />{onMap}</>} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
+        {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={<><MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={regionMenu} how={mapModes} />{catDrawer}{onMap}</>} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
           <img className="map-art" src={atlas.map.image} alt={t("Mapa de Hyrule")} draggable={false} />
           {atlas.places.filter(p => !hideUnknown || seen.has(atlasStages[p.id])).map(p => {
             const key = atlasStages[p.id];
@@ -834,16 +837,16 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
 }
 
 /** One bar over the map. The groups disappear on a wide window so the controls stay one row. On a phone the extra rows start folded. */
-function MapHud({ where, how, open, onToggle }: { where: ReactNode; how: ReactNode; open: boolean; onToggle: () => void }) {
+function MapHud({ where, how, open, onToggle }: { where: ReactNode; how?: ReactNode; open: boolean; onToggle: () => void }) {
   const label = t(open ? 'Ocultar opções do mapa' : 'Mostrar opções do mapa');
-  return <div className="map-float-tools"><div className={open ? 'map-hud' : 'map-hud is-collapsed'}>
+  return <div className="map-float-tools"><div className={!how || open ? 'map-hud' : 'map-hud is-collapsed'}>
     <div className="map-hud-where">
       {where}
-      <button type="button" className="map-hud-toggle" aria-expanded={open} aria-label={label} title={label} onClick={onToggle}>
+      {how && <button type="button" className="map-hud-toggle" aria-expanded={open} aria-label={label} title={label} onClick={onToggle}>
         <svg viewBox="0 0 12 12" aria-hidden="true"><path d={open ? 'M2.2 7.7 6 4l3.8 3.7' : 'M2.2 4.3 6 8l3.8-3.7'} /></svg>
-      </button>
+      </button>}
     </div>
-    <div className="map-hud-how">{how}</div>
+    {how && <div className="map-hud-how">{how}</div>}
   </div></div>;
 }
 

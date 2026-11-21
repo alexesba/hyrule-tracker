@@ -350,6 +350,8 @@
   .zoom-viewport .map-float-tools, .zoom-viewport:has(.map-side) .map-float-tools, .zoom-viewport:has(.map-panel-show) .map-float-tools { left: 12px; right: 12px; width: auto; max-width: none; transform: none; pointer-events: none; }
   .zoom-viewport:has(.map-side) .map-float-tools { right: calc(min(320px, 100% - 80px) + 22px); }
   .zoom-viewport:has(.map-panel-show) .map-float-tools { right: 210px; }
+  .zoom-viewport:has(.map-cats-toggle) .map-float-tools { left: 64px; }
+  .zoom-viewport:has(.map-cats) .map-float-tools { left: 256px; }
   .map-hud { flex-wrap: wrap; row-gap: 6px; pointer-events: auto; }
   .map-hud :is(.map-region, .map-switch, .era-toggle) { white-space: nowrap; }
   .map-hud-modes { display: flex; align-items: center; gap: 14px; padding: 0 4px; }
@@ -407,9 +409,6 @@
   .zoom-viewport:has(.map-panel-show) .zoom-hint { bottom: 76px; }
   /* The fold button joins the region row, and the floor menu takes the next one. */
   .map-hud-where .map-floor { order: 1; }
-  .map-hud-where .map-category { order: 2; flex: 1 1 100%; min-width: 0; }
-  .map-hud-where .map-category > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  .map-view:not(.map-only) .zoom-viewport:not(.map-unmapped):has(.map-category) { --hud-room: 280px; }
   /* Inline (not full screen), the box leaves room above the art for the bar and below it for the zoom row. The layer fits what is left. */
   .map-view:not(.map-only) .zoom-viewport:not(.map-unmapped) { --hud-room: 132px; aspect-ratio: auto; height: min(calc((100vw - 28px) / var(--ratio, 1.6) + var(--hud-room)), 74dvh); max-height: none; container-type: size; --map-h: calc(100cqh - var(--hud-room)); }
   /* Inline, the progress panel follows the map (rendered outside it by HyruleMap). */
@@ -445,6 +444,26 @@
   .zoom-viewport .map-hud { flex-wrap: nowrap; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 }
 /* Progress panel (world: rate per region; region: score, era tabs, counters, list). */
+.map-cats-toggle { position: absolute; top: 12px; left: 12px; z-index: 8; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid #5a4d3e; border-radius: 50%; background: #1a1714e6; color: #f3ece2; cursor: pointer; box-shadow: 0 8px 20px #0008; }
+.map-cats-toggle svg { width: 14px; height: 14px; display: block; }
+.map-cats-toggle path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.map-cats-toggle:hover, .map-cats-toggle.is-set { border-color: #c9a15b; color: #f3ecd4; }
+.map-cats { position: absolute; top: 12px; left: 12px; bottom: 228px; z-index: 8; display: flex; flex-direction: column; width: min(232px, calc(100% - 80px)); overflow: auto; scrollbar-width: thin; border: 1px solid var(--hyrule-line); border-radius: var(--hyrule-radius); background: #141211; box-shadow: 0 12px 32px #000a; }
+.map-cats-head { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #141211; border-bottom: 1px solid var(--hyrule-line); font-size: 13px; }
+.map-cats-collapse { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--hyrule-muted); cursor: pointer; }
+.map-cats-collapse svg { width: 14px; height: 14px; display: block; }
+.map-cats-collapse path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.map-cats-collapse:hover { color: var(--hyrule-text); background: #26221e; }
+.map-cats .side-counters { margin: 0; border: 0; border-radius: 0; background: none; }
+.map-cats .marker-filter { display: flex; flex-direction: column; gap: 4px; margin: 8px 8px 4px; }
+.map-cats .marker-filter button { display: flex; justify-content: space-between; width: 100%; text-align: left; }
+@media (max-width: 960px) {
+  .map-cats, .map-cats-toggle { top: 78px; }
+  .zoom-viewport:has(.map-hud:not(.is-collapsed)) :is(.map-cats, .map-cats-toggle) { top: 126px; }
+}
+@media (max-width: 760px) {
+  .map-cats { bottom: 72px; }
+}
 .map-side { overflow-y: auto; scrollbar-width: thin; border: 1px solid var(--hyrule-line); border-radius: var(--hyrule-radius); background: #141211; }
 .map-side-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: #141211; border-bottom: 1px solid var(--hyrule-line); font-size: 13px; }
 .map-side-collapse { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--hyrule-muted); cursor: pointer; }
@@ -572,7 +591,8 @@
 }
 @media (pointer: coarse) {
   /* Markers stay small on the art, with a finger-sized hit area around them. */
-  .floor-map .atlas-marker::before { content: ""; position: absolute; inset: -10px; border-radius: 50%; }  .map-back, .map-hud-toggle { width: 44px; height: 44px; }
+  .floor-map .atlas-marker::before { content: ""; position: absolute; inset: -10px; border-radius: 50%; }  .map-back, .map-hud-toggle, .map-cats-toggle { width: 44px; height: 44px; }
+  .map-cats-collapse { width: 44px; height: 44px; }
   .map-side-collapse { width: 44px; height: 44px; margin: -9px 0 -9px -9px; }
 /* The progress sheet's close control was a small mark hanging off the corner, next to zoom. The whole header closes it. */
 @media (max-width: 760px), (max-height: 500px) and (min-width: 641px) {
