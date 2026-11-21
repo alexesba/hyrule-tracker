@@ -440,6 +440,10 @@ function Settings({ state, onLanguage }: { state: AppState; onLanguage: (locale:
       <code className="save-path">{state.saveDir || t('Pasta do save ainda não encontrada.')}</code>
       {state.message && <p className="notice" role="status">{tv(state.message, state.messageValues)}</p>}
       {!isRemote && <SaveActions activeDir={state.status === 'ok' ? state.saveDir : undefined} notFound={!state.saveDir} />}
+      {state.profiles.length > 1 && <label className="inline-field">{t('Perfil')}<select value={state.chosenProfile ?? ''} onChange={e => void api.selectProfile(e.target.value || null)}>
+        <option value="">{t('Seguir o perfil jogado por último')}</option>
+        {state.profiles.map(profile => <option key={profile.id} value={profile.id}>{profile.name ?? profile.id.slice(0, 8)} · {date(profile.lastSavedMs)}</option>)}
+      </select></label>}
       {!!state.slots.length && <label className="inline-field">{t('Slot')}<select value={state.slotMode === 'manual' ? state.activeSlot : ''} onChange={e => void api.pinSlot(e.target.value || null)}>
         <option value="">{t("Seguir o save mais recente")}</option>
         {state.slots.map(slot => <option key={slot.name} value={slot.name}>{slot.name} · {t(slot.area ?? '?')} · {date(slot.mtimeMs)}</option>)}

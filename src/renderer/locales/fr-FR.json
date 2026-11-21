@@ -1768,5 +1768,7 @@
   "Checklist": "Checklist",
   "Couldn't connect to the game: {error}": "Impossible de se connecter au jeu : {error}",
   "Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.": "Dans les recomps, la position de Link est en direct. Dans les émulateurs, elle n'est mise à jour qu'à la sauvegarde.",
-  "NX2Saria's tracker API doesn't read this game version's progress.": "L'API de tracker de NX2Saria ne lit pas la progression de cette version du jeu."
+  "NX2Saria's tracker API doesn't read this game version's progress.": "L'API de tracker de NX2Saria ne lit pas la progression de cette version du jeu.",
+  "Perfil": "Profil",
+  "Seguir o perfil jogado por último": "Suivre le dernier profil joué"
 }

@@ -81,6 +81,14 @@ export interface SlotSummary {
   area?: string;
 }
 
+export interface ProfileSummary {
+  /** 32-hex profile folder name, upper case */
+  id: string;
+  /** The account's name, when the emulator keeps it readably */
+  name?: string;
+  lastSavedMs: number;
+}
+
 export interface Activity {
   ms: number;
   source: 'live' | 'save';
@@ -173,6 +181,12 @@ export interface AppState {
   activity?: Activity[];
   saveImage?: string;
   slots: SlotSummary[];
+  /** Profiles with saves in the current emulator or install, most recently played first */
+  profiles: ProfileSummary[];
+  /** The profile shown (its id) */
+  activeProfile?: string;
+  /** The profile picked by hand, when it is one of `profiles` (else the most recent one is followed) */
+  chosenProfile?: string;
   slotMode: 'recent' | 'manual';
   activeSlot?: string;
   summary?: Summary;
