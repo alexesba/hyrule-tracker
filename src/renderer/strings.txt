@@ -871,6 +871,8 @@ Pedaço de coração||Piece of Heart|Pieza de corazón
 Recipiente de coração||Heart Container|Contenedor de corazón
 Grande Fada||Great Fairy|Gran Hada
 Mostrar no mapa||Show on map|Mostrar en el mapa
+No mapa||In the map|En el mapa
+Todos os itens|Todos os itens no mapa|All items in the map|Todos los objetos en el mapa
 Faltam||Remaining|Faltan
 Coletados||Collected|Recogidos
 Grandes Fadas||Great Fairies|Grandes Hadas
