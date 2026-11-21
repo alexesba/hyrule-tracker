@@ -321,10 +321,20 @@
 /* Progress panel docks to the map's right edge. Zoom controls sit on the opposite corner. */
 .zoom-viewport .map-side { position: absolute; top: 10px; right: 10px; bottom: 10px; width: min(320px, calc(100% - 80px)); z-index: 8; max-height: none; box-shadow: 0 12px 32px #000a; }
 /* One bar, centered in the open map. The panel reserves the right side, so the bar centers in what is left. */
-.zoom-viewport .map-float-tools { position: absolute; top: 10px; left: 50%; z-index: 9; transform: translateX(-50%); display: flex; justify-content: center; width: max-content; max-width: calc(100% - 24px); }
+.zoom-viewport .map-float-tools { position: absolute; top: 10px; left: 50%; z-index: 9; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; justify-content: center; width: max-content; max-width: calc(100% - 24px); }
 .zoom-viewport:has(.map-side) .map-float-tools { left: calc((100% - min(320px, 100% - 80px) - 10px) / 2); max-width: calc(100% - min(320px, 100% - 80px) - 28px); }
 .zoom-viewport:has(.map-panel-show) .map-float-tools { left: calc((100% - 200px) / 2); max-width: calc(100% - 220px); }
 .map-hud { display: flex; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 8px 10px; width: max-content; max-width: 100%; padding: 6px 8px; border: 1px solid #3a342e; border-radius: 12px; background: #1c1a18f2; }
+/* Category choice. A row under the bar until a wide, tall map has room for a left column. */
+.map-rail { display: flex; flex-direction: row; align-items: center; align-self: stretch; gap: 4px; min-width: 0; max-width: 100%; padding: 4px; border: 1px solid #3a342e; border-radius: 12px; background: #1c1a18f2; pointer-events: auto; overflow-x: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.map-rail-cats, .map-rail-status, .map-rail .marker-filter { display: flex; flex-direction: row; align-items: center; gap: 2px; flex: none; }
+.map-rail .marker-filter { margin: 0; padding: 0 0 0 4px; border: 0; border-left: 1px solid #3a342e; border-radius: 0; background: none; }
+.map-rail-cats button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: #f3ece2; }
+.map-rail-cats button:hover { background: #2a2622; }
+.map-rail-cats button:active { background: #26362d; }
+.map-rail-cats button[aria-checked="true"] { background: #2e2a25; box-shadow: inset 0 0 0 1px #c9a15b; }
+.map-rail-cats button:has(.map-rail-all) { width: auto; min-width: 36px; padding: 0 7px; }
+.map-rail-all { font-size: 11px; font-weight: 700; line-height: 1.1; }
 .map-hud-where, .map-hud-how, .map-hud-modes { display: contents; }
 .map-hud-divider { width: 1px; align-self: stretch; flex: none; margin: 4px 2px; background: #3a342e; }
 .era-toggle { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 0; border: 0; background: none; color: #f3ece2; font: inherit; font-size: 12.5px; cursor: pointer; }
@@ -347,7 +357,13 @@
 /* Wide window: the bar spans the map left of the panel and wraps by group into centered rows. Labels stay on one line. */
 @media (min-width: 961px) and (min-height: 501px) {
   .zoom-viewport { --map-h: max(380px, calc(100dvh - 200px)); }
-  .zoom-viewport .map-float-tools, .zoom-viewport:has(.map-side) .map-float-tools, .zoom-viewport:has(.map-panel-show) .map-float-tools { left: 12px; right: 12px; width: auto; max-width: none; transform: none; pointer-events: none; }
+  .zoom-viewport .map-float-tools, .zoom-viewport:has(.map-side) .map-float-tools, .zoom-viewport:has(.map-panel-show) .map-float-tools { top: 10px; bottom: 10px; left: 12px; right: 12px; width: auto; max-width: none; transform: none; align-items: center; justify-content: flex-start; padding-left: 64px; pointer-events: none; }
+  .zoom-viewport .map-float-tools:has(.map-rail-status) { padding-left: 176px; }
+  .map-rail { position: absolute; top: 0; left: 0; flex-direction: column; align-items: stretch; width: max-content; max-width: 168px; max-height: calc(100% - 168px); overflow-x: hidden; overflow-y: auto; }
+  .map-rail-cats, .map-rail-status .marker-filter { flex-direction: column; align-items: stretch; }
+  .map-rail-cats button { align-self: center; }
+  .map-rail .marker-filter { border-left: 0; border-top: 1px solid #3a342e; margin-top: 4px; padding: 4px 0 0; }
+  .map-rail .marker-filter button { justify-content: space-between; text-align: left; white-space: nowrap; }
   .zoom-viewport:has(.map-side) .map-float-tools { right: calc(min(320px, 100% - 80px) + 22px); }
   .zoom-viewport:has(.map-panel-show) .map-float-tools { right: 210px; }
   .map-hud { flex-wrap: wrap; row-gap: 6px; pointer-events: auto; }
@@ -480,13 +496,18 @@
 .atlas-controls .inline-field, .atlas-controls .marker-filter { margin: 0; }
 /* Region names sit on the map as banners (cream for areas, green for dungeons), like a printed map. */
 .map-node { position: absolute; transform: translate(-50%, -50%); padding: 0; border: 0; background: none; cursor: pointer; }
-.map-node span { display: block; width: max-content; max-width: 150px; padding: 2px 9px 3px; border: 1px solid #5a3d1c; border-radius: 3px; background: linear-gradient(#f4e6b8, #e6d194); color: #3b2412; font-size: 11px; font-weight: 600; line-height: 1.25; text-align: center; white-space: nowrap; box-shadow: 0 1px 0 #fff6 inset, 0 2px 4px #0006; }
-.map-node.dungeon span { border-color: #1b2b25; background: linear-gradient(#4d6b5f, #3a554a); color: #f3ecd4; }
+.map-node-name { display: block; width: max-content; max-width: 150px; padding: 2px 9px 3px; border: 1px solid #5a3d1c; border-radius: 3px; background: linear-gradient(#f4e6b8, #e6d194); color: #3b2412; font-size: 11px; font-weight: 600; line-height: 1.25; text-align: center; white-space: nowrap; box-shadow: 0 1px 0 #fff6 inset, 0 2px 4px #0006; }
+.map-node.dungeon .map-node-name { border-color: #1b2b25; background: linear-gradient(#4d6b5f, #3a554a); color: #f3ecd4; }
 .map-node:hover, .map-node:focus-visible { z-index: 2; }
-.map-node:hover span, .map-node:focus-visible span { filter: brightness(1.12); box-shadow: 0 0 0 2px #fff8, 0 3px 8px #0008; }
-.map-node.in-game span { box-shadow: 0 0 0 2px #f5c542, 0 0 12px #f5c542aa; }
-.map-node.complete span::before { content: "✓ "; color: #1f7a45; font-weight: 800; }
-.map-node.dungeon.complete span::before { color: #8ef0b4; }
+.map-node:hover .map-node-name, .map-node:focus-visible .map-node-name { filter: brightness(1.12); box-shadow: 0 0 0 2px #fff8, 0 3px 8px #0008; }
+.map-node.in-game .map-node-name { box-shadow: 0 0 0 2px #f5c542, 0 0 12px #f5c542aa; }
+.map-node.complete .map-node-name::before { content: "✓ "; color: #1f7a45; font-weight: 800; }
+.map-node.dungeon.complete .map-node-name::before { color: #8ef0b4; }
+/* Counts hang under the banner so the name stays on the pin. Same dark chip as the tracker panels, so the number stays readable on the light map. */
+.map-counts { position: absolute; top: calc(100% + 2px); left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; width: max-content; max-width: 156px; }
+.map-count { display: inline-flex; align-items: center; gap: 2px; padding: 1px 4px 1px 1px; border-radius: 3px; background: #3b2412; color: #f3ecd4; font-size: 11px; font-weight: 700; line-height: 1; box-shadow: 0 1px 2px #0008; }
+.map-count b { color: #f3ecd4; font-size: 11px; }
+.map-count .game-item-icon { display: block; }
 .region-atlas .inline-field { min-width: 0; }
 .region-atlas select { max-width: min(70%, 290px); }
 .atlas-item > img { display: block; width: 100%; max-height: 310px; object-fit: contain; border-radius: 8px; background: #25201b; }
@@ -561,9 +582,12 @@
   /* A tap keeps :hover on touch screens: no tooltip left behind once the card is closed. */
   .plot-point:hover:not(:focus-visible) .marker-tip { display: none; }
 }
+@media (min-width: 961px) and (min-height: 501px) and (any-pointer: coarse) {
+  .map-rail { max-height: calc(100% - 220px); }
+}
 @media (pointer: coarse) {
   /* Markers stay small on the art, with a finger-sized hit area around them. */
-  .floor-map .atlas-marker::before { content: ""; position: absolute; inset: -10px; border-radius: 50%; }  .map-back, .map-hud-toggle { width: 44px; height: 44px; }
+  .floor-map .atlas-marker::before { content: ""; position: absolute; inset: -10px; border-radius: 50%; }  .map-back, .map-hud-toggle, .map-rail-cats button { width: 44px; height: 44px; }
   .map-side-collapse { width: 44px; height: 44px; margin: -9px 0 -9px -9px; }
 /* The progress sheet's close control was a small mark hanging off the corner, next to zoom. The whole header closes it. */
 @media (max-width: 760px), (max-height: 500px) and (min-width: 641px) {
