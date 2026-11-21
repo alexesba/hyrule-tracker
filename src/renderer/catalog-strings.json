@@ -179,9 +179,9 @@
     "Como criança, à noite, na parede ao lado da porta da Casa das Skulltulas.",
     "De niño, de noche, en la pared junto a la puerta de la Casa de las Skulltulas."
   ],
-  "As a child at night, roll into the tall tree in the village square.": [
-    "Como criança, à noite, dê uma cambalhota contra a árvore alta da praça da vila.",
-    "De niño, de noche, rueda contra el árbol alto de la plaza de la aldea."
+  "As a child at night, roll into the tall tree by the village entrance.": [
+    "Criança, à noite, role contra a árvore alta perto da entrada da vila.",
+    "De niño, de noche, rueda contra el árbol alto junto a la entrada del pueblo."
   ],
   "As a child at night, under the eaves of the house near the gate to Death Mountain.": [
     "Como criança, à noite, sob o beiral da casa perto do portão da Montanha da Morte.",
@@ -235,9 +235,9 @@
     "Como criança, plane com um Cucco até a caverna ao lado da cachoeira e solte insetos na terra fofa de lá.",
     "De niño, planea con un cuco hasta la cueva junto a la cascada y suelta bichos en la tierra blanda."
   ],
-  "As a child, in the first alcove on the right inside the crater, by a crate.": [
-    "Como criança, no primeiro nicho à direita dentro da cratera, junto a um caixote.",
-    "De niño, en el primer nicho a la derecha dentro del cráter, junto a una caja."
+  "As a child, roll into the farther of the two crates by a pot on the left, just inside the crater. The heat starts to hurt after a few seconds.": [
+    "Criança, role contra o mais distante dos dois caixotes ao lado de um pote à esquerda, logo na entrada da cratera. O calor começa a ferir após alguns segundos.",
+    "De niño, rueda contra la más lejana de las dos cajas junto a una vasija a la izquierda, nada más entrar al cráter. El calor empieza a dañar tras unos segundos."
   ],
   "As a child, play the Song of Storms by the tree near Talon's dead end to open a grotto, bomb the wall inside and use the Boomerang.": [
     "Como criança, toque a Canção das Tempestades junto à árvore no beco sem saída perto de Talon para abrir uma gruta. Lá dentro, exploda a parede e use o bumerangue.",
@@ -259,17 +259,17 @@
     "Como criança, teletransporte-se com o Bolero do Fogo e solte insetos na terra fofa junto à lava.",
     "De niño, teletranspórtate con el Bolero del Fuego y suelta bichos en la tierra blanda junto a la lava."
   ],
-  "As an adult at night, high on the wall at a dead end of the meadow's maze. Hookshot.": [
-    "Como adulto, à noite, no alto da parede de um beco sem saída no labirinto da clareira. Use o gancho.",
-    "De adulto, de noche, en lo alto de la pared de un callejón sin salida del laberinto del prado. Usa el gancho."
+  "As an adult, high on the wall by the big tree roots near the ladder up the ruins, just before the stairs to the temple. Hookshot.": [
+    "Adulto, no alto da parede junto às raízes da árvore grande, perto da escada de mão das ruínas, logo antes da escadaria do templo. Gancho.",
+    "De adulto, en lo alto de la pared junto a las raíces del árbol grande, cerca de la escalera de mano de las ruinas, justo antes de la escalinata del templo. Gancho."
   ],
   "As an adult at night, in the cave past the net slope near the summit. Break the rock with the Megaton Hammer.": [
     "Como adulto, à noite, na caverna depois da encosta com rede, perto do cume. Quebre a rocha com o Martelo Megaton.",
     "De adulto, de noche, en la cueva pasada la pendiente con red, cerca de la cima. Rompe la roca con el Martillo Megatón."
   ],
-  "As an adult at night, in the dark tunnel towards Goron City. Break the rock with the Megaton Hammer.": [
-    "Como adulto, à noite, no túnel escuro em direção à Cidade Goron. Quebre a rocha com o Martelo Megaton.",
-    "De adulto, de noche, en el túnel oscuro hacia la Ciudad Goron. Rompe la roca con el Martillo Megatón."
+  "As an adult at night, just outside Goron City where the lone Bomb Flower grew. Break the grey rock with the Megaton Hammer.": [
+    "Adulto, à noite, logo na saída da Cidade Goron, onde ficava a Flor-Bomba solitária. Quebre a rocha cinza com o Martelo Megaton.",
+    "De adulto, de noche, justo a la salida de la Ciudad Goron, donde crecía la flor bomba solitaria. Rompe la roca gris con el Martillo Megatón."
   ],
   "As an adult at night, in the hollow of the big dead tree on the lake's island. Longshot.": [
     "Como adulto, à noite, no oco da grande árvore morta na ilha do lago. Use o gancho longo.",
@@ -323,9 +323,9 @@
     "Como adulto, à noite, sob o arco de rocha junto ao caminho do cânion. Use o gancho.",
     "De adulto, de noche, bajo el arco de roca junto al camino del cañón. Usa el gancho."
   ],
-  "As an adult, high on the lava cave wall seen from the metal walkway. Hookshot.": [
-    "Como adulto, no alto da parede da caverna de lava, visível da passarela de metal. Use o gancho.",
-    "De adulto, en lo alto de la pared de la cueva de lava, visible desde la pasarela metálica. Usa el gancho."
+  "As an adult, on the rock that juts down under the central platform where the Spiritual Stone sat. Drop to the level below the top one and Hookshot it.": [
+    "Adulto, na rocha que se projeta para baixo sob a plataforma central onde ficava a Pedra Espiritual. Desça ao nível abaixo do mais alto e use o gancho.",
+    "De adulto, en la roca que sobresale bajo la plataforma central donde estaba la Piedra Espiritual. Baja al nivel bajo el más alto y usa el gancho."
   ],
   "As an adult, in a small cave above the scarecrow. Play the Scarecrow's Song and Hookshot up, or use the Longshot.": [
     "Como adulto, numa pequena caverna acima do espantalho. Toque a Canção do Espantalho e suba com o gancho, ou use o gancho longo.",
@@ -507,9 +507,9 @@
     "Trepadeiras do subsolo",
     "Enredaderas del sótano"
   ],
-  "Basement web corridor": [
-    "Corredor das teias no subsolo",
-    "Pasillo de las telarañas del sótano"
+  "Basement alcove": [
+    "Nicho do subsolo",
+    "Hueco del sótano"
   ],
   "Beamos": [
     "Beamos",
@@ -795,9 +795,9 @@
     "Deku Mercador na cratera",
     "Deku comerciante en el cráter"
   ],
-  "Buy it from the Business Scrub in the Sacred Forest Meadow grotto that the Song of Storms opens.": [
-    "Compre do Deku Mercador na gruta da Clareira Sagrada que a Canção das Tempestades abre.",
-    "Cómpraselo al Deku comerciante de la gruta del Prado Sagrado del Bosque que abre la Canción de las Tormentas."
+  "Buy it for 40 Rupees from a Business Scrub in the Lost Woods grotto beside the way into the Sacred Forest Meadow. Bomb the rock over the hole first.": [
+    "Compre por 40 Rupias de um Deku Mercador na gruta do Bosque Perdido ao lado da entrada da Clareira Sagrada. Antes, exploda a rocha sobre o buraco.",
+    "Cómpraselo por 40 Rupias a un Deku comerciante de la gruta del Bosque Perdido junto a la entrada del Prado Sagrado del Bosque. Antes, vuela la roca que tapa el agujero."
   ],
   "Buy it from the Business Scrub near the Lost Woods bridge, as a child.": [
     "Compre do Deku Mercador perto da ponte do Bosque Perdido, como criança.",
@@ -931,9 +931,9 @@
     "Dark Link",
     "Dark Link"
   ],
-  "Dark tunnel": [
-    "Túnel escuro",
-    "Túnel oscuro"
+  "Rock by Goron City": [
+    "Rocha perto da Cidade Goron",
+    "Roca junto a la Ciudad Goron"
   ],
   "Darunia gives it after you defeat King Dodongo.": [
     "Darunia entrega depois que você derrota o King Dodongo.",
@@ -1707,17 +1707,17 @@
     "Na Barriga de Jabu-Jabu.",
     "En el Interior de Jabu-Jabu."
   ],
-  "In the basement, behind a web in a dusty passage. Burn the web to reach it.": [
-    "No subsolo, atrás de uma teia numa passagem empoeirada. Queime a teia para alcançá-la.",
-    "En el sótano, detrás de una telaraña en un pasillo polvoriento. Quema la telaraña para llegar."
+  "In the basement, in the small room south of the elevator, past a Skulltula. If a wall blocks it, turn the basement walls until it opens.": [
+    "No subsolo, na salinha ao sul do elevador, depois de uma Skulltula. Se uma parede bloquear, gire as paredes do subsolo até abrir.",
+    "En el sótano, en la salita al sur del ascensor, tras una Skulltula. Si una pared la tapa, gira las paredes del sótano hasta que se abra."
   ],
   "In the basement, next to the grate covered by a spider web.": [
     "No subsolo, ao lado da grade coberta por uma teia de aranha.",
     "En el sótano, junto a la reja cubierta por una telaraña."
   ],
-  "In the basement's back room: burn the web, bomb the wall behind it and fetch the token with the Boomerang.": [
-    "Na sala dos fundos do subsolo: queime a teia, exploda a parede atrás dela e pegue a ficha com o bumerangue.",
-    "En la sala trasera del sótano: quema la telaraña, vuela la pared que hay detrás y recoge la ficha con el bumerán."
+  "In the basement's back room: burn the web with a lit Deku Stick, then shoot it off the vines at the back with the Slingshot and climb up.": [
+    "Na sala dos fundos do subsolo: queime a teia com um Graveto Deku aceso, derrube-a das trepadeiras do fundo com o estilingue e suba.",
+    "En la sala trasera del sótano: quema la telaraña con un palo deku encendido, derríbala de las enredaderas del fondo con el tirachinas y sube."
   ],
   "In the Bottom of the Well.": [
     "No Fundo do Poço.",
@@ -1763,9 +1763,9 @@
     "No baú grande do Templo da Floresta.",
     "En el cofre grande del Templo del Bosque."
   ],
-  "In the fountain behind a boulder near Hyrule Castle, as a child. Play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 50 Rupees.": [
-    "Na fonte atrás de uma rocha perto do Castelo de Hyrule, como criança. Toque a Canção de Ninar da Zelda. Ela só aparece depois que você obtém o Fogo de Din. Ela cobra 50 Rupias.",
-    "En la fuente detrás de una roca cerca del Castillo de Hyrule, de niño. Toca la Nana de Zelda. Solo aparece cuando ya tienes el Fuego de Din. Cobra 50 Rupias."
+  "In the fountain behind a cracked rock wall near Hyrule Castle, as a child. Bomb the wall and play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 50 Rupees.": [
+    "Na fonte atrás de uma parede de rocha rachada perto do Castelo de Hyrule, como criança. Exploda a parede e toque a Canção de Ninar da Zelda. Ela só aparece depois que você obtém o Fogo de Din. Ela cobra 50 Rupias.",
+    "En la fuente detrás de una pared de roca agrietada cerca del Castillo de Hyrule, de niño. Vuela la pared y toca la Nana de Zelda. Solo aparece cuando ya tienes el Fuego de Din. Cobra 50 Rupias."
   ],
   "In the fountain behind a cracked wall at the Desert Colossus. Play Zelda's Lullaby. She only appears once you have Din's Fire. Her fee is 300 Rupees.": [
     "Na fonte atrás de uma parede rachada no Colosso do Deserto. Toque a Canção de Ninar da Zelda. Ela só aparece depois que você obtém o Fogo de Din. Ela cobra 300 Rupias.",
@@ -1803,9 +1803,9 @@
     "Na Caverna de Gelo, guardando as Botas de Ferro.",
     "En la Caverna de Hielo, custodiando las botas de hierro."
   ],
-  "In the ivy-covered room after the pool room. Hookshot.": [
-    "Na sala coberta de hera depois da sala da piscina. Use o gancho.",
-    "En la sala cubierta de hiedra después de la sala de la piscina. Usa el gancho."
+  "After the Boss Key, drop to the balcony over the west courtyard with the well. Follow the ledge south past a door and around the corner. Hookshot.": [
+    "Depois da Chave do Chefe, desça até a varanda sobre o pátio oeste com o poço. Siga a borda para o sul, passe por uma porta e vire a esquina. Gancho.",
+    "Tras la llave del jefe, baja al balcón sobre el patio oeste del pozo. Sigue la cornisa hacia el sur, pasa una puerta y dobla la esquina. Gancho."
   ],
   "In the ruins of Ganon's Castle, the final battle.": [
     "Nas ruínas do Castelo de Ganon, a batalha final.",
@@ -1823,9 +1823,9 @@
     "No baú grande do Templo das Sombras.",
     "En el cofre grande del Templo de las Sombras."
   ],
-  "In the small side room off the first floor's south-east corner.": [
-    "Na pequena sala lateral no canto sudeste do primeiro andar.",
-    "En la pequeña sala lateral de la esquina sureste del primer piso."
+  "In the hallway east of the entrance hall, behind the cracked wall where Baby Dodongos come out. Bomb it, or let a Baby Dodongo blow it up.": [
+    "No corredor a leste do salão de entrada, atrás da parede rachada de onde saem os Bebês Dodongo. Exploda-a com uma bomba ou deixe um Bebê Dodongo explodir nela.",
+    "En el pasillo al este del vestíbulo, detrás de la pared agrietada de donde salen los Bebés Dodongo. Vuélala con una bomba o deja que un Bebé Dodongo explote junto a ella."
   ],
   "In the Spirit Temple, found by young Link on the child side.": [
     "No Templo dos Espíritos, encontrado por Link criança no lado infantil.",
@@ -1915,9 +1915,9 @@
     "Iron Knuckle (Nabooru)",
     "Iron Knuckle (Nabooru)"
   ],
-  "Ivy room": [
-    "Sala da hera",
-    "Sala de la hiedra"
+  "West courtyard balcony": [
+    "Varanda do pátio oeste",
+    "Balcón del patio oeste"
   ],
   "Jo, Second Born": [
     "Jo, a segunda irmã",
@@ -2131,9 +2131,9 @@
     "Caixote da gruta do pântano",
     "Caja de la gruta del pantano"
   ],
-  "Maze dead end": [
-    "Beco sem saída do labirinto",
-    "Callejón sin salida del laberinto"
+  "Wall before the stairs": [
+    "Parede antes da escadaria",
+    "Pared antes de la escalinata"
   ],
   "meeting Zelda": [
     "conhecer Zelda",
@@ -2151,9 +2151,9 @@
     "Jogo de memória com a ocarina",
     "Juego de memoria con la ocarina"
   ],
-  "Mesh walkway": [
-    "Passarela de grade",
-    "Pasarela de rejilla"
+  "Under the central platform": [
+    "Sob a plataforma central",
+    "Bajo la plataforma central"
   ],
   "Metal fence": [
     "Cerca de metal",
@@ -2243,9 +2243,9 @@
     "No primeiro subsolo, no alto da parede de trepadeiras que leva a uma sala com três vasos.",
     "En el primer sótano, en lo alto de la pared de enredaderas que lleva a una sala con tres vasijas."
   ],
-  "On the first floor: push the block away from the cracked wall, bomb it open and find the Skulltula on the back wall.": [
-    "No primeiro andar: empurre o bloco para longe da parede rachada, exploda a parede e encontre a Skulltula na parede do fundo.",
-    "En el primer piso: aparta el bloque de la pared agrietada, vuela la pared y encuentra la Skulltula en la pared del fondo."
+  "Past the giant skull's mouth: push the fallen block against the cracked wall, bomb the wall and climb in. It hides behind an Armos statue.": [
+    "Depois da boca da caveira gigante: empurre o bloco que caiu até a parede rachada, exploda a parede e suba. Ela se esconde atrás de uma estátua Armos.",
+    "Pasada la boca de la calavera gigante: empuja el bloque caído hasta la pared agrietada, vuela la pared y sube. Se esconde tras una estatua Armos."
   ],
   "On the middle floor, in the room behind a cracked wall where the Shell Blades are. Break the wall to get in.": [
     "No andar do meio, na sala dos Shell Blades atrás de uma parede rachada. Quebre a parede para entrar.",
@@ -2271,9 +2271,9 @@
     "Na parede da sala iluminada por tochas onde fica o Like Like. Use o bumerangue.",
     "En la pared de la sala iluminada con antorchas donde está el Like Like. Usa el bumerán."
   ],
-  "On top of a vine-wrapped pillar in a passage on the second floor.": [
-    "No topo de um pilar coberto de trepadeiras numa passagem do segundo andar.",
-    "En lo alto de un pilar cubierto de enredaderas en un pasillo del segundo piso."
+  "In the big room before the boss, on the vines behind the tall pillar. Boomerang or Slingshot.": [
+    "Na sala grande antes do chefe, nas trepadeiras atrás do pilar alto. Bumerangue ou estilingue.",
+    "En la sala grande antes del jefe, en las enredaderas detrás del pilar alto. Bumerán o tirachinas."
   ],
   "Outside Ganon's Castle (adult): Double Defense (halved damage)": [
     "Fora do Castelo de Ganon (adulto): Defesa Dupla (metade do dano)",
@@ -2679,9 +2679,9 @@
     "Telhadinho atrás da casa de Impa",
     "Tejadillo detrás de la casa de Impa"
   ],
-  "Smash the pile of rocks with the Megaton Hammer.": [
-    "Quebre a pilha de rochas com o Martelo Megaton.",
-    "Rompe el montón de rocas con el Martillo Megatón."
+  "Break the statue blocking the door in the lower right of the entrance hall with the Megaton Hammer, then smash the big rock at the back of the room past it.": [
+    "Quebre com o Martelo Megaton a estátua que bloqueia a porta no canto inferior direito do salão de entrada e destrua a rocha grande no fundo da sala seguinte.",
+    "Rompe con el Martillo Megatón la estatua que tapa la puerta abajo a la derecha del vestíbulo y destroza la roca grande al fondo de la sala siguiente."
   ],
   "Snowfield cave": [
     "Caverna do campo de neve",
@@ -3071,9 +3071,9 @@
     "Telhado superior",
     "Tejado superior"
   ],
-  "Village square tree": [
-    "Árvore da praça da vila",
-    "Árbol de la plaza de la aldea"
+  "Tree by the entrance": [
+    "Árvore da entrada",
+    "Árbol de la entrada"
   ],
   "Vine pillar": [
     "Pilar de trepadeiras",
