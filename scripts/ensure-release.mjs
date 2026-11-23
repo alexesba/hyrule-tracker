@@ -24,12 +24,17 @@ if (!notes) { console.error(`[release] CHANGELOG.md has no (or an empty) "## [${
 
 const list = await fetch(`${api}?per_page=50`, { headers });
 if (!list.ok) { console.error(`[release] could not list releases: ${list.status}`); process.exit(1); }
-const matches = (await list.json()).filter(r => r.tag_name === tag);
+// A draft whose tag doesn't exist yet can show up as "untagged-…": match it by name too.
+const matches = (await list.json()).filter(r => r.tag_name === tag || (r.draft && r.name === pkg.version));
 if (matches.length > 1) { console.error(`[release] ${matches.length} releases share tag ${tag}; delete the duplicates on GitHub.`); process.exit(1); }
 if (matches.length === 1) {
   if (!matches[0].draft) { console.error(`[release] ${tag} is already published in ${owner}/${repo}; bump the version in package.json.`); process.exit(1); }
-  const updated = await fetch(`${api}/${matches[0].id}`, { method: 'PATCH', headers, body: JSON.stringify({ body: notes }) });
+  // Send the tag again: a PATCH without it leaves the draft "untagged-…", and electron-builder, which looks
+  // the release up by tag, then creates new drafts of its own and splits the assets between them.
+  const updated = await fetch(`${api}/${matches[0].id}`, { method: 'PATCH', headers, body: JSON.stringify({ tag_name: tag, name: pkg.version, body: notes }) });
   if (!updated.ok) { console.error(`[release] could not update draft ${tag}: ${updated.status}`); process.exit(1); }
+  const after = await updated.json();
+  if (after.tag_name !== tag) { console.error(`[release] draft ${after.id} reads as ${after.tag_name}, not ${tag}; fix it on GitHub before publishing.`); process.exit(1); }
   console.log(`[release] reusing draft ${tag} (text refreshed from CHANGELOG.md)`);
   process.exit(0);
 }
