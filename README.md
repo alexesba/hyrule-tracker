@@ -2,7 +2,7 @@
 
 # 🗡️ Hyrule Tracker
 
-### Track your journey through the Ocarina of Time remake for Nintendo Switch 2
+### Track your journey through Ocarina of Time, Breath of the Wild and Tears of the Kingdom
 
 ![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078D6?logo=windows&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-AppImage%20(experimental)-FCC624?logo=linux&logoColor=black)
@@ -10,11 +10,11 @@
 ![Languages](https://img.shields.io/badge/languages-12-orange)
 ![Open Source](https://img.shields.io/badge/open%20source-contributions%20welcome-brightgreen)
 
-A desktop app for Windows and Linux that **reads your local save** and updates the checklist, map and counters as you play. 🌍 Available in English, Portuguese, Spanish, French, German, Italian, Dutch, Russian, Japanese, Korean and Chinese (simplified and traditional).
+A desktop app for Windows and Linux that **reads your local save** and updates the checklist, map and counters as you play. It covers the **Ocarina of Time remake** for Nintendo Switch 2, **[Breath of the Wild](#breath-of-the-wild)** and **[Tears of the Kingdom](#tears-of-the-kingdom)**: pick the game when the app opens. 🌍 Available in English, Portuguese, Spanish, French, German, Italian, Dutch, Russian, Japanese, Korean and Chinese (simplified and traditional).
 
 👤 Created by **João Victor Prado**.
 
-[🚀 First use](#-first-use) · [🐧 Linux](#-linux-experimental) · [🍎 macOS](#-macos-experimental) · [✨ Features](#-features) · [🎮 Compatibility](#-compatibility) · [🔒 Local data](#-local-data) · [🛠️ Development](#️-development) · [🤝 Contributing](#-contributing)
+[🚀 First use](#-first-use) · [🐧 Linux](#-linux-experimental) · [🍎 macOS](#-macos-experimental) · [🎮 Steam Deck](#-steam-deck-experimental) · [✨ Features](#-features) · [🎮 Compatibility](#-compatibility) · [🔒 Local data](#-local-data) · [🛠️ Development](#️-development) · [🤝 Contributing](#-contributing)
 
 </div>
 
@@ -60,12 +60,16 @@ npm run dist:mac    # fetches the missing images, builds, signs ad hoc: release/
 - Needs Node.js 22+ and an `ffmpeg` with libwebp for the item images (Homebrew's default `ffmpeg` has none; check with `ffmpeg -encoders | grep libwebp`). If npm skipped Electron's install script, the script runs it.
 - The app is signed ad hoc, not notarized. Build it on the Mac that runs it, or clear the quarantine flag after copying it: `xattr -dr com.apple.quarantine "Hyrule Tracker.app"`. Automatic updates do not apply to it; build again for a new version.
 
+## 🎮 Steam Deck (experimental)
+
+A [Decky Loader](https://decky.xyz) plugin opens the tracker's second-screen journal from the Deck's quick access menu, with controller navigation. It reads the saves on the Deck itself. Download `Hyrule-Tracker-Decky-*.zip` from [Releases](https://github.com/jv-prado/hyrule-tracker/releases), then in Gaming Mode open Decky, enable **Developer Mode** in its settings and use **Install Plugin from ZIP File** in the Developer tab. See the [plugin's README](decky/README.md) for details and how to build the ZIP. The plugin hasn't been confirmed on a Steam Deck yet: reports are welcome.
+
 ## ✨ Features
 
 | | Screen | What you can track |
 | :-: | --- | --- |
 | 📊 | **Overview** | Checklist %, hearts, Gold Skulltulas, opened chests, rupees and recent activity. |
-| 🗺️ | **Hyrule Map** | 32 regions, per-floor maps, location photos and filters by Link's age, collectible type and completion. A red arrow shows **where Link is** and which way he faces: live in recomps; in emulators it only updates when you save ([why](#-compatibility)). **Follow Link** keeps his region and dungeon floor on screen. Maps fit the window, even fullscreen. |
+| 🗺️ | **Hyrule Map** | 32 regions, per-floor maps and location photos. The menu on the left filters by Link's age, status (all, remaining, collected) and category, and each region's name on the world map shows its count. Click a marker for its card, or a row in the panel to center the map on it. A red arrow shows **where Link is** and which way he faces: live in recomps; in emulators it only updates when you save ([why](#-compatibility)). **Follow Link** keeps his region and dungeon floor on screen. Maps fit the window, even fullscreen. |
 | ✅ | **100% Checklist** | Hearts, 100 Gold Skulltulas, songs, equipment, trades, dungeons, Big Poes and more. Done items are struck through. **Available now** shows what you can get with known requirements. |
 | 📖 | **Walkthrough** | The whole game step by step: 20 story chapters and 6 side quests, with each step ticked from your save, the chapter you are on picked out, and links to the checklist and the map. Guide text in English, Portuguese and Spanish. |
 | ⏳ | **Threads of Time+** | Chapters, story steps and seven expandable side quests with guidance and progress from the save. |
@@ -93,7 +97,7 @@ The overall percentage uses the **100% Checklist** objectives. Minigame prizes t
 
 ### 🪟 In-game overlay
 
-Turn on **Show in-game overlay** in Settings. It can show counters, remaining objectives in the region or what is available now, with adjustable opacity and locking.
+Turn on **Show in-game overlay** in Settings. It can show counters, remaining objectives in the region or what is available now, with adjustable opacity and locking. It follows the game open in the tracker: in Breath of the Wild and Tears of the Kingdom it shows shrines, Koroks and the region of Link's last save.
 
 | Default shortcut | Action |
 | --- | --- |
@@ -129,6 +133,7 @@ The interface, world catalog and authored guides use the same 12 languages as th
 - ⚡ **NX2Saria** answers live reading itself, on Windows and Linux: turn on its tracker API (`tracker_api = 1` under `[tracker]` in `nx2saria.ini`) and the tracker reads the running game through `127.0.0.1:6545`, read-only, without reading the game's memory. Its saves are found in `<game folder>/profile/save`.
 - 🗂️ **Rekarina** (Windows) is followed through its saves only, in `<game folder>\profile\save`; the launcher's game folder is `<Rekarina folder>\game`. Live reading doesn't work with it yet: it keeps the game at other addresses in memory than the recomps the tracker reads.
 - 🗂️ Saves from other environments can be selected manually if they expose the same format.
+- 🧭 **Breath of the Wild and Tears of the Kingdom** read Nintendo Switch saves (and Wii U/Cemu saves for Breath of the Wild). Saves in **Eden, yuzu, suyu, Sudachi and Citron** are found automatically; for Ryujinx or other folders, use **Choose folder**. These two games follow your saves: Link's position is the one from the last save.
 - ❌ Nintendo 64, Ocarina of Time 3D and original-game port saves use different formats and are **not** supported.
 
 <details>
