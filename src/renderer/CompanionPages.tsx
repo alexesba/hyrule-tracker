@@ -18,6 +18,7 @@ import { PageSkeleton } from './PageSkeleton';
 import { qrPath, qrTarget } from './qr';
 import { regionCounts, type MapBadgeStatus } from './mapCounts';
 import { ZoomPan } from './ZoomPan';
+import { onIllustratedMap } from '../core/mapLand';
 import { locatePlacement, type AtlasPlace as PositionPlace, type PlayerFix } from '../core/position';
 import atlas from '../../data/atlas.json';
 import { Quiz, useStored } from './Recreation';
@@ -582,6 +583,9 @@ interface TrackedPin { item: TrackedItem; cat: TrackedCategory; at: { map: strin
 const atlasPlaces = atlas.places as unknown as PositionPlace[];
 /** The projection clamps what falls outside a map to its border: those spots are not where they look, so they are not drawn. */
 export const atEdge = (at: { x: number; y: number }) => at.x <= 0.021 || at.x >= 0.979 || at.y <= 0.021 || at.y >= 0.979;
+/** A pin is drawn when it is on the picture: not clamped to the border, and not in the blank margin around the drawing. */
+export const shownOnMap = (placeId: string, mapId: string | null, at: { x: number; y: number } | null) =>
+  !!mapId && !!at && !atEdge(at) && onIllustratedMap(placeId, mapId, at);
 export interface Spot { stage?: string; era?: 'child' | 'adult'; x?: number; y?: number; z?: number }
 /** Where a placed collectible falls on the atlas (one fix per map it shows on). */
 export const locateSpot = (spot: Spot): PlayerFix[] => spot.stage && spot.x != null && spot.y != null && spot.z != null
@@ -791,7 +795,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const place = atlas.places.find(p => atlasStages[p.id] === selected);
   // Rows with an atlas marker are drawn by that marker (with its photos), not a second time.
   const tracked: TrackedPin[] = place ? local.filter(r => !markerOf.has(r.item.id)).flatMap(r => r.fixes
-    .filter(f => f.placeId === place.id && f.mapId && f.at && !atEdge(f.at)).map(f => ({ item: r.item, cat: r.cat, at: { map: f.mapId!, x: f.at!.x, y: f.at!.y } }))) : [];
+    .filter(f => f.placeId === place.id && shownOnMap(f.placeId, f.mapId, f.at)).map(f => ({ item: r.item, cat: r.cat, at: { map: f.mapId!, x: f.at!.x, y: f.at!.y } }))) : [];
   const regionName = selected === 'unknown' ? t('Baús sem posição mapeada') : t(LOCAL_NAMES[selected] ?? selected);
 
   // Arriving from a checklist entry: open its region and highlight it.

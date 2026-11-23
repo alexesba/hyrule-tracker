@@ -6,7 +6,7 @@ import atlas from '../../data/atlas.json';
 import { api } from './api';
 import { GameItemIcon, itemImage, trackedItemIcon } from './GameItemIcon';
 import { message, plural, t, tail } from './i18n';
-import { areaShot, atEdge, atlasStages, findRegion, locateSpot, MAP_CATEGORIES, rowMarkers, type Spot } from './CompanionPages';
+import { areaShot, atlasStages, findRegion, locateSpot, MAP_CATEGORIES, rowMarkers, shownOnMap, type Spot } from './CompanionPages';
 
 type Place = (typeof atlas.places)[number];
 /** Where an entry sits: the atlas region, the exact point on one of its floor maps, and in-game photos of the spot. */
@@ -37,7 +37,7 @@ export function WhatToDo({ state, onShowInChecklist, onShowOnMap }: { state: App
       const marker = markers.get(entry.id);
       if (marker) return { region: atlasStages[marker.place] ?? '', place: atlas.places.find(p => p.id === marker.place), at: marker.at ?? undefined, spot: marker.name, photos: marker.images };
       const spot = spots.get(entry.id);
-      const fix = spot ? locateSpot(spot).find(f => f.mapId && f.at && !atEdge(f.at)) : undefined;
+      const fix = spot ? locateSpot(spot).find(f => shownOnMap(f.placeId, f.mapId, f.at)) : undefined;
       if (fix) return { region: atlasStages[fix.placeId] ?? '', place: atlas.places.find(p => p.id === fix.placeId), at: { map: fix.mapId!, x: fix.at!.x, y: fix.at!.y }, photos: [] };
       return { region: findRegion(entry.region) ?? '', photos: [] };
     };
