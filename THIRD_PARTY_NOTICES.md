@@ -97,9 +97,44 @@ The location descriptions in `data/descriptions.json` and the steps in `data/wal
 written for this project from these facts; no guide text or images are reproduced.
 
 ## Format write-ups for Tears of the Kingdom saves
+
+[Savegame Editors](https://github.com/marcrobledo/savegame-editors), copyright 2017–2023 Marc Robledo (MIT),
+supplied the public Tears of the Kingdom save used for validation and references for in-game coordinates,
+save field names and hashes. The Great Sky Island route was written for this tracker with facts checked
+against [Nintendo's guide](https://www.nintendo.com/jp/zelda/totk/guide/en/index.html).
+
+The world catalog cross-checks locations against [Zeldamods Object Map](https://github.com/zeldamods/objmap-totk/tree/271ecbd3a95fdf4c75a20df26b8562b6027e0bb7).
+The interactive map loads sky, surface and depths imagery from the [ZeldaMods Object Map](https://objmap-totk.zeldamods.org/).
+The map artwork is © Nintendo and is served by ZeldaMods. These images are not bundled with Hyrule Tracker.
+Game selection previews use official store artwork © Nintendo served by the
+[Ocarina of Time game page](https://www.nintendo.com/en-gb/Games/Nintendo-Switch-2-games/The-Legend-of-Zelda-Ocarina-of-Time-3115664.html)
+and the [Tears of the Kingdom game page](https://www.nintendo.com/en-gb/Games/Nintendo-Switch-games/The-Legend-of-Zelda-Tears-of-the-Kingdom-1576884.html).
+Quest start points, minigame locations, and interior chest anchors were cross-checked against the
+[Zelda Dungeon map data](https://www.zeldadungeon.net/wiki/Zelda_Dungeon:Tears_of_the_Kingdom_Map)
+and [in-game location data](https://www.zeldadungeon.net/wiki/TextDump:Tears_of_the_Kingdom/Locations).
+Journal instructions were written for Hyrule Tracker.
+Map glyphs © Nintendo are loaded from the [Zelda Xtreme map](https://www.zeldaxtreme.com/tears-of-the-kingdom/map/),
+which also provides coordinates for Voice Memories, Gloom Spawn, and Satori cherry blossoms.
+Regional filters use [ZeldaMods' Skyview Tower map boundaries](https://objmap-totk.zeldamods.org/game_files/ecosystem/MapTower.json).
+World chest and enemy placements come from [Zeldamods Radar](https://github.com/zeldamods/radar-totk/tree/f32fc269d94de8f8e705bc198c52d26a1a10b1f3),
+copyright 2023 savage13 (BSD 2-Clause). [Kiranico's Adventure Log](https://zelda.kiranico.com/en-GB/totk/data/quests)
+provided the quest titles and internal identifiers. [Savegame Editors at b4db8cd](https://github.com/marcrobledo/savegame-editors/tree/b4db8cd11157c6d5ae54a0a5edc88dba82aebe9d/zelda-totk)
+provided the mapped fields for the other collectible and encounter categories. Map artwork and the text of the adventure log are not bundled.
 General GameData container background (Murmur3 keys, typed sections).
 
 ---
+
+## Breath of the Wild
+
+The [ZeldaMods Object Map](https://objmap.zeldamods.org/) provides in-game cartography, positions, dungeon titles and Sheikah Tower region boundaries. [ZeldaMods Radar](https://radar.zeldamods.org/) provides placements for field enemies and treasure chests. The map and glyph artwork is © Nintendo and loads from ZeldaMods and the [Zelda Xtreme map](https://www.zeldaxtreme.com/breath-of-the-wild/map/). The selector and overview use Nintendo's [Breath of the Wild promotional artwork](https://www.nintendo.com/en-gb/Games/Nintendo-Switch-games/The-Legend-of-Zelda-Breath-of-the-Wild-1173609.html).
+
+The catalog uses game facts cross-checked against the [Zelda Xtreme map](https://www.zeldaxtreme.com/breath-of-the-wild/map/) and the [Zelda Central side-quest list](https://zeldacentral.com/games/breath-of-the-wild/side-quests/). Journal instructions were written for Hyrule Tracker with the [Zelda Dungeon walkthrough](https://www.zeldadungeon.net/breath-of-the-wild-walkthrough/) and [Nintendo Explorer's Guide](https://media.nintendo.com/zelda/breath-of-the-wild/assets/ExplorersGuide.pdf) as references.
+
+The save reader uses the [ZeldaMods format notes](https://zeldamods.org/wiki/Save_Files) and [cutscene identifiers](https://zeldamods.org/wiki/Demo). Save flags were checked against [Marc Robledo's Savegame Editors](https://github.com/marcrobledo/savegame-editors/tree/master/zelda-botw). Game and save files are not bundled.
+
+## World journal translations
+
+Localized game terms are attributed to Nintendo and were checked against [Zelda Wiki's Breath of the Wild nomenclature](https://zeldawiki.wiki/wiki/Data:Translations/BotW), [Tears of the Kingdom nomenclature](https://zeldawiki.wiki/wiki/Data:Translations/TotK) and the [Tears of the Kingdom Resources message tables](https://github.com/zoalasaurusrawr/totk-resources). The dictionaries include item names, locations and quest titles. Hyrule Tracker's interface and walkthrough text is translated separately, with machine translation and terminology review.
 
 ## Checklist
 

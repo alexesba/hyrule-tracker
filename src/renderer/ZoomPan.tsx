@@ -9,7 +9,10 @@ const MAX_ZOOM = 6;
  * Resize the layer when zooming so percentage positions track the map and markers keep their size.
  * The overlay stays anchored to the viewport.
  */
-export function ZoomPan({ ratio, className = '', children, overlay, controls }: { ratio: number; className?: string; children: ReactNode; overlay?: ReactNode; controls?: ReactNode }) {
+export function ZoomPan({ ratio, className = '', children, overlay, controls, focus }: {
+  ratio: number; className?: string; children: ReactNode; overlay?: ReactNode; controls?: ReactNode;
+  focus?: readonly [number, number];
+}) {
   const box = useRef<HTMLDivElement>(null);
   const layer = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<View>({ z: 1, x: 0, y: 0 });
@@ -29,6 +32,20 @@ export function ZoomPan({ ratio, className = '', children, overlay, controls }: 
     const my = Math.abs(l.offsetHeight / drawnZoom.current * z - b.clientHeight) / 2 + 60;
     return { z, x: Math.min(mx, Math.max(-mx, v.x)), y: Math.min(my, Math.max(-my, v.y)) };
   }, []);
+
+  useEffect(() => {
+    if (!focus) return;
+    const [left, top] = focus;
+    const target = layer.current;
+    if (!target) return;
+    const zoom = Math.max(2.4, viewRef.current.z);
+    const scale = zoom / drawnZoom.current;
+    setView(clamp({
+      z: zoom,
+      x: (0.5 - left / 100) * target.offsetWidth * scale,
+      y: (0.5 - top / 100) * target.offsetHeight * scale,
+    }));
+  }, [focus, clamp]);
 
   /** Zooms by `factor` keeping the point (qx, qy), relative to the box center, in place. */
   const zoomAt = useCallback((factor: number, qx = 0, qy = 0) => {

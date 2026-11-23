@@ -160,6 +160,8 @@ export interface PlayerState {
 
 export interface AppState {
   status: 'ok' | 'no-folder' | 'no-slots' | 'error' | 'loading';
+  totk?: TotkIslandState;
+  botw?: TotkIslandState;
   easterEggs: string[];
   /** Link on the map (live while the game is attached, else the save's position). */
   player?: PlayerState;
@@ -217,6 +219,20 @@ export interface AppState {
   changeLog: { enabled: boolean; dir: string };
   /** Serving the tracker to other devices on the local network (optional; off by default). */
   lan?: LanState;
+}
+
+export interface TotkIslandState {
+  status: 'unlinked' | 'waiting' | 'ok' | 'error';
+  slots: string[];
+  activeSlot?: string;
+  pinnedSlot?: string;
+  updatedAt?: number;
+  marks: Record<string, import('../core/totk-island.js').IslandMark>;
+  manual: string[];
+  position?: import('../core/totk-island.js').IslandPoint;
+  unverifiedFormat?: boolean;
+  world?: import('../core/totk-world.js').WorldProgress;
+  history?: import('../core/totk-journal.js').TotkHistoryEntry[];
 }
 
 export interface LanState {

@@ -2,15 +2,18 @@ import { Fragment, lazy, Suspense, useEffect, useMemo, useRef, useState, type Re
 import type { Activity, AppState, PlayerState, SaveFolderChoice, TrackedCategory, TrackedItem } from '../shared/types';
 import { LOCAL_NAMES, MASK_SALE_NAMES } from '../core/companion';
 import { WALKTHROUGH_SOURCE_URL } from '../core/walkthrough';
-import { api, isRemote } from './api';
+import { api, canChooseSaveFolder, isRemote } from './api';
+import { inDecky } from './decky';
+import { gameTitle, type Game } from './GamePicker';
 import { enemyPhoto, regionPhoto } from './referenceImages';
 import { LanguageSwitch } from './LanguageFlags';
-import { currentLocale, date, day, hour, languages, message, number, plural, t, tv, type Locale } from './i18n';
+import { currentLocale, date, day, hour, journalText, languages, message, number, plural, t, tv, type Locale } from './i18n';
 import { ObjectiveName } from './ObjectiveName';
 import { GameItemIcon, trackedItemIcon } from './GameItemIcon';
 import { MarkerDetails, markerStatusLabel, trackedMarkerDetails, type MarkerDetailsData } from './MarkerDetails';
 import { Minigames } from './Minigames';
 import { PageProgress } from './PageProgress';
+import { JourneyMetrics, JourneyProgress } from './JournalOverview';
 import { PageSkeleton } from './PageSkeleton';
 import { qrPath, qrTarget } from './qr';
 import { regionCounts, type MapBadgeStatus } from './mapCounts';
@@ -119,18 +122,56 @@ function LiveIndicator({ state }: { state: AppState }) {
   </div>;
 }
 
-export function Sidebar({ page, onPage, state }: { page: Page; onPage: (p: Page) => void; state: AppState | null }) {
-  const connection = connectionStatus(state);
+export const worldPageTitles: Record<Page, readonly [string, string]> = {
+  overview: ['Visão geral', 'Overview'], todo: ['O que fazer?', 'What can I do?'],
+  walkthrough: ['Passo a passo', 'Walkthrough'], map: ['Mapa de Hyrule', 'Hyrule map'],
+  checklist: ['Checklist 100%', '100% Checklist'],
+  threads: ['Missões e memórias', 'Quests and memories'],
+  hall: ['Bestiário e revanches', 'Bestiary and rematches'],
+  minigames: ['Minijogos', 'Minigames'],
+  timeline: ['Registro do dia', 'Journey log'], medals: ['Meus dados', 'My stats'],
+  secrets: ['Segredos e exploração', 'Secrets and exploration'],
+  quiz: ['Quiz diário', 'Daily quiz'],
+  second: ['Segunda tela', 'Second screen'], settings: ['Configurações', 'Settings'],
+};
+const navLabel = (page: Page, game: Game) => game === 'oot' ? t(pages[page]) : journalText(worldPageTitles[page]);
+
+function journalConnection(state: AppState | null, game: Game) {
+  if (game === 'oot') return { ...connectionStatus(state), name: sourceName(state) };
+  const save = state?.[game];
+  return {
+    label: save?.status === 'error' ? journalText(['Falha ao ler o save', 'Could not read save'])
+      : save?.status === 'ok' ? journalText(['Save conectado', 'Save connected']) : journalText(['Sem partida', 'No save']),
+    connected: save?.status === 'ok',
+    name: save?.activeSlot ?? t('Fonte da partida'),
+    detail: undefined,
+  };
+}
+
+interface NavigationProps {
+  page: Page;
+  onPage: (p: Page) => void;
+  state: AppState | null;
+  game: Game;
+}
+
+export function Sidebar({ page, onPage, state, game }: NavigationProps) {
+  const connection = journalConnection(state, game);
   return <aside className="tracker-sidebar">
-    <div className="tracker-brand"><img className="brand-icon" src="./brand/icon.webp" alt="" /><div><strong>Hyrule Tracker</strong><small>Ocarina of Time</small></div></div>
+    <div className="tracker-brand"><img className="brand-icon" src="./brand/icon.webp" alt="" /><div><strong>Hyrule Tracker</strong><small>{gameTitle(game)}</small></div></div>
     <button className={connection.connected ? 'sidebar-source connected' : 'sidebar-source'} title={connection.detail ?? t(connection.label)} onClick={() => onPage('settings')}>
       <span className="status-dot" aria-hidden="true" />
-      <b>{sourceName(state)}</b>
+      <b>{connection.name}</b>
       <small>{t(connection.label)}</small>
     </button>
-    {state && <LiveIndicator state={state} />}
-    <nav aria-label={t("Menu principal")}>{navGroups.map(group => isRemote ? group.filter(p => p !== 'second') : group).map((group, index) => <div className="nav-group" key={index}>{group.map(p =>
-      <button key={p} type="button" title={t(pages[p])} aria-current={p === page ? 'page' : undefined} onClick={() => onPage(p)}><Icon name={p} size={17} /><span>{t(pages[p])}</span></button>,
+    {game === 'oot' && state && !inDecky && <LiveIndicator state={state} />}
+    {game !== 'oot' && state?.[game]?.status === 'ok' && <div className="sidebar-live on">
+      <span className="live-dot" aria-hidden="true" />
+      <span><b>{journalText(['Rastreamento por save', 'Save tracking'])}</b>
+        <small>{journalText(['O diário atualiza quando você salva no jogo.', 'The journal updates when you save in the game.'])}</small></span>
+    </div>}
+    <nav aria-label={t("Menu principal")}>{navGroups.map(group => isRemote ? group.filter(p => p !== 'second') : group).filter(group => group.length > 0).map((group, index) => <div className="nav-group" key={index}>{group.map(p =>
+      <button key={p} type="button" title={navLabel(p, game)} aria-current={p === page ? 'page' : undefined} onClick={() => onPage(p)}><Icon name={p} size={17} /><span>{navLabel(p, game)}</span></button>,
     )}</div>)}</nav>
     {state && <div className="sidebar-footer">v{state.version}</div>}
   </aside>;
@@ -139,10 +180,10 @@ export function Sidebar({ page, onPage, state }: { page: Page; onPage: (p: Page)
 /** Phones (portrait): tab bar at the bottom with the main pages; "More" opens a sheet with the rest. Hidden by CSS elsewhere. */
 const tabPages: Page[] = ['overview', 'todo', 'map', 'checklist'];
 const tabNames: Partial<Record<Page, string>> = { overview: 'Início', map: 'Mapa', checklist: 'Checklist' };
-export function MobileNav({ page, onPage, state }: { page: Page; onPage: (p: Page) => void; state: AppState | null }) {
+export function MobileNav({ page, onPage, state, game }: NavigationProps) {
   const [open, setOpen] = useState(false);
   const dialog = useModalDialog(open);
-  const connection = connectionStatus(state);
+  const connection = journalConnection(state, game);
   const others = navGroups.flat().filter(p => !tabPages.includes(p) && !(isRemote && p === 'second'));
   const go = (p: Page) => { setOpen(false); onPage(p); };
   useEffect(() => {
@@ -172,25 +213,33 @@ export function MobileNav({ page, onPage, state }: { page: Page; onPage: (p: Pag
         </div>
         <div className={connection.connected ? 'sheet-source connected' : 'sheet-source'}>
           <span className="status-dot" aria-hidden="true" />
-          <div><b>{sourceName(state)}</b><small>{connection.detail ?? t(connection.label)}</small></div>
+          <div><b>{connection.name}</b><small>{connection.detail ?? t(connection.label)}</small></div>
         </div>
         <div className="sheet-grid">{others.map(p => <button key={p} type="button" aria-current={p === page ? 'page' : undefined} onClick={() => go(p)}>
-          <Icon name={p} size={22} /><span>{t(pages[p])}</span>
+          <Icon name={p} size={22} /><span>{navLabel(p, game)}</span>
         </button>)}</div>
     </dialog>}
   </>;
 }
 
+export function PageHeaderFrame({ title, description, actions, disconnected }: {
+  title: string; description?: string; actions: ReactNode; disconnected?: string;
+}) {
+  return <header className="page-header">
+    {disconnected && <p className="notice connection-notice" role="alert">{disconnected}</p>}
+    <div><h1>{title}</h1>{description && <p className="page-description">{description}</p>}</div>
+    <div className="page-header-actions">{actions}</div>
+  </header>;
+}
+
 export function PageHeader({ page, state, headerActions, connectionLost }: { page: Page; state: AppState | null; headerActions: ReactNode; connectionLost: boolean }) {
   const connection = connectionStatus(state);
-  return <header className="page-header">
-    {connectionLost && <p className="notice connection-notice" role="alert">{t('Sem conexão com o PC. Tentando reconectar…')}</p>}
-    <div><h1>{t(pages[page])}</h1><p className="page-description">{t(pageDescriptions[page])}</p></div>
-    <div className="page-header-actions">
+  return <PageHeaderFrame title={t(pages[page])} description={t(pageDescriptions[page])}
+    disconnected={connectionLost ? t('Sem conexão com o PC. Tentando reconectar…') : undefined}
+    actions={<>
       <span className={connection.connected ? 'connection connected' : 'connection'} title={connection.detail} role="status"><i aria-hidden="true" />{t(connection.label)}</span>
       {headerActions}
-    </div>
-  </header>;
+    </>} />;
 }
 
 const value = (n: number | null | undefined) => n == null ? '—' : number(n);
@@ -321,7 +370,7 @@ export function CompanionPage({ page, state, onPage, onScan, scanning, onLanguag
  * "Second screen": serve the tracker on the local network and walk the user through opening it
  * on a phone or tablet, with this PC's address ready to type.
  */
-function SecondScreen({ state }: { state: AppState }) {
+export function SecondScreen({ state }: { state: AppState }) {
   const lan = state.lan;
   const on = !!lan?.enabled && !lan.error;
   const [busy, setBusy] = useState(false);
@@ -394,9 +443,9 @@ function Overview({ state, onPage, onScan, scanning }: { state: AppState; onPage
   const s = state.summary;
   if (!s) return <section className="focus-panel empty-state">
     <img className="brand-icon big" src="./brand/icon.webp" alt="" /><h2>{t('Encontre a sua partida')}</h2>
-    <p>{isRemote ? t('Abra o Hyrule Tracker no PC e selecione a pasta da partida.')
+    <p>{!canChooseSaveFolder ? t('Abra o Hyrule Tracker no PC e selecione a pasta da partida.')
       : state.message ? tv(state.message, state.messageValues) : t('Procurando saves do remake nos locais de instalação.')}</p>
-    {isRemote
+    {!canChooseSaveFolder
       ? <button className="action" disabled={scanning} onClick={onScan}>{t(scanning ? 'Buscando…' : 'Buscar saves')}</button>
       : <SaveActions notFound />}
   </section>;
@@ -410,20 +459,15 @@ function Overview({ state, onPage, onScan, scanning }: { state: AppState; onPage
   ];
   const artwork = state.saveImage || regionPhoto('HyruleField')?.file;
   return <>
-    <section className={artwork ? 'focus-panel progress-panel has-photo' : 'focus-panel progress-panel'}>
-      {artwork && <img className="progress-photo" src={artwork} alt="" />}
-      <div className="progress-copy">
-        <h2>{t("Progresso da jornada")}</h2>
-        <div className="big-progress">{value(s.percent)}<span>%</span></div>
-        <progress aria-label={t("Progresso do checklist")} value={s.percent} max={100} />
-        <p>{s.doneA} {t("de")} {s.totalA} {t("objetivos concluídos")}</p>
-        <button className="action primary" onClick={() => onPage('checklist')}>{t("Abrir checklist")}</button>
-      </div>
-      <div className="progress-place">{s.area ? t(s.area) : sourceName(state)}<small>{s.lastSavedMs ? date(s.lastSavedMs) : t('Último save')}</small></div>
-    </section>
-    <section className="metric-strip" aria-label={t("Resumo da partida")}>
-      {metrics.map(m => <div className="metric" key={m.label}><span className="metric-label"><GameItemIcon id={m.icon} size={25} />{t(m.label)}</span><strong>{'text' in m ? m.text : value(m.count)}{m.max != null && <small>/{m.max}</small>}</strong><span>{m.detail}</span></div>)}
-    </section>
+    <JourneyProgress title={t('Progresso da jornada')} artwork={artwork}
+      progress={{ value: s.percent, display: value(s.percent), label: t('Progresso do checklist') }}
+      description={s.doneA + ' ' + t('de') + ' ' + s.totalA + ' ' + t('objetivos concluídos')}
+      action={<button className="action primary" onClick={() => onPage('checklist')}>{t('Abrir checklist')}</button>}
+      place={<>{s.area ? t(s.area) : sourceName(state)}<small>{s.lastSavedMs ? date(s.lastSavedMs) : t('Último save')}</small></>} />
+    <JourneyMetrics label={t('Resumo da partida')} metrics={metrics.map(m => ({
+      label: t(m.label), icon: <GameItemIcon id={m.icon} size={25} />,
+      value: 'text' in m ? m.text : value(m.count), max: m.max, detail: m.detail,
+    }))} />
     <div className="home-grid">
       <section className="focus-panel"><div className="section-line"><h2>{t("Fios do Tempo+")}</h2><button className="text-action" onClick={() => onPage('threads')}>{t("Ver jornada")}</button></div>
         <div className="chapter-list">{state.companion?.chapters.map(c => <div className="chapter-line" key={c.id}>
@@ -445,7 +489,7 @@ function Settings({ state, onLanguage }: { state: AppState; onLanguage: (locale:
       <p>{sourceName(state)}</p>
       <code className="save-path">{state.saveDir || t('Pasta do save ainda não encontrada.')}</code>
       {state.message && <p className="notice" role="status">{tv(state.message, state.messageValues)}</p>}
-      {!isRemote && <SaveActions activeDir={state.status === 'ok' ? state.saveDir : undefined} notFound={!state.saveDir} />}
+      {canChooseSaveFolder && <SaveActions activeDir={state.status === 'ok' ? state.saveDir : undefined} notFound={!state.saveDir} />}
       {state.profiles.length > 0 && <label className="inline-field">{t('Perfil')}<select value={state.chosenProfile ?? ''} onChange={e => void api.selectProfile(e.target.value || null)}>
         <option value="">{t('Seguir o perfil jogado por último')}</option>
         {state.profiles.map(profile => <option key={profile.id} value={profile.id}>{profile.name ?? profile.id.slice(0, 8)} · {date(profile.lastSavedMs)}</option>)}
@@ -650,19 +694,25 @@ function CategoryCounters({ rows, filter, chosen, onFilter }: { rows: MapRow[]; 
   // The filter follows the player between regions. A region without that category still lists it, at 0/0, so it can be cleared here.
   if (chosen && !counters.some(c => c.cat.id === chosen.cat.id)) counters.push({ ...chosen, done: 0, total: 0 });
   if (!counters.length) return null;
-  return <div className="side-counters">{counters.map(c =>
+  const doneAll = counters.reduce((n, c) => n + c.done, 0);
+  const totalAll = counters.reduce((n, c) => n + c.total, 0);
+  return <div className="side-counters">
+    <button type="button" aria-pressed={filter === 'all'} onClick={() => onFilter('all')}>
+      <span className="counter-icon"><Icon name="map" size={18} /></span><span>{t('Todos os itens')}</span><b>{number(doneAll)}/{number(totalAll)}</b>
+    </button>
+    {counters.map(c =>
     <button key={c.cat.id} type="button" aria-pressed={filter === c.cat.id} title={t('Filtrar a lista por esta categoria')} onClick={() => onFilter(filter === c.cat.id ? 'all' : c.cat.id)}>
       <span className="counter-icon"><GameItemIcon id={c.icon} size={18} /></span><span>{t(c.cat.label)}</span><b>{number(c.done)}/{number(c.total)}</b>
     </button>)}</div>;
 }
 
 /** What the map draws. Closed, it is a button on the left. Open, it lists the filters for this map. */
-function MapCatDrawer({ open, onOpen, icon, name, children }: { open: boolean; onOpen: (open: boolean) => void; icon?: string; name?: string; children: ReactNode }) {
+export function MapCatDrawer({ open, onOpen, icon, name, children }: { open: boolean; onOpen: (open: boolean) => void; icon?: ReactNode; name?: string; children: ReactNode }) {
   const label = t('Mostrar no mapa');
   const onMap = t('No mapa');
   const allItems = t('Todos os itens');
-  if (!open) return <button type="button" className={icon ? 'map-cats-toggle is-set' : 'map-cats-toggle'} aria-expanded="false" aria-label={name ? `${t(name)}, ${onMap}` : allItems} onClick={() => onOpen(true)}>
-    {icon && <GameItemIcon id={icon} size={18} />}
+  if (!open) return <button type="button" className={icon ? 'map-cats-toggle is-set' : 'map-cats-toggle'} aria-expanded="false" aria-label={name ? `${name}, ${onMap}` : allItems} onClick={() => onOpen(true)}>
+    {icon}
     <span>{icon ? onMap : allItems}</span>
     <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.1 2.2 7.9 6 4.1 9.8" /></svg>
   </button>;
@@ -676,7 +726,7 @@ function MapCatDrawer({ open, onOpen, icon, name, children }: { open: boolean; o
 }
 
 /** All / still to find / already taken, the same control a region map uses for its markers. */
-function StatusFilter({ show, onShow, total, left }: { show: MapBadgeStatus; onShow: (id: MapBadgeStatus) => void; total: number; left: number }) {
+export function StatusFilter({ show, onShow, total, left }: { show: MapBadgeStatus; onShow: (id: MapBadgeStatus) => void; total: number; left: number }) {
   return <div className="marker-filter" role="radiogroup" aria-label={t('Mostrar no mapa')}>
     {([['all', 'Todos', total], ['todo', 'Faltam', left], ['done', 'Coletados', total - left]] as const).map(([id, label, n]) =>
       <button key={id} type="button" role="radio" aria-checked={show === id} className={`filter-${id}`} onClick={() => onShow(id)}><span>{t(label)}</span><b>{number(n)}</b></button>)}
@@ -695,7 +745,8 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   // On by default: the map opens where Link is and keeps up with him.
   const [follow, setFollow] = useStored('map.follow', true);
   const [panelOpen, setPanelOpen] = useStored('map.panel', true);
-  const [catsOpen, setCatsOpen] = useState(false);
+  // Open by default: the filters are the first thing to reach for on the map. Closing it is remembered.
+  const [catsOpen, setCatsOpen] = useStored('map.cats', true);
   const [hudOpen, setHudOpen] = useStored('map.hud', false);
   const [active, setActive] = useState<TrackedItem>();
   const mapView = useRef<HTMLDivElement>(null);
@@ -820,7 +871,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const chosenCat = filter === 'all' ? undefined : tallyCounters(mapRows).find(c => c.cat.id === filter);
   const regionAtlas = inRegion && showLocation && !!place;
   // RegionAtlas draws its own menu. The world map and a region without its own map use this one.
-  const catDrawer = !regionAtlas && (!inRegion || showLocation) && <MapCatDrawer open={catsOpen} onOpen={setCatsOpen} icon={chosenCat?.icon} name={chosenCat?.cat.label}>
+  const catDrawer = !regionAtlas && (!inRegion || showLocation) && <MapCatDrawer open={catsOpen} onOpen={setCatsOpen} icon={chosenCat && <GameItemIcon id={chosenCat.icon} size={18} />} name={chosenCat && t(chosenCat.cat.label)}>
     <div className="era-tabs" role="radiogroup" aria-label={t('Era')}>{eras.map(([id, label]) =>
       <button key={id} type="button" role="radio" aria-checked={era === id} onClick={() => { setEra(id); setActive(undefined); }}>{t(label)}</button>)}</div>
     {statusFilter}
@@ -861,7 +912,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
         </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} onEra={next => { setEra(next); setActive(undefined); }} filter={filter} onFilter={pickFilter} show={show} onShow={pickShow} hideDone={hideDone} player={player} follow={follow} regionMenu={regionMenu} mapModes={mapModes} overlay={onMap} onBack={back} hudOpen={hudOpen} onHud={() => setHudOpen(!hudOpen)} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
             categoryRows={local} chosenCat={chosenCat} catsOpen={catsOpen} onCats={setCatsOpen} below={panelBelow} focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
           : <div className="zoom-viewport map-unmapped">
-            <MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<><button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={back}><Icon name="map" size={16} /></button>{regionMenu}</>} how={mapModes} />
+            <MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<><MapBack onBack={back} />{regionMenu}</>} how={mapModes} />
             {!panelBelow && catDrawer}
             {onMap}
             <p className="map-unmapped-note">{showLocation ? t('Esta região não tem mapa próprio.') : t('Visite a região para ver os itens.')}</p>
@@ -873,8 +924,17 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   </div>;
 }
 
+/** Leaves a region for the world map. The label names where it goes, so it reads as a way back and not as a map icon. */
+export function MapBack({ onBack }: { onBack: () => void }) {
+  const label = t('Voltar ao mapa de Hyrule');
+  return <button type="button" className="map-back" aria-label={label} title={label} onClick={onBack}>
+    <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.9 2.2 4.1 6l3.8 3.8" /></svg>
+    <span>{t('Hyrule')}</span>
+  </button>;
+}
+
 /** One bar over the map. The groups disappear on a wide window so the controls stay one row. On a phone the extra rows start folded. */
-function MapHud({ where, how, open, onToggle }: { where: ReactNode; how?: ReactNode; open: boolean; onToggle: () => void }) {
+export function MapHud({ where, how, open, onToggle }: { where: ReactNode; how?: ReactNode; open: boolean; onToggle: () => void }) {
   const label = t(open ? 'Ocultar opções do mapa' : 'Mostrar opções do mapa');
   return <div className="map-float-tools"><div className={!how || open ? 'map-hud' : 'map-hud is-collapsed'}>
     <div className="map-hud-where">
@@ -888,7 +948,7 @@ function MapHud({ where, how, open, onToggle }: { where: ReactNode; how?: ReactN
 }
 
 /** Icon button for the map's zoom cluster: enter or leave the dedicated map view. */
-function MapScreenButton({ on, toggle }: { on: boolean; toggle: () => void }) {
+export function MapScreenButton({ on, toggle }: { on: boolean; toggle: () => void }) {
   const label = t(on ? 'Sair da tela cheia' : 'Tela cheia');
   return <button type="button" className="map-only-toggle" aria-pressed={on} aria-keyshortcuts={on ? 'Escape' : undefined} aria-label={label} title={on ? `${label} (Esc)` : label} onClick={toggle}>
     <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -904,7 +964,7 @@ function MapScreenButton({ on, toggle }: { on: boolean; toggle: () => void }) {
  * iPhone Safari only grants fullscreen to videos, so there the view just covers the page. Leaving browser fullscreen
  * (Esc, F11) leaves the view too. The rest of the app turns inert meanwhile, so Tab stays on the map.
  */
-function useMapOnlyView(view: RefObject<HTMLElement | null>) {
+export function useMapOnlyView(view: RefObject<HTMLElement | null>) {
   const [on, setOn] = useState(false);
   useEffect(() => {
     const el = view.current;
@@ -938,10 +998,10 @@ function useMapOnlyView(view: RefObject<HTMLElement | null>) {
 }
 
 /** Screens where the marker card docks to the map's edge instead of floating beside its marker. */
-const DOCKED_CARD = '(max-width: 640px), (max-height: 500px), (pointer: coarse)';
+export const DOCKED_CARD = '(max-width: 640px), (max-height: 500px), (pointer: coarse)';
 /** Phone portrait (the 760px block in companion.css): the progress panel sits below the map instead of on it. */
 const PANEL_BELOW = '(max-width: 760px)';
-function useMatches(query: string) {
+export function useMatches(query: string) {
   const [matches, setMatches] = useState(() => matchMedia(query).matches);
   useEffect(() => {
     const media = matchMedia(query);
@@ -993,7 +1053,8 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
   }));
   const pool = [...atlasPins, ...trackedPins].filter(p => filter === 'all' || p.filter === filter);
   const doneCount = pool.filter(m => m.status === 'done').length;
-  const markers = pool.filter(m => (!hideDone || m.status !== 'done') &&
+  // The selected marker stays on the map whatever the filters say: a row picked in the panel may be one they hide.
+  const markers = pool.filter(m => m.id === active || (!hideDone || m.status !== 'done') &&
     (show === 'all' || (show === 'done' ? m.status === 'done' : m.status !== 'done')));
   const selected = markers.find(item => item.id === active);
   const select = (id: string) => {
@@ -1001,7 +1062,10 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
     const item = pool.find(p => p.id === id)?.item;
     if (item && item.id !== focusItem) onPickItem?.(item);
   };
-  // A row picked outside the map: open its floor and its marker.
+  // Where the map centers when a row is picked outside it, as the Tears of the Kingdom map does.
+  // Kept with its floor: the same object stays set, so later clicks on the map don't center it again.
+  const [focus, setFocus] = useState<{ floor: string; point: readonly [number, number] }>();
+  // A row picked outside the map: open its floor and its marker, and center the map on it.
   useEffect(() => {
     // A row can have a marker on several floors (child and adult): keep the floor on screen when it has one.
     const pins = focusItem ? pool.filter(p => p.item?.id === focusItem && p.at) : [];
@@ -1009,6 +1073,7 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
     if (!pin || pins.some(p => p.id === active)) return;
     setFloor(pin.at!.map);
     setActive(pin.id);
+    setFocus({ floor: pin.at!.map, point: [pin.at!.x * 100, pin.at!.y * 100] });
   }, [focusItem]);
   const docked = useMatches(DOCKED_CARD);
   // Beside its marker on a large screen. On phones and touch screens it docks to the map's edge away from the marker,
@@ -1025,7 +1090,7 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
   </div>;
   const markerFilter = !!pool.length && <StatusFilter show={show} onShow={id => { onShow(id); setActive(''); }} total={pool.length} left={pool.length - doneCount} />;
   const floorSelect = place.maps.length > 1 && currentFloor && <label className="map-region map-floor"><span>{t("Andar / era")}</span><select value={currentFloor.id} onChange={e => { setFloor(e.target.value); select(''); }}>{place.maps.map(m => <option key={m.id} value={m.id}>{t(m.label)}</option>)}</select></label>;
-  const drawer = <MapCatDrawer open={catsOpen} onOpen={onCats} icon={chosen?.icon} name={chosen?.cat.label}>
+  const drawer = <MapCatDrawer open={catsOpen} onOpen={onCats} icon={chosen && <GameItemIcon id={chosen.icon} size={18} />} name={chosen && t(chosen.cat.label)}>
     <div className="era-tabs" role="radiogroup" aria-label={t('Era')}>{eras.map(([id, label]) =>
       <button key={id} type="button" role="radio" aria-checked={era === id} onClick={() => { onEra(id); setActive(''); }}>{t(label)}</button>)}</div>
     {markerFilter}
@@ -1033,12 +1098,13 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
     <CategoryCounters rows={categoryRows} filter={filter} chosen={chosen} onFilter={onFilter} />
   </MapCatDrawer>;
   const mapTools = <MapHud open={hudOpen} onToggle={onHud} where={<>
-      {onBack && <button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={onBack}><Icon name="map" size={16} /></button>}
+      {onBack && <MapBack onBack={onBack} />}
       {regionMenu}
       {floorSelect}
     </>} how={mapModes} />;
   return <div className="region-atlas">
-    {currentFloor ? <ZoomPan key={currentFloor.id} ratio={currentFloor.aspect ?? 1.6} className="floor-map" controls={controls} overlay={<>{mapTools}{!below && drawer}{overlay}{docked && card}</>}>
+    {currentFloor ? <ZoomPan key={currentFloor.id} ratio={currentFloor.aspect ?? 1.6} className="floor-map" controls={controls}
+      focus={focus?.floor === currentFloor.id ? focus.point : undefined} overlay={<>{mapTools}{!below && drawer}{overlay}{docked && card}</>}>
       <div className="floor-fill" aria-label={t("Mapa da região")}
         onClick={e => { if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('map-art')) setActive(''); }}>
         <img className="map-art" src={currentFloor.image} alt="" draggable={false} />

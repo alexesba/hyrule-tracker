@@ -7,9 +7,11 @@ import { buildCards, tileItems, Card, TileModel } from './view';
 import { Masonry } from './Masonry';
 import { CompanionPage, Icon, MobileNav, Sidebar, PageHeader, MAP_CATEGORIES, type Page } from './CompanionPages';
 import { WhatToDo } from './WhatToDo';
+import { GamePicker, GameSwitch, lastGame, rememberGame, type Game } from './GamePicker';
 
 // The guide's text is large: it loads when the page opens.
 const Walkthrough = lazy(() => import('./Walkthrough'));
+const TotkJournal = lazy(() => import('./TotkJournal'));
 import { LanguageSwitch } from './LanguageFlags';
 import { currentLocale, day, loadLocale, message, percent, setLocale, t, tail, tv, type Locale } from './i18n';
 import { ObjectiveName } from './ObjectiveName';
@@ -30,6 +32,9 @@ export function App() {
   const [startupFailed, setStartupFailed] = useState(false);
   const [connection, setConnection] = useState<Connection>('connecting');
   const [selected, setSelected] = useState<string | null>(null);
+  // Opens straight into the last game played; the picker shows on the first run and from "Switch game".
+  const [game, setGame] = useState<Game | undefined>(lastGame);
+  const [previousGame, setPreviousGame] = useState(lastGame);
   const [page, setPage] = useState<Page>('overview');
   // Checklist entry the map should open on ("View on map").
   const [mapFocus, setMapFocus] = useState<string>();
@@ -173,15 +178,29 @@ export function App() {
       {languageError && <small role="alert">{t('Não foi possível carregar o idioma.')}</small>}
     </div>
     <LanguageSwitch locale={locale} onChange={changeLanguage} />
+    <GameSwitch onClick={() => setGame(undefined)} />
   </>;
   const changePage = (next: Page) => { setMapFocus(undefined); setPage(next); };
+
+  function openGame(next: Game) {
+    rememberGame(next);
+    setPreviousGame(next);
+    setReveal(undefined);
+    changePage('overview');
+    setGame(next);
+  }
+
+  if (!game) return <GamePicker last={previousGame} locale={locale} onLanguage={changeLanguage} onEnter={openGame} />;
 
   return (
     <div className="tracker-shell" lang={locale}>
       {state && prefs && <UpdateDialog />}
-      <Sidebar page={page} onPage={changePage} state={state} />
-      <MobileNav page={page} onPage={changePage} state={state} />
-      {!state || !prefs || state.status === 'loading' ? (
+      <Sidebar page={page} onPage={changePage} state={state} game={game} />
+      <MobileNav page={page} onPage={changePage} state={state} game={game} />
+      {game !== 'oot' ? <Suspense fallback={<main className="companion-page"><PageSkeleton page={page} /></main>}>
+        <TotkJournal key={game} game={game} state={state} locale={locale} onLanguage={changeLanguage} connectionLost={lost} view={page}
+          onPage={changePage} onBack={() => setGame(undefined)} />
+      </Suspense> : !state || !prefs || state.status === 'loading' ? (
         <main className={page === 'checklist' ? 'app' : 'companion-page'} key={page}>
           <PageHeader page={page} state={state} headerActions={headerActions} connectionLost={lost} />
           <div className="page-content">
@@ -248,7 +267,7 @@ export function App() {
       )}
       <footer className="tracker-footer"><AuthorCredit /></footer>
       <div className="toasts" aria-live="polite">
-        {state?.toasts.map(toast => <div key={toast.id} className="toast">{message(toast.text, toast.values)}</div>)}
+        {game === 'oot' && state?.toasts.map(toast => <div key={toast.id} className="toast">{message(toast.text, toast.values)}</div>)}
       </div>
     </div>
   );

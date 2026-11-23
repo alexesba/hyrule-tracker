@@ -1,0 +1,87 @@
+.totk-category-icon { display: inline-block; flex: none; object-fit: contain; vertical-align: middle; }
+.totk-category-icon[hidden] { display: none; }
+.world-name { display: flex; align-items: center; gap: 7px; }
+.world-selection p, .totk-quest-detail p { overflow-wrap: anywhere; }
+.world-selection a, .totk-quest-detail a { color: var(--hyrule-gold); }
+.totk-quest-detail { width: 100%; }
+.totk-quest-detail > summary { cursor: pointer; }
+.totk-map-search { box-sizing: border-box; width: 100%; margin-block: 6px; }
+.totk-check-categories > summary { cursor: pointer; }
+.totk-check-categories .dropdown-menu { max-height: min(450px, 60dvh); overflow: auto; min-width: 220px; }
+.totk-checklist-page .tile .glyph img { width: 28px; height: 28px; }
+.totk-checklist-page .card .small-btn { margin-top: 6px; }
+.map-view[data-layer="sky"] .zoom-viewport { background: #25393f; }
+.map-view[data-layer="surface"] .zoom-viewport { background: #242b23; }
+.map-view[data-layer="depths"] .zoom-viewport { background: #1c1b23; }
+.totk-map-art { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.totk-map-art img { position: absolute; visibility: hidden; max-width: none; }
+.totk-map-art[data-ready="true"] img[data-loaded="true"] { visibility: visible; }
+.totk-map-credit { color: var(--hyrule-muted); font-size: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+.totk-map-credit a { color: inherit; text-underline-offset: 3px; }
+.world-pin {
+  position: absolute;
+  translate: -50% -50%;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+}
+.world-pin::before { content: ''; border: 2px solid #ffe091; background: #292e26; width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 1px 3px #15130de6; }
+.world-pin[data-mark="done"]::before { background: #b4d99c; border-color: #203324; }
+.world-pin[data-mark="found"]::before { background: #f2ca74; }
+.world-pin[data-kind="minigame"]::before { border-radius: 2px; border-color: #8fe0e0; }
+.world-pin[data-kind$="quest"]::before, .world-pin[data-kind="adventure"]::before { border-radius: 2px; rotate: 45deg; }
+.world-pin .totk-category-icon:not([data-loaded]) { display: none; }
+.world-pin:has(.totk-category-icon[data-loaded])::before { display: none; }
+.world-pin .totk-category-icon {
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  border: 1px solid #d5cbb58c;
+  border-radius: 50%;
+  background: #202721;
+  box-shadow: 0 1px 3px #150f0ce6;
+}
+.world-pin[data-mark="done"]:has(.totk-category-icon[data-loaded])::after {
+  content: '';
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 6px;
+  height: 6px;
+  border: 1px solid #203324;
+  border-radius: 50%;
+  background: #b4d99c;
+}
+.world-pin[data-mark="found"] .totk-category-icon { border-color: #f2ca74; }
+.world-pin[aria-pressed="true"] .totk-category-icon { outline: 2px solid #f9dc99; outline-offset: 2px; }
+.world-pin[aria-pressed="true"], .world-pin:focus-visible, .world-pin:hover { z-index: 5; }
+.world-pin[aria-pressed="true"]::before, .world-pin:focus-visible::before, .world-pin:hover::before {
+  background: #f9dc99;
+  border-color: #292e26;
+  outline: 2px solid #f9dc99;
+  outline-offset: 2px;
+}
+.world-selection { display: grid; gap: 8px; justify-items: start; }
+.world-selection h2 { font-size: 1.15rem; }
+.totk-region-score { align-items: center; margin-top: 4px; }
+.totk-region-score span { font-size: 13px; font-weight: 650; }
+.totk-region-score small { margin-left: 4px; color: var(--hyrule-muted); font-weight: 500; }
+.totk-map-crop { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.totk-map-crop-origin { position: absolute; top: 50%; width: 0; height: 0; }
+.totk-map-crop img { position: absolute; width: 256px; height: 256px; max-width: none; }
+/* The text sits on the left; the map shows through on the right, lighter than the photo rows need. */
+.totk-region-rate { position: relative; isolation: isolate; overflow: hidden; background: #141211; }
+.totk-region-rate::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #141211e6 0%, #141211a6 42%, #14121126 100%); }
+.totk-region-rate .totk-map-crop { z-index: -2; }
+.easter-photo:has(.totk-map-crop) { position: relative; overflow: hidden; }
+.easter-photo .totk-map-crop { z-index: 0; }
+.easter-photo .totk-map-crop img { width: 256px; height: 256px; object-fit: fill; }
+/* The pins sit under the region names; the names stay readable and clickable above them. */
+.totk-map-node { z-index: 3; }
+.totk-map-node .map-count .totk-category-icon { width: 14px; height: 14px; }

@@ -62,6 +62,21 @@ describe('startLanServer', () => {
     expect(await res.text()).toContain('hi');
   });
 
+  it('scopes an embedded tracker and its API to its session path', async () => {
+    const embedded = await startLanServer({ root, host: '127.0.0.1', port: 0, basePath: '/test-session/', rpc: { getState: () => 'ok' } });
+    try {
+      const origin = `http://127.0.0.1:${embedded.port}`;
+      const request = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ method: 'getState' }) };
+      expect((await fetch(`${origin}/`)).status).toBe(404);
+      expect((await fetch(`${origin}/test-session-other/`)).status).toBe(404);
+      expect(await (await fetch(`${origin}/test-session/?decky=1`)).text()).toContain('hi');
+      expect((await fetch(`${origin}/api/rpc`, request)).status).toBe(404);
+      expect(await (await fetch(`${origin}/test-session/api/rpc`, request)).json()).toEqual({ result: 'ok' });
+    } finally {
+      await embedded.close();
+    }
+  });
+
   it('never serves files outside the UI folder', async () => {
     const raw = (p: string) => new Promise<number>(resolve => {
       http.get({ host: '127.0.0.1', port: server.port, path: p }, r => { r.resume(); resolve(r.statusCode ?? 0); });

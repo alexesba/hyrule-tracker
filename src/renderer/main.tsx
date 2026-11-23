@@ -1,13 +1,18 @@
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
-import { Overlay } from './Overlay';
 import { currentLocale, loadLocale, setLocale } from './i18n';
+import { enableDeckyNavigation } from './decky';
 import './styles.css';
 import './responsive.css';
 
 const isOverlay = new URLSearchParams(location.search).has('overlay');
 const locale = currentLocale();
-void loadLocale(locale).catch(console.error).then(() => {
+void loadLocale(locale).catch(console.error).then(async () => {
   setLocale(locale);
-  createRoot(document.getElementById('root')!).render(isOverlay ? <Overlay /> : <App />);
+  const root = createRoot(document.getElementById('root')!);
+  if (isOverlay) {
+    const { Overlay } = await import('./Overlay');
+    root.render(<Overlay />);
+  } else root.render(<App />);
+  enableDeckyNavigation();
 });

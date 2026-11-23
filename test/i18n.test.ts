@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { currentLocale, fromSystem, languages, loadLocale, setLocale, t, type Locale } from '../src/renderer/i18n.js';
+import { currentLocale, fromSystem, journalMessage, journalName, journalText, languages, loadLocale, setLocale, t, type Locale } from '../src/renderer/i18n.js';
 
 describe('first-run language', () => {
   it('picks the system language when the app has it', () => {
@@ -41,6 +41,28 @@ it('keeps character names in localized labels and hints', async () => {
       expect(t('In the Water Temple, after Dark Link.'), locale).toContain(names.dark);
       expect(t("Dampé's race"), locale).toContain('Dampé');
     }
+  } finally {
+    setLocale(previous);
+    vi.unstubAllGlobals();
+  }
+});
+
+it('resolves journal text, catalog names, and placeholders when switching language', async () => {
+  const previous = currentLocale();
+  vi.stubGlobal('document', { documentElement: { lang: previous } });
+  try {
+    await loadLocale('ja-JP');
+    setLocale('ja-JP');
+    expect(journalText(['Santuários', 'Shrines'])).toBe('祠');
+    expect(journalName('totk', 'Ukouh Shrine')).toBe('ウコウホの祠');
+    expect(journalName('botw', 'Korok H23')).toBe('コログ H23');
+    expect(journalMessage(['{done} de {total} descobertas', '{done} of {total} discoveries'], { done: 3, total: 10 })).toBe('発見：3/10件');
+
+    await loadLocale('es-ES');
+    setLocale('es-ES');
+    expect(journalText(['Santuários', 'Shrines'])).toBe('Santuarios');
+    expect(journalName('botw', 'Oman Au Shrine')).toBe('Santuario de Maonu');
+    expect(journalName('botw', 'Korok H23')).toBe('Kolog H23');
   } finally {
     setLocale(previous);
     vi.unstubAllGlobals();

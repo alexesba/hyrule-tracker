@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 import entries from './strings.txt?raw';
 import catalogEntries from './catalog-strings.json';
+import { inDecky } from './decky';
 
 /** Every language, by its own name (the order of the language menu). */
 export const languages = {
@@ -14,12 +15,23 @@ type BaseLocale = 'pt-BR' | 'en-US' | 'es-ES';
 const isBase = (l: Locale): l is BaseLocale => l === 'pt-BR' || l === 'en-US' || l === 'es-ES';
 const dictionariesByFile = import.meta.glob<Record<string, string>>('./locales/*.json', { import: 'default' });
 const dictionaries: Partial<Record<Locale, Record<string, string>>> = {};
+type WorldLanguage = Record<'text' | 'botw' | 'totk', Record<string, string>>;
+const worldFiles = import.meta.glob<WorldLanguage>('./world-locales/*.json', { import: 'default' });
+const worldLanguages: Partial<Record<Locale, WorldLanguage>> = {};
 
 export async function loadLocale(next: Locale) {
-  if (isBase(next) || dictionaries[next]) return;
-  const load = dictionariesByFile[`./locales/${next}.json`];
-  if (!load) throw new Error(`Missing dictionary for ${next}`);
-  dictionaries[next] = await load();
+  const pending: Promise<void>[] = [];
+  if (!isBase(next) && !dictionaries[next]) {
+    const load = dictionariesByFile[`./locales/${next}.json`];
+    if (!load) throw new Error(`Missing dictionary for ${next}`);
+    pending.push(load().then(dictionary => { dictionaries[next] = dictionary; }));
+  }
+  if (next !== 'en-US' && !worldLanguages[next]) {
+    const load = worldFiles[`./world-locales/${next}.json`];
+    if (!load) throw new Error(`Missing Hyrule journal dictionary for ${next}`);
+    pending.push(load().then(dictionary => { worldLanguages[next] = dictionary; }));
+  }
+  await Promise.all(pending);
 }
 const storage = 'hyrule-tracker.locale';
 function initial(): Locale {
@@ -27,6 +39,8 @@ function initial(): Locale {
     const saved = localStorage.getItem(storage);
     if (saved && Object.hasOwn(languages, saved)) return saved as Locale;
   } catch { /* browser storage unavailable */ }
+  const deckyLocale = inDecky && new URLSearchParams(location.search).get('locale');
+  if (deckyLocale && Object.hasOwn(languages, deckyLocale)) return deckyLocale as Locale;
   return fromSystem(typeof navigator === 'undefined' ? [] : navigator.languages ?? [navigator.language]);
 }
 /** First run: the system's language if the app has it (zh-Hant/HK/MO/TW -> traditional Chinese), else English. */
@@ -84,6 +98,28 @@ export function t(source: string): string {
     if (head !== undefined && body !== undefined) return `${head}: ${body}`;
   }
   return source;
+}
+
+export function journalText([pt, en]: readonly [string, string], language = locale): string {
+  if (language === 'en-US') return en;
+  if (language === 'pt-BR') return pt;
+  return worldLanguages[language]?.text[en] ?? lookup(pt) ?? lookup(en) ?? en;
+}
+
+export function journalMessage(label: readonly [string, string], values: Record<string, string | number>): string {
+  return journalText(label).replace(/\{(\w+)\}/g, (placeholder, key: string) => {
+    const value = Object.hasOwn(values, key) ? values[key] : undefined;
+    return typeof value === 'number' ? number(value) : value ?? placeholder;
+  });
+}
+
+export function journalName(game: 'botw' | 'totk', source: string, language = locale): string {
+  const names = worldLanguages[language]?.[game];
+  if (!names) return source;
+  const key = source.normalize('NFC').replace(/[’‘]/g, "'").replace(/[“”]/g, '"').trim();
+  if (Object.hasOwn(names, key)) return names[key];
+  const numbered = /^(.+?)( (?:x?\d+|[A-Z]{1,3}\d{2,}))$/.exec(key);
+  return numbered && Object.hasOwn(names, numbered[1]) ? names[numbered[1]] + numbered[2] : source;
 }
 /** Name without its "Area: " prefix, translated. Translates the tail alone when it is known, else the whole name and then cuts the prefix. */
 export function tail(source: string): string {

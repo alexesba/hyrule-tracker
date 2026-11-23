@@ -25,6 +25,13 @@ export interface Settings {
   /** manual ticks: "<userDir>|<slot>" -> item id -> true */
   manual: Record<string, Record<string, boolean>>;
   easterEggs: string[];
+  totk?: {
+    folder?: string;
+    pinnedSlot?: string;
+    manual?: Record<string, string[]>;
+    history?: Record<string, import('../core/totk-journal.js').TotkHistoryEntry[]>;
+  };
+  botw?: Settings['totk'];
   ui: UiPrefs;
   devPanel: boolean;
   mainBounds?: { x: number; y: number; width: number; height: number };

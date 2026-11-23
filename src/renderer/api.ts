@@ -1,13 +1,15 @@
 import type { TrackerApi } from '../preload/preload';
 import { currentLocale, date } from './i18n';
 import { createWebApi, type Connection } from './webApi';
+import { chooseDeckyFolder, inDecky } from './decky';
 
 declare global {
   interface Window { tracker?: TrackerApi }
 }
 /** Opened in a browser on another device (served on the local network), not in the app's own window. */
 export const isRemote = !window.tracker;
-const web = isRemote ? createWebApi() : undefined;
+export const canChooseSaveFolder = !isRemote || inDecky;
+const web = isRemote ? createWebApi(inDecky ? chooseDeckyFolder : undefined) : undefined;
 export const api: TrackerApi = window.tracker ?? web!;
 /** Remote pages: whether the PC is reachable. The app's own windows are always connected. */
 export const onConnection = (fn: (c: Connection) => void) => web ? web.onConnection(fn) : (fn('open'), () => {});

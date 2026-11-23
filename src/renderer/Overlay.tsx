@@ -5,11 +5,21 @@ import type { AppState, TrackedCategory, OverlayMode } from '../shared/types';
 import { api } from './api';
 import { categoryColor } from './icons';
 import { buildCards } from './view';
+import { lastGame } from './GamePicker';
+import { TotkOverlay } from './TotkOverlay';
+import { journals, WorldJournalContext } from './WorldJournalContext';
 
 /** Compact always-on-top view. Locked = click-through; unlocked = drag/resize + controls. */
 export function Overlay() {
   const [state, setState] = useState<AppState | null>(null);
   const [locale, setLanguage] = useState(currentLocale);
+  // The game open in the main window. Picking another there writes it to storage, which this window hears.
+  const [game, setGame] = useState(lastGame);
+  useEffect(() => {
+    const changed = () => setGame(lastGame());
+    window.addEventListener('storage', changed);
+    return () => window.removeEventListener('storage', changed);
+  }, []);
   useEffect(() => {
     document.body.classList.add('overlay-body');
     void api.getState().then(setState).catch(console.error);
@@ -49,7 +59,9 @@ export function Overlay() {
           <button onClick={() => void api.toggleOverlayLock()} title={`Lock (${state.hotkeys.lockOverlay})`}>{t("Lock")}</button>
         </div>
       )}
-      {state.status !== 'ok' || !s ? (
+      {game && game !== 'oot' ? <WorldJournalContext.Provider value={journals[game]}>
+        <TotkOverlay state={state} locale={locale} />
+      </WorldJournalContext.Provider> : state.status !== 'ok' || !s ? (
         <div className="ov-msg">{state.message ? tv(state.message, state.messageValues) : t('Waiting for a save…')}</div>
       ) : (
         <>

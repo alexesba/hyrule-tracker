@@ -128,7 +128,7 @@ export function useNarrow(el: HTMLElement | null, min: number) {
 }
 
 /** The details as a bottom sheet: Escape, the back gesture (Android) and a tap outside close it; focus goes back to the row. */
-function TodoSheet({ children, onClose }: { children: ReactNode; onClose: () => void }) {
+export function TodoSheet({ children, onClose }: { children: ReactNode; onClose: () => void }) {
   const dialog = useModalDialog(true);
   return <dialog ref={dialog} className="mobile-sheet todo-sheet" aria-labelledby="todo-detail-title"
     onCancel={e => { e.preventDefault(); onClose(); }}

@@ -17,6 +17,8 @@ export interface LanOptions {
   port: number;
   /** Address to listen on (default: every interface). */
   host?: string;
+  /** Optional URL path prefix, including its leading and trailing slashes. */
+  basePath?: string;
   /** What remote pages may call, by method name. Anything else is refused. */
   rpc: Record<string, RpcHandler>;
 }
@@ -167,6 +169,10 @@ export function startLanServer(opts: LanOptions): Promise<LanServer> {
     if (!allowedHost(req.headers.host)) return send(res, 421, 'Misdirected request');
     let pathname: string;
     try { pathname = new URL(req.url ?? '/', 'http://x').pathname; } catch { return send(res, 400, 'Bad request'); }
+    if (opts.basePath) {
+      if (!pathname.startsWith(opts.basePath)) return send(res, 404, 'Not found');
+      pathname = pathname.slice(opts.basePath.length - 1);
+    }
     if (pathname === '/api/rpc') return req.method === 'POST' ? void rpc(req, res) : send(res, 405, 'Method not allowed');
     if (pathname === '/api/events') return req.method === 'GET' ? events(req, res) : send(res, 405, 'Method not allowed');
     file(req, res, pathname);

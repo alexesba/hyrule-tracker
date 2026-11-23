@@ -1,3 +1,53 @@
+# Paridade de layout entre os jogos
+
+- [x] Compartilhar o layout do Passo a passo, mapa, checklist e próximos objetivos.
+- [x] Aplicar as estruturas do Ocarina às telas de missões, minijogos, inimigos, segredos, registro, dados, quiz e configurações do Tears.
+- [x] Verificar as 14 telas no Electron e os fluxos da Segunda Tela a 390 px, com e sem save.
+
+# Visão geral de Tears of the Kingdom
+
+- [x] Aplicar a composição do Ocarina à Visão geral e ao cabeçalho do diário de Tears of the Kingdom.
+- [x] Conferir o painel com e sem save no Electron e na Segunda Tela.
+
+# Diário completo de Tears of the Kingdom
+
+- [x] Reutilizar a navegação do Ocarina e implementar as páginas e subseções equivalentes.
+- [x] Conferir guias, acrescentar coordenadas verificadas e ligar mapa, objetivos e explicações.
+- [x] Aplicar arte oficial no seletor e preservar o último jogo.
+- [x] Usar ícones do jogo no mapa, na lista e nos filtros quando disponíveis.
+- [x] Validar no Electron e na Segunda Tela a 390 px com um save público de Tears of the Kingdom.
+
+Foram conferidos o seletor, a sidebar, as capas oficiais, os marcadores com ícones, os filtros por região, a marcação manual e a atualização do checklist e do Registro do dia ao alterar uma cópia de teste do save. O build e o TypeScript passaram. Foram executados 249 testes e ignorados 11 que dependem de arquivos de save ausentes.
+
+# Cartografia de Tears of the Kingdom
+
+- [x] Localizar e conferir a cartografia do jogo para céu, superfície e profundezas.
+- [x] Integrar as imagens e preservar as posições dos marcadores e da rota da ilha.
+- [x] Validar as camadas, o zoom e a alternativa offline no Electron e na Segunda Tela a 390 px.
+
+# Tears of the Kingdom no mundo inteiro
+
+- [x] Catalogar objetivos do céu, da superfície e das profundezas com coordenadas e campos de save verificáveis.
+- [x] Integrar mapa em camadas, checklist de conclusão, guia da história e segredos ao diário de Tears of the Kingdom.
+- [x] Conferir o catálogo com o save público e validar a troca de camadas, o guia e a atualização automática no Electron e na Segunda Tela a 390 px.
+
+# Tears of the Kingdom na Grande Ilha Celeste
+
+- [x] Conectar um save de Tears of the Kingdom em modo de leitura, separado do Ocarina.
+- [x] Implementar mapa interativo, checklist dos quatro santuários e passo a passo sincronizado.
+- [x] Catalogar segredos e atividades da ilha e sincronizar os que têm flags verificáveis.
+- [x] Abrir com um seletor que lembra o último jogo e mostrar menus específicos de cada jogo.
+- [x] Validar o save público, a mudança de slot, o seletor e a atualização após salvar no Electron e na Segunda Tela a 390 px.
+
+A compatibilidade com saves da edição Switch 2 ainda precisa de validação com uma amostra dessa edição.
+
+# Decky Loader (#21)
+
+- [x] Implementar a abertura da interface da Segunda Tela pelo menu Decky, com navegação pelo controle.
+- [x] Reaproveitar a leitura local de saves, perfis e progresso. Conferidos no Linux via Docker com a versão empacotada.
+- [x] Conferir a interface no navegador e no Electron e gerar `Hyrule-Tracker-Decky-0.1.0-experimental.1.zip` para o Eduardo.
+- [ ] Confirmar a instalação, a detecção da partida e o controle no Modo Jogo em um Steam Deck.
+
 # Walkthrough
 
 - [x] Mover o crédito à IGN dos capítulos para Configurações e conferir no desktop e no navegador. O crédito e o link aparecem em Créditos, o aviso saiu dos capítulos e a navegação foi preservada. No navegador a 320 px, o texto coube sem rolagem horizontal. O link usa o endereço registrado no projeto, que retornou HTTP 403 na verificação externa.
@@ -97,3 +147,20 @@ O build, o TypeScript e 172 testes passaram. Onze testes dependem de arquivos de
 
 - [x] Revisar os issues e atualizar o changelog. Todos os issues existentes já estavam fechados.
 - [x] Gerar os pacotes para Windows e Linux e validar a versão e os hashes nos metadados do atualizador. TypeScript passou e 176 testes foram aprovados.
+# Breath of the Wild
+
+- [x] Pesquisar o guia, validar as fontes de coordenadas e integrar arte, ícones e mapa do jogo.
+- [x] Reutilizar as 14 telas e as colunas do diário de Tears of the Kingdom.
+- [x] Catalogar o Grande Planalto e as 15 regiões, com 120 santuários do jogo base, 16 do DLC, 900 Koroks e 18 memórias da história.
+- [x] Sincronizar o mapa, o checklist, o passo a passo e o registro com o save, com armazenamento independente por jogo.
+- [x] Verificar as 14 telas do Electron, as 13 da Segunda Tela a 390 px, a troca entre os três jogos e a atualização automática com um save público de teste. O formato Switch e o formato Wii U passaram em testes de leitura.
+
+O checklist mede o catálogo do diário. Objetivos sem flag confirmada podem ser marcados à mão. Os dados cartográficos e os ícones são carregados pela internet.
+
+# Tradução de Tears of the Kingdom e Breath of the Wild
+
+- [x] Traduzir interface, seleção de jogos, mapa, checklist, passo a passo, quiz e overlay nos 12 idiomas do Ocarina.
+- [x] Traduzir os nomes e detalhes dos catálogos, priorizando a nomenclatura dos jogos.
+- [x] Conferir a cobertura dos dicionários e a troca de idioma no Electron e na Segunda Tela.
+
+Visão geral, mapa, busca no checklist e passo a passo foram exercitados nos 12 idiomas dos dois jogos, no Electron e no navegador a 390 px. As demais telas foram conferidas em francês e japonês. O overlay foi conferido em japonês. TypeScript, build e 261 testes passaram.

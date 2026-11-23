@@ -30,12 +30,12 @@ export interface WalkthroughSection {
 
 export type WalkthroughPart = 'stones' | 'medallions' | 'ganon' | 'side';
 
-export interface WalkthroughChapter {
+export interface WalkthroughChapter<Part extends string = WalkthroughPart> {
   id: string;
-  part: WalkthroughPart;
+  part: Part;
   title: string;
   summary: string;
-  age: Age | 'both';
+  age?: Age | 'both';
   /** Atlas place the chapter is mostly about (map link and picture). */
   place: string;
   /** Checklist rows that mean the chapter is finished. */
@@ -74,7 +74,7 @@ export interface ChapterProgress {
   started: boolean;
 }
 
-export function chapterProgress(chapter: WalkthroughChapter, done: DoneLookup): ChapterProgress {
+export function chapterProgress(chapter: WalkthroughChapter<string>, done: DoneLookup): ChapterProgress {
   const out: ChapterProgress = { done: 0, total: 0, extrasDone: 0, extrasTotal: 0, complete: false, started: false };
   for (const section of chapter.sections) for (const step of section.steps) {
     const status = stepStatus(step, done);

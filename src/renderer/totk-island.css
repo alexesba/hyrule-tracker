@@ -1,0 +1,40 @@
+.totk-refresh, .totk-progress-actions { gap: 8px; }
+.totk-progress-actions { display: flex; flex-wrap: wrap; }
+.totk-progress-panel::before { background: linear-gradient(90deg, #171811fa 6%, #171811f4 28%, #17181162 71%, #17181136); }
+/* The cover fills the whole banner. The crop keeps Link and the sky islands on the right; the gradient keeps the text readable on the left. */
+.totk-progress-panel .progress-photo {
+  object-fit: cover;
+  object-position: center 30%;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%);
+  mask-image: linear-gradient(90deg, transparent, #000 30%);
+}
+.totk-overview .metric-label .totk-category-icon { width: 25px; height: 25px; }
+.totk-overview .chapter-line { padding-block: 6px; }
+.totk-overview .chapter-line small { text-align: end; }
+.island-chart { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.island-player {
+  position: absolute;
+  translate: -50% -50%;
+  z-index: 2;
+  width: 13px;
+  height: 13px;
+  border: 2px solid #2a1b0a;
+  border-radius: 50%;
+  background: #ffe487;
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  .totk-refresh span { display: none; }
+  .totk-progress-panel::before { background: #171811; }
+  .totk-progress-panel .progress-photo {
+    position: static;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 1;
+    border-radius: 6px;
+    -webkit-mask-image: none;
+    mask-image: none;
+    /* In the column a flex item keeps its z-index, and -2 put the cover under the solid background. */
+    z-index: 0;
+  }
+}

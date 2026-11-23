@@ -26,7 +26,7 @@ export function useStored<T>(key: string, initial: T) {
   return [value, change] as const;
 }
 
-type Question = [string, string, string, string, string, string?];
+export type Question = [string, string, string, string, string, string?, string?];
 const normal: Question[] = [
   ['Quem acompanha Link desde Kokiri?', 'Navi', 'Malon', 'Sheik', 'Impa'],
   ['Quem ensina a canção de Epona?', 'Malon', 'Saria', 'Zelda', 'Ruto'],
@@ -85,18 +85,20 @@ function pictureQuestions(kind: 'enemy' | 'place'): Question[] {
 }
 const normalBank = [...normal, ...pictureQuestions('place')];
 const hardBank = [...hard, ...pictureQuestions('enemy')];
-export function Quiz() {
+export function Quiz({ normalQuestions = normalBank, hardQuestions = hardBank, historyKey = 'quiz.results' }: {
+  normalQuestions?: Question[]; hardQuestions?: Question[]; historyKey?: string;
+} = {}) {
   const [level, setLevel] = useState<'normal' | 'hard'>('normal');
-  const [history, setHistory] = useStored<Record<string, number>>('quiz.results', {});
+  const [history, setHistory] = useStored<Record<string, number>>(historyKey, {});
   const [index, setIndex] = useState(0);
   const [chosen, setChosen] = useState<string>();
   const [score, setScore] = useState(0);
   const [practice, setPractice] = useState(false);
   const key = `${day()}.${level}`;
-  const bank = level === 'normal' ? normalBank : hardBank;
+  const bank = level === 'normal' ? normalQuestions : hardQuestions;
   const seed = Math.floor(Date.parse(day()) / 86400000);
   const question = bank[(seed + index * 2 + (practice ? 5 : 0)) % bank.length];
-  const [label, answer, wrong1, wrong2, wrong3, photo] = question;
+  const [label, answer, wrong1, wrong2, wrong3, photo, explanation] = question;
   const answers = [answer, wrong1, wrong2, wrong3];
   const rotate = (seed + index) % answers.length;
   function reset(next: boolean) { setPractice(next); setIndex(0); setChosen(undefined); setScore(0); }
@@ -111,7 +113,7 @@ export function Quiz() {
       <div className="quiz-answers">{[...answers.slice(rotate), ...answers.slice(0, rotate)].map((text, i) =>
         <button className="action" key={`${i}:${text}`} aria-pressed={chosen === text} disabled={!!chosen} onClick={() => { setChosen(text); if (text === answer) setScore(score + 1); }}>{t(text)}</button>,
       )}</div>
-      {chosen && <><p className="notice" role="status">{chosen === answer ? t('Resposta correta.') : `${t('Resposta correta')} · ${t(answer)}.`}</p><button className="action primary" onClick={() => {
+      {chosen && <><p className="notice" role="status">{chosen === answer ? t('Resposta correta.') : `${t('Resposta correta')} · ${t(answer)}.`}{explanation && ' ' + explanation}</p><button className="action primary" onClick={() => {
         if (!practice && index + 1 === testLength) setHistory({ ...history, [key]: score });
         setIndex(index + 1); setChosen(undefined);
       }}>{index + 1 === testLength ? t('Ver resultado') : t('Próxima questão')}</button></>}

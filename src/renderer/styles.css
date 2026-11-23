@@ -296,3 +296,7 @@ button.card-head .card-count { margin-left: auto; }
 }
 .tile .glyph .tile-photo { display: block; width: 34px; height: 34px; border-radius: 6px; object-fit: cover; }
 .tile.todo .glyph .tile-photo { opacity: .8; }
+/* Tears of the Kingdom rows use the game's category icons where the Ocarina rows use a color dot. */
+.ov-icon { display: inline-flex; flex: none; }
+.ov-icon .totk-category-icon { width: 18px; height: 18px; }
+.ov-summary .totk-category-icon { width: 21px; height: 21px; vertical-align: -3px; }

@@ -1,0 +1,10 @@
+{
+  "name": "Hyrule Tracker",
+  "author": "João Victor Prado",
+  "flags": [],
+  "api_version": 1,
+  "publish": {
+    "tags": ["game", "tracker"],
+    "description": "Track your Ocarina of Time Remake saves in Steam Deck Gaming Mode."
+  }
+}

@@ -24,3 +24,21 @@ describe.each(files)('locales/%s', file => {
     expect([...english].filter(([k, en]) => typeof dict[k] === 'string' && placeholders(dict[k] as string) !== placeholders(en)).map(([k]) => k)).toEqual([]);
   });
 });
+
+it('covers the same journal text and catalog entries in every translated language', () => {
+  const journalDir = path.join(dir, '..', 'world-locales');
+  const locales = [...files, 'pt-BR.json', 'es-ES.json'].sort();
+  expect(fs.readdirSync(journalDir).sort()).toEqual(locales);
+  type Dictionary = Record<'text' | 'botw' | 'totk', Record<string, string>>;
+  const read = (file: string): Dictionary => JSON.parse(fs.readFileSync(path.join(journalDir, file), 'utf8'));
+  const reference = read('pt-BR.json');
+  for (const file of locales) {
+    const dict = read(file);
+    for (const category of ['text', 'botw', 'totk'] as const) {
+      expect(Object.keys(dict[category]).sort(), file + '/' + category).toEqual(Object.keys(reference[category]).sort());
+      const invalid = Object.entries(dict[category]).filter(([, value]) => !value.trim() || /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(value));
+      expect(invalid, file + '/' + category).toEqual([]);
+    }
+    expect(Object.entries(dict.text).filter(([key, value]) => placeholders(key) !== placeholders(value)), file).toEqual([]);
+  }
+});

@@ -19,7 +19,7 @@ function storedPrefs(): UiPrefs | undefined {
 /** Whether the page is connected to the PC right now (for a "reconnecting" notice). */
 export type Connection = 'connecting' | 'open' | 'lost';
 
-export function createWebApi(): TrackerApi & { onConnection: (fn: Listener<Connection>) => () => void } {
+export function createWebApi(chooseFolder?: () => Promise<string | undefined>): TrackerApi & { onConnection: (fn: Listener<Connection>) => () => void } {
   const state = new Set<Listener<AppState>>();
   const player = new Set<Listener<PlayerState | null>>();
   const language = new Set<Listener<string>>();
@@ -57,22 +57,37 @@ export function createWebApi(): TrackerApi & { onConnection: (fn: Listener<Conne
     updateNow: () => {},
     updateLater: () => {},
     installUpdate: () => {},
-    getPrefs: async () => storedPrefs() ?? await rpc<UiPrefs>('getPrefs'),
+    getPrefs: async () => (!chooseFolder && storedPrefs()) || await rpc<UiPrefs>('getPrefs'),
     setPrefs: async (p: UiPrefs) => {
+      if (chooseFolder) return rpc<UiPrefs>('setPrefs', p);
       try { localStorage.setItem(PREFS, JSON.stringify(p)); } catch { /* storage unavailable: keep for this visit */ }
       return p;
     },
-    setLanguage: async (locale: string) => { for (const fn of language) fn(locale); },
+    setLanguage: async (locale: string) => {
+      if (chooseFolder) await rpc('setLanguage', locale);
+      for (const fn of language) fn(locale);
+    },
     onLanguage: fn => { language.add(fn); return () => { language.delete(fn); }; },
     pinSlot: (name: string | null) => rpc('pinSlot', name),
     selectProfile: (id: string | null) => rpc<AppState>('selectProfile', id),
     toggleManual: (id: string) => rpc('toggleManual', id),
     setEasterEggFound: (id: string, found: boolean) => rpc<boolean>('setEasterEggFound', id, found),
     refreshProgress: () => rpc<void>('refreshProgress'),
+    browseTotkFolder: () => Promise.resolve(null),
+    refreshTotk: () => rpc<void>('refreshTotk'),
+    pinTotkSlot: (name: string | null) => rpc<void>('pinTotkSlot', name),
+    markTotkExtra: (id: string, done: boolean) => rpc<boolean>('markTotkExtra', id, done),
+    browseBotwFolder: () => Promise.resolve(null),
+    refreshBotw: () => rpc<void>('refreshBotw'),
+    pinBotwSlot: (name: string | null) => rpc<void>('pinBotwSlot', name),
+    markBotwExtra: (id: string, done: boolean) => rpc<boolean>('markBotwExtra', id, done),
     scanFolders: () => rpc<AppState>('scanFolders'),
-    browseFolder: () => rpc<AppState>('getState'), // picking a folder happens on the PC
-    findSaveFolders: async () => [],
-    selectSaveFolder: async () => false,
+    browseFolder: async () => {
+      const folder = await chooseFolder?.();
+      return folder ? rpc<AppState>('pickSaveFolder', folder) : rpc<AppState>('getState');
+    },
+    findSaveFolders: () => chooseFolder ? rpc('findSaveFolders') : Promise.resolve([]),
+    selectSaveFolder: (dir: string) => chooseFolder ? rpc('selectSaveFolder', dir) : Promise.resolve(false),
     answerIdentify: (reqId: string, itemIds: string[]) => rpc('answerIdentify', reqId, itemIds),
     skipIdentify: (reqId: string) => rpc('skipIdentify', reqId),
     forgetIdentification: (itemId: string) => rpc('forgetIdentification', itemId),

@@ -10,6 +10,7 @@ import { regionsForArea } from '../core/areas.js';
 import { evaluateLogic, Logic, LogicFile, requirementLabels } from '../core/logic.js';
 import type { AvailableEntry } from '../shared/types.js';
 import { SaveWatcher } from './watcher.js';
+import { TotkTracker } from './totk-tracker.js';
 import { LiveSource } from './live.js';
 import { ChangeLog } from './changelog.js';
 import { logError } from './errorlog.js';
@@ -36,7 +37,7 @@ export interface ControllerPaths {
   userData: string;
   snapshots: string;
   version: string;
-  /** Tests only: don't look for a running game. */
+  /** Read save files only, including when running as a Decky plugin. */
   noLive?: boolean;
 }
 
@@ -69,6 +70,8 @@ export class Controller {
   private toastId = 1;
   private toasts: Toast[] = [];
   state: AppState;
+  readonly totk: TotkTracker;
+  readonly botw: TotkTracker;
   private listeners = new Set<(s: AppState) => void>();
 
   constructor(readonly paths: ControllerPaths, readonly settings: SettingsStore) {
@@ -117,6 +120,8 @@ export class Controller {
       },
       worldMarkers: read('world-markers.json') as Record<string, WorldMarker>,
     };
+    this.totk = new TotkTracker(settings, totk => this.patch({ totk }));
+    this.botw = new TotkTracker(settings, botw => this.patch({ botw }), 'botw');
     this.log = new ChangeLog(path.join(paths.userData, 'logs'));
     this.log.enabled = settings.data.changeLog;
     this.allRegions = [...new Set(this.tracker.checklist.categories.flatMap(c => c.items.map(i => i.chapter).filter((x): x is string => !!x)))];
@@ -179,6 +184,8 @@ export class Controller {
   patch(p: Partial<AppState>) { this.state = { ...this.state, ...p }; this.emit(); }
 
   async start() {
+    this.totk.start();
+    this.botw.start();
     let dir = this.settings.data.saveDir;
     const saved = !!dir && resolveUserFolders(dir).length > 0;
     // Cheap first: the default install folders. The full drive search runs in the background.
@@ -811,7 +818,7 @@ export class Controller {
     this.emit();
   }
 
-  stop() { this.stopped = true; clearTimeout(this.pollTimer); this.watcher?.stop(); this.live?.stop(); }
+  stop() { this.stopped = true; clearTimeout(this.pollTimer); this.watcher?.stop(); this.live?.stop(); this.totk.stop(); this.botw.stop(); }
 }
 
 

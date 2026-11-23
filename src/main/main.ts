@@ -10,6 +10,7 @@ import { SettingsStore } from './settings.js';
 import { boundsVisible, cleanBounds, isLocale, isString, isStringArray, parseHotkeys, parseOverlayPatch, sanitizeUiPrefs, type MainLocale, type Rect } from './validate.js';
 import { useX11 } from './x11.js';
 import { findPublicNetworks, lanUrls, startLanServer, type LanServer } from './lan.js';
+import { trackerRpc } from './tracker-rpc.js';
 import { logError as writeErrorLog } from './errorlog.js';
 import { WALKTHROUGH_SOURCE_URL } from '../core/walkthrough.js';
 
@@ -136,7 +137,10 @@ function createMain() {
     let target: URL;
     try { target = new URL(url); } catch { return { action: 'deny' }; }
     if (target.protocol === 'https:' && (
-      ['nintendoeverything.com', 'www.nintendo.com', 'zelda.mtwildwood.net', 'github.com', 'www.nintenduo.com'].includes(target.hostname)
+      ['nintendoeverything.com', 'www.nintendo.com', 'zelda.mtwildwood.net', 'github.com', 'www.nintenduo.com', 'objmap-totk.zeldamods.org', 'objmap.zeldamods.org'].includes(target.hostname)
+      || (target.hostname === 'www.zeldadungeon.net' && ['/wiki/', '/breath-of-the-wild-walkthrough/'].some(prefix => target.pathname.startsWith(prefix)))
+      || target.href === 'https://www.zeldaxtreme.com/tears-of-the-kingdom/map/'
+      || target.href === 'https://www.zeldaxtreme.com/breath-of-the-wild/map/'
       || controller.isEasterEggSource(target.href)
       || target.href === WALKTHROUGH_SOURCE_URL
     )) void shell.openExternal(target.href);
@@ -257,23 +261,6 @@ async function installedNx2naviIcon(saveDir: string) {
 let lanServer: LanServer | null = null;
 let lanBusy: Promise<void> = Promise.resolve();
 
-/** What a page opened on another device may do: follow and tick progress, never touch this PC's files or windows. */
-function remoteApi() {
-  return {
-    getState: () => controller.state,
-    getPrefs: () => settings.data.ui,
-    pinSlot: (name: unknown) => (name === null || isString(name, 100)) ? controller.pinSlot(name) : undefined,
-    selectProfile: (id: unknown) => (id === null || isString(id, 64)) ? controller.selectProfile(id) : undefined,
-    toggleManual: (id: unknown) => isString(id) ? controller.toggleManual(id) : undefined,
-    setEasterEggFound: (id: unknown, found: unknown) => controller.setEasterEggFound(id, found),
-    answerIdentify: (reqId: unknown, itemIds: unknown) => isString(reqId) && isStringArray(itemIds) ? controller.answerIdentify(reqId, itemIds) : undefined,
-    skipIdentify: (reqId: unknown) => isString(reqId) ? controller.skipIdentify(reqId) : undefined,
-    forgetIdentification: (itemId: unknown) => isString(itemId) ? controller.forgetIdentification(itemId) : undefined,
-    refreshProgress: () => controller.refreshNow(),
-    scanFolders: () => controller.scanFolders(),
-  };
-}
-
 const lanPort = () => {
   const p = settings.data.lan.port;
   return Number.isInteger(p) && p >= 1024 && p <= 65535 ? p : 5184;
@@ -287,7 +274,7 @@ function applyLan(): Promise<AppState['lan']> {
     if (lanServer && (!want || lanServer.port !== port)) { await lanServer.close(); lanServer = null; }
     let error = false;
     if (want && !lanServer) {
-      try { lanServer = await startLanServer({ root: path.join(appDir, 'dist'), port, rpc: remoteApi() }); }
+      try { lanServer = await startLanServer({ root: path.join(appDir, 'dist'), port, rpc: trackerRpc(controller) }); }
       catch (e) { error = true; logError('lan server', e); }
     }
     const publicNetworks = lanServer ? await findPublicNetworks() : [];
@@ -429,6 +416,22 @@ if (primaryInstance) app.whenReady().then(async () => {
   ipcMain.handle('folder:select', (_e, dir: unknown) => isString(dir, 4096) && controller.selectSaveFolder(dir));
   ipcMain.handle('folder:scan', () => controller.scanFolders());
   ipcMain.handle('progress:refresh', () => controller.refreshNow());
+  ipcMain.handle('totk:browse', async () => {
+    const options = { title: 'Tears of the Kingdom', properties: ['openDirectory' as const], defaultPath: settings.data.totk?.folder };
+    const result = main ? await dialog.showOpenDialog(main, options) : await dialog.showOpenDialog(options);
+    return result.canceled || !result.filePaths[0] ? null : controller.totk.attach(result.filePaths[0]);
+  });
+  ipcMain.handle('totk:refresh', () => controller.totk.refresh(true));
+  ipcMain.handle('totk:pin', (_e, name: unknown) => controller.totk.pin(name));
+  ipcMain.handle('totk:mark', (_e, id: unknown, done: unknown) => controller.totk.mark(id, done));
+  ipcMain.handle('botw:browse', async () => {
+    const options = { title: 'Breath of the Wild', properties: ['openDirectory' as const], defaultPath: settings.data.botw?.folder };
+    const result = main ? await dialog.showOpenDialog(main, options) : await dialog.showOpenDialog(options);
+    return result.canceled || !result.filePaths[0] ? null : controller.botw.attach(result.filePaths[0]);
+  });
+  ipcMain.handle('botw:refresh', () => controller.botw.refresh(true));
+  ipcMain.handle('botw:pin', (_e, name: unknown) => controller.botw.pin(name));
+  ipcMain.handle('botw:mark', (_e, id: unknown, done: unknown) => controller.botw.mark(id, done));
 
   createMain();
   startUpdater();
