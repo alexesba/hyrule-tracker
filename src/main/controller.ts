@@ -302,6 +302,8 @@ export class Controller {
       },
     });
     this.live.watchInts = this.watchedInts();
+    // An opened chest never closes again: one the save has but the live tables lack shows they lag behind.
+    this.live.permanentFlags = new Set(this.companionData.chests.map(c => c.hash >>> 0));
     if (this.lastShownSave) this.live.setReference(this.lastShownSave);
     await this.live.start();
   }

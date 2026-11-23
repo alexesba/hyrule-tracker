@@ -76,6 +76,8 @@ export class LiveSource {
   private sweepPausedUntil = 0;
   /** The save's 64-bit keys when the tables were found: a later save's new keys must show up live too. */
   private keysAtFind?: Set<bigint>;
+  /** The permanent flags (opened chests) the save had when the tables were found: same check as keysAtFind. */
+  private flagsAtFind?: Set<number>;
   /** Tables found to lag behind the game this run (by their 64-bit key table), skipped by later searches. */
   private stale = new Set<bigint>();
   private inFlight?: Promise<void>;
@@ -89,6 +91,8 @@ export class LiveSource {
   /** Ticks in a row the API gave no data while live: a few are a save being written or loaded. */
   private apiMisses = 0;
   watchInts = new Set<number>();
+  /** Bool flags the game never clears (opened chests): one in a newer save but unset live means stale tables. */
+  permanentFlags = new Set<number>();
 
   constructor(private opts: LiveOptions) {}
 
@@ -145,6 +149,7 @@ export class LiveSource {
     this.lastPrint = undefined;
     this.sweep = undefined;
     this.keysAtFind = undefined;
+    this.flagsAtFind = undefined;
     this.stale.clear();
     this.sweepPausedUntil = 0;
     this.playerReader = undefined;
@@ -216,7 +221,7 @@ export class LiveSource {
     const print = fingerprint(this.tables!, raw, this.watchInts);
     // Nothing tracked changed: skip rebuilding (most ticks).
     if (print === this.lastPrint && this.info.status === 'live') return;
-    this.publish(print, buildLive(this.tables!, raw, this.ref));
+    this.publish(print, buildLive(this.tables!, raw, this.ref, this.permanentFlags));
   }
 
   /** NX2Saria: Link's place and the game data, from its tracker API. A failed call drops the connection. */
@@ -241,12 +246,13 @@ export class LiveSource {
   }
 
   /** Use a fresh read when it is the same playthrough as the reference save. */
-  private publish(print: string, live: { data: GameDataFile; agreement: Agreement[]; resettable: Set<bigint>; missing?: bigint[] }) {
-    // A save made after the tables were found has Skulltulas or heart pieces these tables never got: they are a
-    // copy the game doesn't keep up to date. Drop them and look for the current one; the save covers the meantime.
+  private publish(print: string, live: { data: GameDataFile; agreement: Agreement[]; resettable: Set<bigint>; missing?: bigint[]; missingFlags?: number[] }) {
+    // A save made after the tables were found has Skulltulas, heart pieces or opened chests these tables never got:
+    // they are a copy the game doesn't keep up to date. Drop them and look for the current one; the save covers the meantime.
     const behind = this.tables && this.keysAtFind ? (live.missing ?? []).filter(k => !this.keysAtFind!.has(k)) : [];
-    if (behind.length && this.tables) {
-      this.opts.onError?.(new Error(`Live tables at 0x${this.tables.b64.start.toString(16)} lag behind the save (${behind.length} new keys missing); searching again.`));
+    const behindFlags = this.tables && this.flagsAtFind ? (live.missingFlags ?? []).filter(h => !this.flagsAtFind!.has(h)) : [];
+    if ((behind.length || behindFlags.length) && this.tables) {
+      this.opts.onError?.(new Error(`Live tables at 0x${this.tables.b64.start.toString(16)} lag behind the save (${behind.length} new keys, ${behindFlags.length} new flags missing); searching again.`));
       this.stale.add(this.tables.b64.start);
       this.tables = undefined;
       this.snapshot = undefined;
@@ -332,6 +338,7 @@ export class LiveSource {
   private found(t: LiveTables): boolean {
     this.tables = t;
     this.keysAtFind = this.ref ? new Set(this.ref.bool64) : undefined;
+    this.flagsAtFind = this.ref ? new Set([...this.permanentFlags].filter(h => this.ref!.entries.get(h)?.value === true)) : undefined;
     this.sweep = undefined;
     // The tables showed guest memory somewhere other than the usual base (e.g. under Wine): read Link there too.
     const base = t.location?.checked ? t.location.base : undefined;

@@ -106,6 +106,20 @@ describe('live memory tables', () => {
     expect(matchesReference(live.agreement)).toBe(true);
   });
 
+  it('reports permanent flags (opened chests) the save has but the read lacks', () => {
+    const { mem, m, tables } = build();
+    const ref = reference();
+    const t = locate(m, ref, BASE + 0x200000n, 2 << 20)!;
+    mem[tables.Bool + 10 * 0x18 + 0x16] = 0; // a chest the save has opened reads closed
+    mem[tables.Bool + 20 * 0x18 + 0x16] = 0; // an ordinary flag the save has reads unset
+    const live = readLive(m, t, ref, new Set([hBool(10), hBool(30)]))!;
+    // Only the permanent one is reported; both stay set from the save.
+    expect(live.missingFlags).toEqual([hBool(10)]);
+    expect(live.data.entries.get(hBool(10))!.value).toBe(true);
+    expect(live.data.entries.get(hBool(20))!.value).toBe(true);
+    expect(readLive(m, t, ref)!.missingFlags).toEqual([]);
+  });
+
   it('ignores unwatched counters when deciding whether anything changed', () => {
     const { mem, m } = build();
     const ref = reference();

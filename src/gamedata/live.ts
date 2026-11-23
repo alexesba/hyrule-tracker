@@ -304,15 +304,17 @@ export interface LiveRead {
    * pieces). They are kept from the save; when a newer save brings some, the live tables are behind the game.
    */
   missing: bigint[];
+  /** Same for Bool flags the game never clears (the `permanent` ones passed in, e.g. opened chests). */
+  missingFlags: number[];
 }
 
 /**
  * Read the tables now and build a GameDataFile: the reference save with every Bool,
  * Int and Enum value and the 64-bit key set replaced by live values.
  */
-export function readLive(mem: Mem, tables: LiveTables, ref: GameDataFile): LiveRead | null {
+export function readLive(mem: Mem, tables: LiveTables, ref: GameDataFile, permanent?: Set<number>): LiveRead | null {
   const raw = readTables(mem, tables);
-  return raw && buildLive(tables, raw, ref);
+  return raw && buildLive(tables, raw, ref, permanent);
 }
 
 /** Raw bytes of every table, in `tables.records` order, then the 64-bit-key table. */
@@ -365,9 +367,10 @@ export function fingerprint(tables: LiveTables, raw: Buffer[], watchInts: Set<nu
   return parts.join('|');
 }
 
-export function buildLive(tables: LiveTables, raw: Buffer[], ref: GameDataFile): LiveRead {
+export function buildLive(tables: LiveTables, raw: Buffer[], ref: GameDataFile, permanent?: Set<number>): LiveRead {
   const entries = new Map(ref.entries);
   const agreement: Agreement[] = [];
+  const missingFlags: number[] = [];
   for (const [n, t] of tables.records.entries()) {
     const L = LAYOUTS.find(l => l.type === t.type)!;
     const buf = raw[n];
@@ -381,7 +384,7 @@ export function buildLive(tables: LiveTables, raw: Buffer[], ref: GameDataFile):
       if (t.type === 'Bool' && prev.value === true) { a.refTrue!++; if (v === true) a.liveTrueOfRefTrue!++; }
       // Progress only grows: a flag the save already has stays set even when this read lacks it
       // (a copy of the tables the game refreshes late, e.g. the Gossip Stones' after an area loads).
-      if (t.type === 'Bool' && prev.value === true && v === false) continue;
+      if (t.type === 'Bool' && prev.value === true && v === false) { if (permanent?.has(h)) missingFlags.push(h); continue; }
       if (!sameValue(v, prev.value)) entries.set(h, { ...prev, value: v });
     }
     agreement.push(a);
@@ -406,7 +409,7 @@ export function buildLive(tables: LiveTables, raw: Buffer[], ref: GameDataFile):
     const prev = ref.entries.get(LOCATION_KEY);
     entries.set(LOCATION_KEY, { hash: LOCATION_KEY, type: 'String64Array', recordOffset: prev?.recordOffset ?? 0, value: locationStrings(loc) } as Entry);
   }
-  return { data: { ...ref, entries, bool64, warnings: [] }, raw, agreement, resettable, missing };
+  return { data: { ...ref, entries, bool64, warnings: [] }, raw, agreement, resettable, missing, missingFlags };
 }
 
 /**
