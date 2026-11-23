@@ -4,6 +4,11 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [2.0.1] - 2026-11-23
+
+### Fixed
+- **Opened chests while reading the game live.** When a save shows chests opened that the game's memory still has closed, the tracker knows it was reading an outdated copy of your progress and looks for the current one, as it already did for Gold Skulltulas and heart pieces. Until it finds it, saving in the game checks them off. Thanks to Supernoodles1990 for reporting it. [#26](https://github.com/jv-prado/hyrule-tracker/issues/26)
+
 ## [2.0.0] - 2026-11-23
 
 ### New
