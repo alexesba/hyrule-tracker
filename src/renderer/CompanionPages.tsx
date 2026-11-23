@@ -640,9 +640,13 @@ function tallyCounters(list: MapRow[]) {
   }, new Map<string, { cat: TrackedCategory; icon: string; done: number; total: number }>()).values()];
 }
 
+type CategoryCounter = ReturnType<typeof tallyCounters>[number];
+
 /** The area panel's category list. A click filters; the next click on the same row clears it. */
-function CategoryCounters({ rows, filter, onFilter }: { rows: MapRow[]; filter: string; onFilter: (id: string) => void }) {
+function CategoryCounters({ rows, filter, chosen, onFilter }: { rows: MapRow[]; filter: string; chosen?: CategoryCounter; onFilter: (id: string) => void }) {
   const counters = tallyCounters(rows);
+  // The filter follows the player between regions. A region without that category still lists it, at 0/0, so it can be cleared here.
+  if (chosen && !counters.some(c => c.cat.id === chosen.cat.id)) counters.push({ ...chosen, done: 0, total: 0 });
   if (!counters.length) return null;
   return <div className="side-counters">{counters.map(c =>
     <button key={c.cat.id} type="button" aria-pressed={filter === c.cat.id} title={t('Filtrar a lista por esta categoria')} onClick={() => onFilter(filter === c.cat.id ? 'all' : c.cat.id)}>
@@ -810,13 +814,16 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
     <label className="map-switch"><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} /><span>{t("Ocultar regiões não vistas")}</span></label>
     <label className="map-switch"><input type="checkbox" checked={follow} onChange={e => { setFollow(e.target.checked); setActive(undefined); }} /><span>{t("Seguir Link")}</span></label>
   </div>;
+  // Looked up over every region, so a category this region lacks still has its name and icon.
   const chosenCat = filter === 'all' ? undefined : tallyCounters(mapRows).find(c => c.cat.id === filter);
-  const catDrawer = !inRegion && <MapCatDrawer open={catsOpen} onOpen={setCatsOpen} icon={chosenCat?.icon} name={chosenCat?.cat.label}>
+  const regionAtlas = inRegion && showLocation && !!place;
+  // RegionAtlas draws its own menu. The world map and a region without its own map use this one.
+  const catDrawer = !regionAtlas && (!inRegion || showLocation) && <MapCatDrawer open={catsOpen} onOpen={setCatsOpen} icon={chosenCat?.icon} name={chosenCat?.cat.label}>
     <div className="era-tabs" role="radiogroup" aria-label={t('Era')}>{eras.map(([id, label]) =>
       <button key={id} type="button" role="radio" aria-checked={era === id} onClick={() => { setEra(id); setActive(undefined); }}>{t(label)}</button>)}</div>
     {statusFilter}
     <hr className="map-cats-rule" />
-    <CategoryCounters rows={mapRows} filter={filter} onFilter={pickFilter} />
+    <CategoryCounters rows={inRegion ? local : mapRows} filter={filter} chosen={chosenCat} onFilter={pickFilter} />
   </MapCatDrawer>;
 
 
@@ -850,9 +857,10 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
           })}
           {player && <PlayerPin at={player.world} yaw={player.yaw} live={player.source === 'live'} />}
         </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} onEra={next => { setEra(next); setActive(undefined); }} filter={filter} onFilter={pickFilter} show={show} onShow={pickShow} hideDone={hideDone} player={player} follow={follow} regionMenu={regionMenu} mapModes={mapModes} overlay={onMap} onBack={back} hudOpen={hudOpen} onHud={() => setHudOpen(!hudOpen)} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
-            categoryRows={local} catsOpen={catsOpen} onCats={setCatsOpen} below={panelBelow} focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
+            categoryRows={local} chosenCat={chosenCat} catsOpen={catsOpen} onCats={setCatsOpen} below={panelBelow} focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
           : <div className="zoom-viewport map-unmapped">
-            <MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<><button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={back}><Icon name="map" size={16} /></button>{regionMenu}</>} how={<>{statusFilter}<span className="map-hud-divider" aria-hidden="true" />{mapModes}</>} />
+            <MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<><button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={back}><Icon name="map" size={16} /></button>{regionMenu}</>} how={mapModes} />
+            {!panelBelow && catDrawer}
             {onMap}
             <p className="map-unmapped-note">{showLocation ? t('Esta região não tem mapa próprio.') : t('Visite a região para ver os itens.')}</p>
           </div>}
@@ -947,9 +955,9 @@ type AtlasPlace = (typeof atlas.places)[number];
 /** One marker on a floor map: an atlas location or a tracked collectible. */
 interface Pin extends MarkerDetailsData { id: string; filter?: string; at?: { map: string; x: number; y: number } }
 
-function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow, hideDone, player, follow, regionMenu, mapModes, overlay, onBack, hudOpen, onHud, controls, tracked, categoryRows, catsOpen, onCats, below, focusItem, onPickItem, onShowInChecklist }: {
+function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow, hideDone, player, follow, regionMenu, mapModes, overlay, onBack, hudOpen, onHud, controls, tracked, categoryRows, chosenCat: chosen, catsOpen, onCats, below, focusItem, onPickItem, onShowInChecklist }: {
   place: AtlasPlace; state: AppState; era: Era; onEra: (era: Era) => void; filter: string; onFilter: (id: string) => void; show: MapBadgeStatus; onShow: (id: MapBadgeStatus) => void; hideDone: boolean; player?: PlayerState; follow: boolean; regionMenu?: ReactNode; mapModes?: ReactNode; overlay?: ReactNode; onBack?: () => void; hudOpen: boolean; onHud: () => void; controls?: ReactNode; tracked: TrackedPin[];
-  categoryRows: MapRow[]; catsOpen: boolean; onCats: (open: boolean) => void; below?: boolean;
+  categoryRows: MapRow[]; chosenCat?: CategoryCounter; catsOpen: boolean; onCats: (open: boolean) => void; below?: boolean;
   /** Checklist row picked outside the map (side list, "View on map"): its marker gets selected. */
   focusItem?: string; onPickItem?: (item: TrackedItem) => void; onShowInChecklist?: (id: string) => void;
 }) {
@@ -1015,13 +1023,12 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
   </div>;
   const markerFilter = !!pool.length && <StatusFilter show={show} onShow={id => { onShow(id); setActive(''); }} total={pool.length} left={pool.length - doneCount} />;
   const floorSelect = place.maps.length > 1 && currentFloor && <label className="map-region map-floor"><span>{t("Andar / era")}</span><select value={currentFloor.id} onChange={e => { setFloor(e.target.value); select(''); }}>{place.maps.map(m => <option key={m.id} value={m.id}>{t(m.label)}</option>)}</select></label>;
-  const chosen = filter === 'all' ? undefined : tallyCounters(categoryRows).find(c => c.cat.id === filter);
   const drawer = <MapCatDrawer open={catsOpen} onOpen={onCats} icon={chosen?.icon} name={chosen?.cat.label}>
     <div className="era-tabs" role="radiogroup" aria-label={t('Era')}>{eras.map(([id, label]) =>
       <button key={id} type="button" role="radio" aria-checked={era === id} onClick={() => { onEra(id); setActive(''); }}>{t(label)}</button>)}</div>
     {markerFilter}
     <hr className="map-cats-rule" />
-    <CategoryCounters rows={categoryRows} filter={filter} onFilter={onFilter} />
+    <CategoryCounters rows={categoryRows} filter={filter} chosen={chosen} onFilter={onFilter} />
   </MapCatDrawer>;
   const mapTools = <MapHud open={hudOpen} onToggle={onHud} where={<>
       {onBack && <button type="button" className="map-back" aria-label={t('Voltar ao mapa de Hyrule')} title={t('Voltar ao mapa de Hyrule')} onClick={onBack}><Icon name="map" size={16} /></button>}
@@ -1051,6 +1058,7 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
       </div>
     </ZoomPan> : <div className="zoom-viewport map-unmapped">
       {mapTools}
+      {!below && drawer}
       {overlay}
       <div className="map-unmapped-pick">
         {markers.length ? <label className="inline-field marker-pick">{t("Mostrar local")}<select value={selected ? active : ''} onChange={e => select(e.target.value)}><option value="">{t("Escolha um marcador")}</option>{markers.map(m => <option key={m.id} value={m.id} className={m.status === 'done' ? 'completed-title' : undefined}>{m.status === 'done' && '✓ '}{m.kind}: {t(m.name)}</option>)}</select></label> : <p className="map-unmapped-note">{t('Esta região não tem mapa próprio.')}</p>}
