@@ -163,8 +163,9 @@ export function locate(mem: Mem, ref: GameDataFile, hint: bigint, window = 64 <<
         const v = readValue(buf, run.offset + i * L.stride + L.valueOffset, L.type);
         if (sameValue(v, refEntries.get(h)!.value)) agree++;
       }
+      const table = { type: L.type, start: run.start, count: run.count, index, vtable: buf.readBigUInt64LE(run.offset) };
       const score = agree / index.size;
-      if (!best || score > best.score) best = { t: { type: L.type, start: run.start, count: run.count, index, vtable: buf.readBigUInt64LE(run.offset) }, score };
+      if (!best || score > best.score) best = { t: table, score };
     }
     if (!best) { if (L.optional) continue; return null; }
     records.push(best.t);
@@ -278,7 +279,9 @@ export function areaFrom(stage: string, list: unknown): string {
 }
 
 function readWindow(mem: Mem, lo: bigint, len: number): Buffer | null {
-  const CH = 4 << 20;
+  // A read that crosses a hole in the heap fails as a whole. Longshot's heap is full of
+  // those holes, so a 4 MB read of the progress tables comes back empty. 64 KB stays inside one block.
+  const CH = 64 << 10;
   const out = Buffer.alloc(len);
   let any = false;
   for (let o = 0; o < len; o += CH) {
