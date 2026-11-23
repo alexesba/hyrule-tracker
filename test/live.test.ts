@@ -90,6 +90,22 @@ describe('live memory tables', () => {
     expect(fingerprint(t, readTables(m, t)!, new Set([hInt(4)]))).not.toBe(before);
   });
 
+  it('keeps progress the save has when a read lacks it, but lets respawning objects clear', () => {
+    const { mem, m, tables } = build();
+    const ref = reference();
+    const t = locate(m, ref, BASE + 0x200000n, 2 << 20)!;
+    mem[tables.Bool + 10 * 0x18 + 0x16] = 0; // a flag the save has (e.g. a Gossip Stone) reads unset
+    mem[tables.b64 + 20 * 16 + 12] = 0; // a Skulltula the save counts reads unset
+    mem[tables.b64 + 1 * 16 + 12] = 0; // a respawning object cleared again by the game
+    const live = readLive(m, t, ref)!;
+    expect(live.data.entries.get(hBool(10))!.value).toBe(true);
+    expect(live.data.bool64.has(key64(20))).toBe(true);
+    expect(live.data.bool64.has(key64(1))).toBe(false);
+    // The kept Skulltula is reported, so a newer save's missing keys can show the tables lag behind.
+    expect(live.missing).toEqual([key64(20)]);
+    expect(matchesReference(live.agreement)).toBe(true);
+  });
+
   it('ignores unwatched counters when deciding whether anything changed', () => {
     const { mem, m } = build();
     const ref = reference();

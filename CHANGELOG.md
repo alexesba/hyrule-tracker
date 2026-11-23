@@ -22,6 +22,7 @@ Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 - **Hand ticks.** In Tears of the Kingdom and Breath of the Wild any objective can be ticked by hand until the save confirms it, from the checklist (double-click), the map card and What to do.
 
 ### Fixed
+- **Live tracking no longer undoes saved progress.** While reading the game live, Gold Skulltulas, heart pieces and flags such as the Gossip Stones that your save already has stay checked even when the game's memory hasn't caught up. When a newer save shows the tracker was reading a copy of the progress the game no longer updates, it looks for the current one again and notes it in the error log. Thanks to Supernoodles1990 and vffanletter-oss for reporting it. [#25](https://github.com/jv-prado/hyrule-tracker/issues/25) · [#24](https://github.com/jv-prado/hyrule-tracker/issues/24)
 - **Map filters in regions without their own map.** The category and era filters stay reachable there, so a category picked on the world map can always be cleared.
 - **Map detail buttons.** The buttons in a selected item's details are compact again instead of filling the whole row.
 

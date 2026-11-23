@@ -299,6 +299,11 @@ export interface LiveRead {
   agreement: Agreement[];
   /** 64-bit keys the game clears again later (respawning objects). */
   resettable: Set<bigint>;
+  /**
+   * Keys set in the reference save that the live table lacks and that the game never clears (Skulltulas, heart
+   * pieces). They are kept from the save; when a newer save brings some, the live tables are behind the game.
+   */
+  missing: bigint[];
 }
 
 /**
@@ -374,6 +379,9 @@ export function buildLive(tables: LiveTables, raw: Buffer[], ref: GameDataFile):
       a.checked++;
       if (sameValue(v, prev.value)) a.agree++;
       if (t.type === 'Bool' && prev.value === true) { a.refTrue!++; if (v === true) a.liveTrueOfRefTrue!++; }
+      // Progress only grows: a flag the save already has stays set even when this read lacks it
+      // (a copy of the tables the game refreshes late, e.g. the Gossip Stones' after an area loads).
+      if (t.type === 'Bool' && prev.value === true && v === false) continue;
       if (!sameValue(v, prev.value)) entries.set(h, { ...prev, value: v });
     }
     agreement.push(a);
@@ -389,14 +397,16 @@ export function buildLive(tables: LiveTables, raw: Buffer[], ref: GameDataFile):
     // (respawning objects). Skulltulas and heart pieces are 0x18 (permanent).
     if (b[o + 8] & 0x40) resettable.add(k);
   }
-  const lost = [...ref.bool64].filter(k => !bool64.has(k) && !resettable.has(k)).length;
-  agreement.push({ type: 'Bool64bitKey', checked: ref.bool64.size, agree: ref.bool64.size - lost });
+  const missing = [...ref.bool64].filter(k => !bool64.has(k) && !resettable.has(k));
+  agreement.push({ type: 'Bool64bitKey', checked: ref.bool64.size, agree: ref.bool64.size - missing.length });
+  // Same rule for Skulltulas and heart pieces: what the save counts is never taken away by a live read.
+  for (const k of missing) bool64.add(k);
   const loc = raw[tables.records.length + 1];
   if (loc?.length) {
     const prev = ref.entries.get(LOCATION_KEY);
     entries.set(LOCATION_KEY, { hash: LOCATION_KEY, type: 'String64Array', recordOffset: prev?.recordOffset ?? 0, value: locationStrings(loc) } as Entry);
   }
-  return { data: { ...ref, entries, bool64, warnings: [] }, raw, agreement, resettable };
+  return { data: { ...ref, entries, bool64, warnings: [] }, raw, agreement, resettable, missing };
 }
 
 /**

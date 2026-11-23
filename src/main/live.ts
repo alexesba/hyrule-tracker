@@ -74,6 +74,10 @@ export class LiveSource {
   /** Where the sweep is: ranges to search (host [lo, hi)), the current one and the next window's centre. */
   private sweep?: { ranges: [bigint, bigint][]; i: number; at: bigint };
   private sweepPausedUntil = 0;
+  /** The save's 64-bit keys when the tables were found: a later save's new keys must show up live too. */
+  private keysAtFind?: Set<bigint>;
+  /** Tables found to lag behind the game this run (by their 64-bit key table), skipped by later searches. */
+  private stale = new Set<bigint>();
   private inFlight?: Promise<void>;
   private playerReader?: PlayerReader;
   private playerNow?: LivePlayer & { atMs: number };
@@ -140,6 +144,8 @@ export class LiveSource {
     this.snapshot = undefined;
     this.lastPrint = undefined;
     this.sweep = undefined;
+    this.keysAtFind = undefined;
+    this.stale.clear();
     this.sweepPausedUntil = 0;
     this.playerReader = undefined;
     this.playerStage = undefined;
@@ -235,7 +241,18 @@ export class LiveSource {
   }
 
   /** Use a fresh read when it is the same playthrough as the reference save. */
-  private publish(print: string, live: { data: GameDataFile; agreement: Agreement[]; resettable: Set<bigint> }) {
+  private publish(print: string, live: { data: GameDataFile; agreement: Agreement[]; resettable: Set<bigint>; missing?: bigint[] }) {
+    // A save made after the tables were found has Skulltulas or heart pieces these tables never got: they are a
+    // copy the game doesn't keep up to date. Drop them and look for the current one; the save covers the meantime.
+    const behind = this.tables && this.keysAtFind ? (live.missing ?? []).filter(k => !this.keysAtFind!.has(k)) : [];
+    if (behind.length && this.tables) {
+      this.opts.onError?.(new Error(`Live tables at 0x${this.tables.b64.start.toString(16)} lag behind the save (${behind.length} new keys missing); searching again.`));
+      this.stale.add(this.tables.b64.start);
+      this.tables = undefined;
+      this.snapshot = undefined;
+      this.lastPrint = undefined;
+      return this.set({ status: 'searching' });
+    }
     if (!matchesReference(live.agreement)) {
       this.snapshot = undefined;
       this.lastPrint = undefined;
@@ -283,10 +300,10 @@ export class LiveSource {
       const hints = [...new Set([...this.opts.hints.map(h => BigInt('0x' + h)), ...DEFAULT_HINTS])];
       // Exact spots first (cheap), then a wider window around each. An emulator's memory
       // moves every run, so only a tracker restart during the same run hits a hint there.
-      for (const h of hints) { const t = locate(mem, ref, h, 4 << 20, this.hostPointers); if (t) return this.found(t); }
+      for (const h of hints) { const t = locate(mem, ref, h, 4 << 20, this.hostPointers); if (t && !this.stale.has(t.b64.start)) return this.found(t); }
       if (!this.emulator) for (const h of hints.slice(0, 2)) {
         const t = locate(mem, ref, h, SWEEP_WINDOW, this.hostPointers);
-        if (t) return this.found(t);
+        if (t && !this.stale.has(t.b64.start)) return this.found(t);
       }
       const ranges: [bigint, bigint][] = this.hostPointers
         ? readableRanges(mem.regions())
@@ -299,7 +316,7 @@ export class LiveSource {
     const range = s.ranges[s.i];
     if (range) {
       const t = locate(mem, ref, s.at, SWEEP_WINDOW, this.hostPointers);
-      if (t) return this.found(t);
+      if (t && !this.stale.has(t.b64.start)) return this.found(t);
       s.at += SWEEP_STEP;
       if (s.at - BigInt(SWEEP_WINDOW) >= range[1] && s.ranges[++s.i]) s.at = s.ranges[s.i][0] + BigInt(SWEEP_WINDOW);
     }
@@ -314,6 +331,7 @@ export class LiveSource {
 
   private found(t: LiveTables): boolean {
     this.tables = t;
+    this.keysAtFind = this.ref ? new Set(this.ref.bool64) : undefined;
     this.sweep = undefined;
     // The tables showed guest memory somewhere other than the usual base (e.g. under Wine): read Link there too.
     const base = t.location?.checked ? t.location.base : undefined;
