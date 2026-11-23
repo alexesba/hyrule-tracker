@@ -7,6 +7,9 @@ Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 ## [2.0.1] - 2026-11-23
 
 ### Fixed
+- **Live tracking in Longshot.** The tracker reads the game's memory in smaller pieces, so it finds the current progress even where Longshot's memory has gaps, instead of an older copy that stops updating. Thanks to alexesba. [#27](https://github.com/jv-prado/hyrule-tracker/pull/27)
+- **Gossip Stones stay checked.** The game clears a Gossip Stone's flag on a later save. The tracker now remembers each stone you played the ocarina for, including ones an earlier save or the change log already reported. Unchecking one by hand sticks. Thanks to alexesba. [#27](https://github.com/jv-prado/hyrule-tracker/pull/27) · [#24](https://github.com/jv-prado/hyrule-tracker/issues/24)
+- **Pins on the parchment.** Collectibles whose position falls in the blank margin around a floor map's drawing are no longer drawn there (a purple rupee and a Lost Woods Gossip Stone west of Kokiri Forest). They stay in the checklist. Thanks to alexesba. [#28](https://github.com/jv-prado/hyrule-tracker/pull/28)
 - **Opened chests while reading the game live.** When a save shows chests opened that the game's memory still has closed, the tracker knows it was reading an outdated copy of your progress and looks for the current one, as it already did for Gold Skulltulas and heart pieces. Until it finds it, saving in the game checks them off. Thanks to Supernoodles1990 for reporting it. [#26](https://github.com/jv-prado/hyrule-tracker/issues/26)
 
 ## [2.0.0] - 2026-11-23
