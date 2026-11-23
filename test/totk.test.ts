@@ -6,7 +6,7 @@ import { murmur3 } from '../src/gamedata/murmur3';
 import { parseGameData } from '../src/gamedata/parser';
 import { readTotkIsland } from '../src/gamedata/totk';
 import { SettingsStore } from '../src/main/settings';
-import { TotkTracker } from '../src/main/totk-tracker';
+import { TotkTracker, emulatorSaveFolders } from '../src/main/totk-tracker';
 import type { TotkIslandState } from '../src/shared/types';
 
 function save(states: string[]) {
@@ -84,5 +84,21 @@ describe('Great Sky Island save progress', () => {
       vi.useRealTimers();
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+});
+
+describe('Switch emulator saves', () => {
+  it('finds the newest save of the game in the emulator folders, by title id', () => {
+    const root = mkdtempSync(join(tmpdir(), 'hyrule-emu-'));
+    try {
+      const saves = (emulator: string, user: string) => join(root, emulator, 'nand', 'user', 'save', '0000000000000000', user);
+      const put = (dir: string, time: number) => { mkdirSync(join(dir, 'slot_00'), { recursive: true }); const file = join(dir, 'slot_00', 'progress.sav'); writeFileSync(file, 'x'); utimesSync(file, time, time); };
+      put(join(saves('yuzu', 'AAAA'), '0100F2C0115B6000'), 100);
+      put(join(saves('eden', 'BBBB'), '0100f2c0115b6000'), 200); // lowercase title id, newer save
+      put(join(saves('eden', 'BBBB'), '01007EF00011E000'), 300); // another game (Breath of the Wild)
+      mkdirSync(join(saves('suyu', 'CCCC'), '0100F2C0115B6000'), { recursive: true }); // no save in it
+      expect(emulatorSaveFolders('totk', [root])).toEqual([join(saves('eden', 'BBBB'), '0100f2c0115b6000'), join(saves('yuzu', 'AAAA'), '0100F2C0115B6000')]);
+      expect(emulatorSaveFolders('totk', [join(root, 'missing')])).toEqual([]);
+    } finally { rmSync(root, { recursive: true, force: true }); }
   });
 });

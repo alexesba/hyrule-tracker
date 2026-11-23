@@ -104,7 +104,7 @@ Turn on **Show in-game overlay** in Settings. It can show counters, remaining ob
 
 Choose **Tears of the Kingdom** when Hyrule Tracker opens. The tracker remembers the last game on this device and preselects it the next time you open the app. Use **Switch game** to return to the picker. Each game has its own menu.
 
-In the desktop app, choose the save folder that contains the slots or an exported **progress.sav**. The tracker follows the most recently saved slot by default and refreshes the map, shrine checklist and walkthrough when the game saves. A connected Second Screen shows the same progress.
+In the desktop app, choose the save folder that contains the slots or an exported **progress.sav**. A save in Eden, yuzu, suyu, Sudachi or Citron is found on its own, in `nand\user\save\0000000000000000\<user>\0100F2C0115B6000`. The tracker follows the most recently saved slot by default and refreshes the map, shrine checklist and walkthrough when the game saves. A connected Second Screen shows the same progress.
 
 The world journal covers the Sky, Surface and Depths. Its schematic maps use in-game coordinates and show Link's last saved position. The catalog includes the 152 shrines, 120 Lightroots, 15 Skyview Towers, 900 Korok locations (1,000 seeds), 197 cave entrances, 58 wells, 36 chasms, 509 Compendium entries and more than 1,500 treasure chest records. You can filter and search the catalog by layer and category.
 
@@ -114,7 +114,7 @@ The journal and map-discovery counters cover the tracker's catalog. The official
 
 ## Breath of the Wild
 
-Select **Breath of the Wild** from **Switch game**. In the desktop app, connect the folder containing `game_data.sav` or the numbered save folders. The journal reads Nintendo Switch and Wii U/Cemu saves. Its progress, selected slot, manual checks and daily log are stored separately from the other games.
+Select **Breath of the Wild** from **Switch game**. In the desktop app, connect the folder containing `game_data.sav` or the numbered save folders. A save in Eden, yuzu, suyu, Sudachi or Citron is found on its own (title folder `01007EF00011E000`). The journal reads Nintendo Switch and Wii U/Cemu saves. Its progress, selected slot, manual checks and daily log are stored separately from the other games.
 
 The journal includes the in-game map of Hyrule, 120 base-game shrines, 16 DLC shrines, 900 Koroks, 15 Sheikah Towers and 18 memories. The walkthrough covers the Great Plateau, the four Divine Beasts, Hyrule Castle and the DLC routes. The checklist has filters for base-game, DLC and Zelda Notes content. The tracker updates objectives with known save flags automatically. Other activities can be checked by hand.
 

@@ -49,6 +49,38 @@ function readSlots(folder: string, game: 'totk' | 'botw'): Slot[] {
 const recentSlot = (slots: Slot[]) => slots.reduce<Slot | undefined>((latest, slot) =>
   !latest || slot.mtimeMs > latest.mtimeMs ? slot : latest, undefined);
 
+/** The games' title ids, the folder name the Switch emulators keep each save under. */
+const TITLE_IDS = { totk: '0100F2C0115B6000', botw: '01007EF00011E000' } as const;
+/** Switch emulators that keep yuzu's folder layout (nand\user\save\<zeros>\<user>\<title id>). */
+const EMULATORS = ['eden', 'yuzu', 'suyu', 'sudachi', 'citron'];
+
+/** Where the emulators keep their data: %APPDATA% on Windows, the XDG data folder on Linux. */
+function emulatorDataRoots(): string[] {
+  if (process.platform === 'win32') return process.env.APPDATA ? [process.env.APPDATA] : [];
+  const home = process.env.HOME;
+  return [process.env.XDG_DATA_HOME, home && path.join(home, '.local', 'share')].filter((dir): dir is string => !!dir);
+}
+
+/**
+ * The game's save folders in the Switch emulators' data, newest save first. The folder name is the title id
+ * (compared without case, as emulators differ). `roots` is for tests.
+ */
+export function emulatorSaveFolders(game: 'totk' | 'botw', roots = emulatorDataRoots()): string[] {
+  const title = TITLE_IDS[game].toLowerCase();
+  const found: { folder: string; mtimeMs: number }[] = [];
+  const dirs = (dir: string) => { try { return fs.readdirSync(dir, { withFileTypes: true }).filter(e => e.isDirectory()).map(e => e.name); } catch { return []; } };
+  for (const root of roots) for (const emulator of EMULATORS) {
+    const saves = path.join(root, emulator, 'nand', 'user', 'save', '0000000000000000');
+    for (const user of dirs(saves)) for (const name of dirs(path.join(saves, user))) {
+      if (name.toLowerCase() !== title) continue;
+      const folder = path.join(saves, user, name);
+      const slot = recentSlot(readSlots(folder, game));
+      if (slot) found.push({ folder, mtimeMs: slot.mtimeMs });
+    }
+  }
+  return found.sort((a, b) => b.mtimeMs - a.mtimeMs).map(f => f.folder);
+}
+
 async function loadSlot(slot: Slot, game: 'totk' | 'botw') {
   if (slot.size > 16 * 1024 * 1024) throw new Error('Save is too large');
   if (game === 'botw') {
@@ -68,6 +100,8 @@ export class TotkTracker {
   private timer?: ReturnType<typeof setInterval>;
   private revision = 0;
   private busy = 0;
+  /** The Switch emulators' folders were searched for a save already (done once, when no folder is chosen). */
+  private lookedForEmulators = false;
   private signature?: string;
   private state: TotkIslandState = { status: 'unlinked', slots: [], marks: {}, manual: [] };
 
@@ -162,6 +196,12 @@ export class TotkTracker {
   async refresh(force = false) {
     const folder = this.preferences?.folder;
     if (typeof folder !== 'string' || !folder) {
+      // No folder chosen yet: use the save of a Switch emulator (Eden, yuzu…) if there is one. Once per run.
+      if (!this.lookedForEmulators) {
+        this.lookedForEmulators = true;
+        const [found] = emulatorSaveFolders(this.game);
+        if (found && await this.attach(found)) return;
+      }
       this.update({ ...this.state, manual: this.manual(undefined) });
       return;
     }
