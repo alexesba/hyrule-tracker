@@ -1,4 +1,5 @@
 ﻿import { describe, it, expect } from 'vitest';
+import { murmur3 } from '../src/gamedata/murmur3';
 import { locate, readLive, matchesReference, fingerprint, readTables, areaFrom, sweepRanges, findRecordRuns, readableRanges, LAYOUTS, STAGE_KEY, LOCATION_KEY, DAY_NIGHT_KEY, GUEST_BASE, Mem } from '../src/gamedata/live';
 import type { GameDataFile, Entry } from '../src/gamedata/parser';
 
@@ -17,6 +18,7 @@ function build(start = 0x1000) {
   const tables: Record<string, number> = {};
   const put = (type: 'Bool' | 'Int' | 'Enum', n: number, h: (i: number) => number, vt: bigint, val: (i: number) => number) => {
     const L = LAYOUTS.find(l => l.type === type)!;
+    tables[type + 'Map'] = o;
     for (let i = 0; i < n; i++) { mem.writeUInt32LE(h(i), o); mem.writeUInt32LE(i, o + 4); o += 8; o += 8 * (i % 3); } // map with gaps
     o = (o + 0x40) & ~7;
     tables[type] = o;
@@ -88,6 +90,26 @@ describe('live memory tables', () => {
     expect(live.data.bool64.has(key64(3))).toBe(true);
     expect(matchesReference(live.agreement)).toBe(true);
     expect(fingerprint(t, readTables(m, t)!, new Set([hInt(4)]))).not.toBe(before);
+  });
+
+  it('keeps the bool table that matches the save when another copy already has a Gossip Stone on', () => {
+    const { mem, m, tables } = build();
+    const ref = reference();
+    const gossip = murmur3('BlewOcarinaByGossipStone.GOSSIP_KOKIRI_FOREST_01') >>> 0;
+    const hash = hBool(7);
+    for (let o = tables.BoolMap; o + 8 <= tables.Bool; o += 4) {
+      if (mem.readUInt32LE(o) === hash && mem.readUInt32LE(o + 4) === 7) { mem.writeUInt32LE(gossip, o); break; }
+    }
+    ref.entries.delete(hash);
+    ref.entries.set(gossip, { hash: gossip, type: 'Bool', value: false, recordOffset: 0 });
+    const end = tables.Bool + nBool * 0x18;
+    const dest = 0x180000;
+    mem.copy(mem, dest, tables.BoolMap, end);
+    const copied = dest + (tables.Bool - tables.BoolMap);
+    mem[copied + 7 * 0x18 + 0x16] = 1;
+    const t = locate(m, ref, BASE + 0x200000n, 2 << 20)!;
+    expect(Number(t.records[0].start - BASE)).toBe(tables.Bool);
+    expect(readLive(m, t, ref)!.data.entries.get(gossip)!.value).toBe(false);
   });
 
   it('keeps progress the save has when a read lacks it, but lets respawning objects clear', () => {

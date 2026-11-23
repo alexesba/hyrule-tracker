@@ -19,6 +19,7 @@ import { keyOf } from '../gamedata/detect.js';
 import { SettingsStore } from './settings.js';
 import type { Activity, AppState, ChangeRow, Summary, Toast, SlotSummary } from '../shared/types.js';
 import { canonicalStage, companionProgress, extendChecklist, RUPEES, type CompanionData, type WorldMarker } from '../core/companion.js';
+import { continuesPlaythrough, gossipItemIdsFromChangeLog, gossipItemIdsRising, gossipItemIdsTrue } from '../gamedata/latch.js';
 import { evaluateAtlasWithManual, joinMarkerFlags, linkAtlas, type AtlasRule } from '../core/atlas.js';
 import { locatePlayer, type AtlasPlace, type PlayerPosition } from '../core/position.js';
 import { readPlayLog } from '../gamedata/playlog.js';
@@ -423,11 +424,17 @@ export class Controller {
     // current state, which a pinned older slot isn't), and only while it matches it.
     if (!pinned) { this.lastShownSave = read.data; this.live?.setReference(read.data); }
     const liveSnap = pinned ? undefined : this.live?.current();
-    const cur = liveSnap ? { mtimeMs: liveSnap.atMs, data: liveSnap.data, buf: read.buf } : saved;
+    const raw = liveSnap ? { mtimeMs: liveSnap.atMs, data: liveSnap.data, buf: read.buf } : saved;
+    const noted = !!this.settings.data.gossipNoted?.[this.userDir];
+    const earlier = noted ? [] : await this.earlierPlaythrough(slots, slot, saved.data);
+    if (refreshId !== this.refreshId) return;
+    const cur = raw;
 
     // Compare with the previous state we showed. Autosaves rotate across slots, so when
     // following "most recent" the previous save is usually in a different slot.
     const prev = pinned ? this.lastShownBySlot.get(slot.name) : this.lastShown;
+    // The game clears a Gossip Stone after reporting it. Keep that report as a hand tick.
+    this.rememberGossipStones(slot.name, !!pinned, cur.data, earlier, prev?.data);
     const isNewSave = !!prev && cur.mtimeMs > prev.mtimeMs;
     // A save from another playthrough loses flags; don't toast, glow or ask about it.
     // (Respawning objects clear their flags again by design; they don't count.)
@@ -520,6 +527,74 @@ export class Controller {
     this.emit();
     for (const fn of this.playerListeners) fn(this.state.player);
   }
+  /** Copy a Gossip Stone report into the hand tick for this view. A later save can clear the flag; the tick stays. */
+  private rememberGossipStones(slotName: string, pinned: boolean, current: GameDataFile, earlier: readonly GameDataFile[], previous?: GameDataFile) {
+    if (!this.userDir) return;
+    const manualKey = this.manualKey(slotName, pinned);
+    const noted = !!this.settings.data.gossipNoted?.[this.userDir];
+    const had = this.settings.data.manual[manualKey] ?? {};
+    const dismissed = this.settings.data.gossipDismissed?.[manualKey] ?? [];
+    const blocked = new Set(dismissed);
+    const reportedNow = new Set(gossipItemIdsTrue([current]));
+    const dismissNext = dismissed.filter(id => reportedNow.has(id));
+    const add: string[] = [];
+    const consider = (ids: readonly string[]) => {
+      for (const id of ids) if (!had[id] && !blocked.has(id) && !add.includes(id)) add.push(id);
+    };
+    if (!noted) {
+      consider(gossipItemIdsTrue([current, ...earlier]));
+      consider(this.gossipIdsFromLogs());
+    }
+    consider(gossipItemIdsRising(current, previous));
+    if (!previous) consider([...reportedNow]);
+    const dismissChanged = dismissNext.length !== dismissed.length || dismissNext.some((id, i) => id !== dismissed[i]);
+    if (!add.length && noted && !dismissChanged) return;
+    this.settings.update(s => {
+      if (add.length) {
+        const ticks = (s.manual[manualKey] ??= {});
+        for (const id of add) ticks[id] = true;
+      }
+      (s.gossipNoted ??= {})[this.userDir!] = true;
+      const lists = (s.gossipDismissed ??= {});
+      if (dismissNext.length) lists[manualKey] = dismissNext;
+      else delete lists[manualKey];
+    });
+  }
+
+  private gossipIdsFromLogs(): string[] {
+    let names: string[];
+    try { names = fs.readdirSync(this.log.dir); } catch { return []; }
+    const ids: string[] = [];
+    const seen = new Set<string>();
+    for (const name of names) {
+      if (!name.startsWith('changes-') || !name.endsWith('.jsonl')) continue;
+      let text: string;
+      try { text = fs.readFileSync(path.join(this.log.dir, name), 'utf8'); } catch { continue; }
+      for (const id of gossipItemIdsFromChangeLog(text)) {
+        if (seen.has(id)) continue;
+        seen.add(id);
+        ids.push(id);
+      }
+    }
+    return ids;
+  }
+
+  /** Earlier slots of the save on screen. A slot from another playthrough is left out. */
+  private async earlierPlaythrough(slots: SlotInfo[], active: SlotInfo, current: GameDataFile): Promise<GameDataFile[]> {
+    const when = active.savedAtMs ?? active.mtimeMs;
+    const out: GameDataFile[] = [];
+    for (const slot of slots) {
+      if (slot.name === active.name || (slot.savedAtMs ?? slot.mtimeMs) > when) continue;
+      let read = this.lastParsed.get(slot.name);
+      if (!read || read.mtimeMs !== slot.mtimeMs) {
+        try { read = await readSaveStable(slot.progress); } catch { continue; }
+        this.lastParsed.set(slot.name, { mtimeMs: read.mtimeMs, data: read.data, buf: read.buf });
+      }
+      if (continuesPlaythrough(current, read.data)) out.push(read.data);
+    }
+    return out;
+  }
+
   private lastShownBySlot = new Map<string, { mtimeMs: number; data: GameDataFile; buf: Buffer }>();
   /** Profiles next to the current save folder (listProfiles), read again on most refreshes. */
   private profiles: ProfileInfo[] = [];
@@ -755,7 +830,19 @@ export class Controller {
     this.settings.update(s => {
       const k = this.manualKey(slot);
       const m = (s.manual[k] ??= {});
-      if (m[itemId]) delete m[itemId]; else m[itemId] = true;
+      if (m[itemId]) {
+        delete m[itemId];
+        if (!itemId.startsWith('gossip_stones.')) return;
+        const lists = (s.gossipDismissed ??= {});
+        if (!lists[k]?.includes(itemId)) lists[k] = [...(lists[k] ?? []), itemId];
+      } else {
+        m[itemId] = true;
+        const list = s.gossipDismissed?.[k];
+        if (!list) return;
+        const next = list.filter(id => id !== itemId);
+        if (next.length) s.gossipDismissed![k] = next;
+        else delete s.gossipDismissed![k];
+      }
     });
     this.log.write({ kind: 'manual', item: itemId, ticked: !!this.manualFor(slot)[itemId], slot });
     await this.refresh(false);

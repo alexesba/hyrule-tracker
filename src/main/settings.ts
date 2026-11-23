@@ -24,6 +24,10 @@ export interface Settings {
   pinnedSlot: string | null;
   /** manual ticks: "<userDir>|<slot>" -> item id -> true */
   manual: Record<string, Record<string, boolean>>;
+  /** Save folders whose older Gossip Stone reports were already copied into hand ticks. */
+  gossipNoted?: Record<string, true>;
+  /** Gossip stones unmarked while the save still reported them. Dropped once that report is gone. */
+  gossipDismissed?: Record<string, string[]>;
   easterEggs: string[];
   totk?: {
     folder?: string;
