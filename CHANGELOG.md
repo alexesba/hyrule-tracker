@@ -4,6 +4,33 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [2.0.0] - 2026-11-23
+
+### New
+- **Tears of the Kingdom.** A full journal for the Sky, Surface and Depths: overview, what to do next, walkthrough of the 23 main quests, world map, 100% checklist, quests and memories, minigames, bosses and rematches, secrets, daily log, medals and quiz. It reads your save folder (slots or an exported progress.sav) and follows the most recently saved slot. The Great Sky Island keeps its own detailed route.
+- **Breath of the Wild.** The same journal for Breath of the Wild, reading Nintendo Switch and Wii U/Cemu saves: the in-game map of Hyrule, 120 base-game and 16 DLC shrines, 900 Koroks, 15 Sheikah Towers and the 18 memories, with a walkthrough from the Great Plateau to Hyrule Castle.
+- **Game picker.** Choose Ocarina of Time, Breath of the Wild or Tears of the Kingdom. The tracker opens straight into the last game you played; use **Switch game** to change.
+- **Region counts on the world map.** Each region's name shows how many items of the chosen category it has, what is left or what you collected, following the map's filters. Thanks to alexesba for building it. [#22](https://github.com/jv-prado/hyrule-tracker/pull/22)
+- **In-game overlay for every game.** The floating window shows Tears of the Kingdom and Breath of the Wild progress too: counters, what is left in Link's region and what is nearby.
+- **Steam Deck (experimental).** A Decky Loader plugin opens the second-screen journal from the Deck's quick access menu, with controller navigation. [#21](https://github.com/jv-prado/hyrule-tracker/issues/21)
+
+### Improved
+- **Map filters on the left.** Era, status (all, remaining, collected) and categories sit in a menu on the left of every map, open by default. A click filters by a category and **All items** shows everything again. Thanks to alexesba. [#22](https://github.com/jv-prado/hyrule-tracker/pull/22)
+- **Same layout in every game.** Tears of the Kingdom and Breath of the Wild use the Ocarina of Time screens: the region list with completion on the right of the map, a card beside each pin, the details of a list item right under it, and progress shown from zero even before a save is connected.
+- **Picking an item in the map panel.** The map centers on its marker and opens its card, in every game, even when the status filter would hide it.
+- **Back to the world map.** A labelled **Hyrule** button leaves a region map.
+- **Hand ticks.** In Tears of the Kingdom and Breath of the Wild any objective can be ticked by hand until the save confirms it, from the checklist (double-click), the map card and What to do.
+
+### Fixed
+- **Map filters in regions without their own map.** The category and era filters stay reachable there, so a category picked on the world map can always be cleared.
+- **Map detail buttons.** The buttons in a selected item's details are compact again instead of filling the whole row.
+
+### Known
+- **Game names in quiz answers.** A few ability names in the Tears of the Kingdom and Breath of the Wild quizzes (Fuse, Recall, Ascend, Magnesis, Cryonis, Stasis) appear in English in some languages.
+- **Switch 2 editions.** Saves from the Nintendo Switch 2 editions of Breath of the Wild and Tears of the Kingdom still need checking with a sample save.
+- **Steam Deck.** The Decky plugin hasn't been confirmed on a Steam Deck in Game Mode yet.
+- **Rekarina.** Live tracking still doesn't work with Rekarina; it follows the saves.
+
 ## [1.5.0] - 2026-11-21
 
 ### New
