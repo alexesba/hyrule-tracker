@@ -468,6 +468,8 @@ function Settings({ state, onLanguage }: { state: AppState; onLanguage: (locale:
         <a href="https://www.nintenduo.com/" target="_blank" rel="noreferrer">Nintendúo</a></p>
       <p>{t("Imagens de itens, colecionáveis e HUD: Zelda Wiki e Mt. Wildwood Zelda Wiki. Imagens de inimigos e regiões: Mt. Wildwood Zelda Wiki.")}</p>
       <p>{t("Mapeamento do save e lógica do jogo: Clawshot, OOT-SW2SE, editor de save de dlr-developer e OoT Randomizer.")}</p>
+      <p>{t("O Hyrule Tracker começou a partir do Boomerang Tracker, de LucieTheFool (licença MIT). O leitor de save e as ferramentas de dados do jogo vêm dele.")}{' '}
+        <a href="https://github.com/LucieTheFool/boomerang-tracker" target="_blank" rel="noreferrer">Boomerang Tracker</a></p>
       <p>{t('O passo a passo do Hyrule Tracker foi escrito com base no guia da IGN para Ocarina of Time Remake.')}{' '}
         <a href={WALKTHROUGH_SOURCE_URL} target="_blank" rel="noreferrer">{t('Consultar o guia da IGN')}</a></p>
       <p>{t("As imagens do jogo pertencem aos seus respectivos detentores de direitos.")}{' '}

@@ -1,5 +1,16 @@
 # Third-party notices
 
+## Boomerang Tracker
+
+Hyrule Tracker is derived from [Boomerang Tracker](https://github.com/LucieTheFool/boomerang-tracker)
+by LucieTheFool, MIT License, Copyright (c) 2026 Boomerang Tracker contributors. The save parser and
+game-data tools (`src/gamedata/byml.ts`, `diff.ts`, `gamedatalist.ts`, `harvest.ts`, `murmur3.ts`,
+`names.ts`, `parser.ts`, `romfs.ts`), `src/core/pools.ts`, `src/cli/sav.ts`, `src/main/changelog.ts`,
+`src/renderer/icons.ts`, the scripts in `scripts/` (`dev.mjs`, `start.mjs`, `extract-placements.ts`,
+`map-placements.ts`, `mapping-report.ts`), the tests `changelog`, `parser`, `pools` and `tracker`, and the
+TypeScript and Vitest configuration come from it. Other parts of the tracker grew from its code. Its license
+notice is reproduced in [LICENSE](LICENSE).
+
 ## Bundled libraries
 
 - **koffi** by Niels Martignène, MIT License (https://github.com/Koromix/koffi). Used to

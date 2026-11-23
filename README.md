@@ -194,6 +194,7 @@ Not a coder? Open an [issue](https://github.com/jv-prado/hyrule-tracker/issues) 
 ## 🙏 Credits and license
 
 - 👤 **João Victor Prado** created Hyrule Tracker.
+- 🪃 Hyrule Tracker started from [Boomerang Tracker](https://github.com/LucieTheFool/boomerang-tracker) by LucieTheFool (MIT license). The save parser, game-data tools, scripts and several tests come from it, and some files are still unchanged. Its [reference folder](https://github.com/LucieTheFool/boomerang-tracker/tree/main/reference) has more validated game data and cross-references.
 - 🗺️ Maps, location photos and the live Link position come from [Ocarina Atlas](https://github.com/antonioalvromero/Ocarina-Atlas) by antonioalvromero, which credits its imagery to [Nintendúo](https://www.nintenduo.com/). Enemy, region and item images are credited in the docs.
 - 🧩 Save mapping and game logic build on [Clawshot](https://github.com/hiKareeem/Clawshot), [OOT-SW2SE](https://github.com/Traiver/OOT-SW2SE), [dlr-developer's save editor](https://github.com/dlr-developer/the-legend-of-zelda-ocarina-of-time-switch-2-save-editor) and [OoT Randomizer](https://github.com/OoTRandomizer/OoT-Randomizer). See [third-party credits](THIRD_PARTY_NOTICES.md) for everything else.
 - 📄 Code is under the [MIT license](LICENSE). Game images and trademarks belong to their owners and have their own terms of use.
