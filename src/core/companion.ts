@@ -139,6 +139,19 @@ const sideEvents: [string, string, Rule | null, string?][] = [
 
 const BIG_POE_HINT = 'Como adulto, com uma garrafa vazia, derrote o Big Poe no Campo de Hyrule com o Arco das Fadas e capture-o na garrafa. Venda-o ao Coletor de Poes nas ruínas do Mercado. Veja o ponto exato no mapa.';
 const GOSSIP_STONE_HINT = 'Fique ao lado da pedra falante e toque a ocarina. Veja o ponto exato no mapa.';
+const GOSSIP_STONE_GROUPS = [
+  ['GORON_CITY', 'GoronCity', 2], ['HYRULE_FIELD', 'HyruleField', 4],
+  ['KAKARIKO_VILLAGE', 'KakarikoVillage', 1], ['HYRULE_CASTLE', 'HyruleCastle', 3],
+  ['KOKIRI_FOREST', 'KokiriForest', 4], ['LOST_WOOD', 'LostWood', 2], ['LAKE_HYLIA', 'LakeHylia', 3],
+  ['ZORA_RIVER', 'ZoraRiver', 3], ['ZORA_FOUNTAIN', 'ZoraFountain', 2], ['HYRULE_MARKET', 'Market', 4],
+  ['GERUDO_VALLEY', 'GerudoValley', 1], ['SACRED_FOREST_MEADOW', 'SacredForestMeadow', 3],
+  ['DEATH_MOUNTAIN_CRATER', 'DeathMountainCrater', 2], ['DESERT_COLOSSUS', 'DesertColossus', 1],
+  ['DEATH_MOUNTAIN_TRAIL', 'DeathMountainTrail', 2], ['DODONGO_CAVERN', 'DodongoCavern', 1],
+  ['ZORA_DOMAIN', 'ZoraDomain', 1], ['GRAVEYARD', 'Graveyard', 1],
+] as const;
+/** The game sets these when the ocarina is played by a stone, then clears them on a later save. */
+export const GOSSIP_STONE_FLAGS = GOSSIP_STONE_GROUPS.flatMap(([flag, , count]) =>
+  Array.from({ length: count }, (_, i) => `BlewOcarinaByGossipStone.GOSSIP_${flag}_${String(i + 1).padStart(2, '0')}`));
 
 export function extendChecklist(checklist: ChecklistFile, mapping: MappingFile, data: CompanionData) {
   type Category = ChecklistFile['categories'][number];
@@ -198,17 +211,7 @@ export function extendChecklist(checklist: ChecklistFile, mapping: MappingFile, 
     // so those flags don't stick. 1,000 points means all ten field Big Poes were caught.
     return [n, 'Big Poe ' + n, { any: [done('HyruleField_Defeat_BigPoe_' + n), { name: 'GhostShop_CouponNum', gte: 1000 }] }, LOCAL_NAMES.HyruleField];
   }), 'B', 'boss', () => BIG_POE_HINT);
-  const stoneGroups = [
-    ['GORON_CITY', 'GoronCity', 2], ['HYRULE_FIELD', 'HyruleField', 4],
-    ['KAKARIKO_VILLAGE', 'KakarikoVillage', 1], ['HYRULE_CASTLE', 'HyruleCastle', 3],
-    ['KOKIRI_FOREST', 'KokiriForest', 4], ['LOST_WOOD', 'LostWood', 2], ['LAKE_HYLIA', 'LakeHylia', 3],
-    ['ZORA_RIVER', 'ZoraRiver', 3], ['ZORA_FOUNTAIN', 'ZoraFountain', 2], ['HYRULE_MARKET', 'Market', 4],
-    ['GERUDO_VALLEY', 'GerudoValley', 1], ['SACRED_FOREST_MEADOW', 'SacredForestMeadow', 3],
-    ['DEATH_MOUNTAIN_CRATER', 'DeathMountainCrater', 2], ['DESERT_COLOSSUS', 'DesertColossus', 1],
-    ['DEATH_MOUNTAIN_TRAIL', 'DeathMountainTrail', 2], ['DODONGO_CAVERN', 'DodongoCavern', 1],
-    ['ZORA_DOMAIN', 'ZoraDomain', 1], ['GRAVEYARD', 'Graveyard', 1],
-  ] as const;
-  add('gossip_stones', 'Pedras falantes', stoneGroups.flatMap(([flag, region, count]) =>
+  add('gossip_stones', 'Pedras falantes', GOSSIP_STONE_GROUPS.flatMap(([flag, region, count]) =>
     Array.from({ length: count }, (_, i): [string, string, Rule, string] => {
       const id = flag + '_' + String(i + 1).padStart(2, '0');
       return [id, `Pedra falante ${i + 1}`, done('BlewOcarinaByGossipStone.GOSSIP_' + id), LOCAL_NAMES[region]];
