@@ -62,8 +62,10 @@ try {
   for (const file of ['main.py', 'plugin.json', 'README.md']) copyFileSync(path.join(decky, file), path.join(bundle, file));
   for (const file of ['LICENSE', 'THIRD_PARTY_NOTICES.md']) copyFileSync(path.join(root, file), path.join(bundle, file));
   copyFileSync(path.join(root, 'docs', 'atlas-license.txt'), path.join(bundle, 'atlas-license.txt'));
+  // Decky Loader imports dist/index.js as an ES module only when package.json says "type": "module".
+  // Without it, the loader evaluates the bundle as a legacy script and fails on its `export`.
   writeFileSync(path.join(bundle, 'package.json'), JSON.stringify({
-    name: plugin.name, version: plugin.version, trackerVersion: tracker.version, author: tracker.author, license: tracker.license,
+    name: plugin.name, version: plugin.version, type: 'module', trackerVersion: tracker.version, author: tracker.author, license: tracker.license,
   }, null, 2) + '\n');
 
   mkdirSync(release, { recursive: true });
