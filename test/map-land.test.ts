@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import atlas from '../data/atlas.json';
+import markers from '../data/world-markers.json';
 import { onIllustratedMap } from '../src/core/mapLand';
 import { locatePlacement, type AtlasPlace } from '../src/core/position';
+import { listedRegion } from '../src/renderer/mapCounts';
 
 const places = atlas.places as AtlasPlace[];
 
@@ -22,5 +24,38 @@ describe('illustrated map', () => {
 
   it('leaves a floor with no mask alone', () => {
     expect(onIllustratedMap('perdido', 'principal', { x: 0.5, y: 0.5 })).toBe(true);
+  });
+
+  it('lists a Lost Woods gossip stone with the Lost Woods when its point misses another map', () => {
+    const stages: Record<string, string> = { kokiri: 'KokiriForest', prado: 'SacredForestMeadow', rio: 'ZoraRiver', perdido: 'LostWood' };
+    const atEdge = (at: { x: number; y: number }) => at.x <= 0.021 || at.x >= 0.979 || at.y <= 0.021 || at.y >= 0.979;
+    const region = (id: keyof typeof markers, checklist: string, checklistHasFloor: boolean) => {
+      const spot = markers[id];
+      const fixes = locatePlacement(spot.stage, undefined, { x: spot.x, y: spot.y, z: spot.z }, places);
+      const shown = fixes.find(f => f.mapId && f.at && !atEdge(f.at) && onIllustratedMap(f.placeId, f.mapId, f.at));
+      const projected = fixes[0] ? stages[fixes[0].placeId] : undefined;
+      return listedRegion({
+        shownRegion: shown ? stages[shown.placeId] : undefined,
+        projectedRegion: projected,
+        projectedHasFloor: projected !== 'LostWood',
+        checklistRegion: checklist,
+        checklistHasFloor,
+        placed: true,
+      });
+    };
+    expect(region('gossip_stones.LOST_WOOD_02', 'LostWood', false)).toBe('LostWood');
+    expect(region('gossip_stones.LOST_WOOD_01', 'LostWood', false)).toBe('LostWood');
+    expect(region('gossip_stones.KOKIRI_FOREST_01', 'KokiriForest', true)).toBe('KokiriForest');
+    expect(region('gossip_stones.KOKIRI_FOREST_02', 'KokiriForest', true)).toBe('SacredForestMeadow');
+  });
+
+  it('leaves a Kokiri chest off the list when its point misses the drawing', () => {
+    expect(listedRegion({
+      projectedRegion: 'KokiriForest',
+      projectedHasFloor: true,
+      checklistRegion: 'KokiriForest',
+      checklistHasFloor: true,
+      placed: true,
+    })).toBe('unknown');
   });
 });

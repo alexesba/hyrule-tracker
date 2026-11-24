@@ -1,3 +1,24 @@
+/**
+ * Region a collectible is listed under. A point on the drawing wins. A point in the blank margin
+ * does not stay with that region: a checklist region with no floor of its own receives it,
+ * and otherwise it is left unmapped.
+ */
+export function listedRegion(opts: {
+  shownRegion?: string
+  projectedRegion?: string
+  projectedHasFloor: boolean
+  checklistRegion?: string
+  checklistHasFloor: boolean
+  markerRegion?: string
+  placed: boolean
+}): string {
+  if (opts.shownRegion) return opts.shownRegion;
+  if (opts.checklistRegion && opts.checklistRegion !== (opts.projectedRegion ?? '') && !opts.checklistHasFloor) return opts.checklistRegion;
+  if (opts.placed && opts.projectedHasFloor && opts.checklistRegion === opts.projectedRegion) return 'unknown';
+  if (opts.placed) return opts.projectedRegion || 'unknown';
+  return opts.markerRegion || opts.checklistRegion || '';
+}
+
 export interface MapCountRow { area: string; catId: string; done: boolean }
 export interface MapCount { catId: string; left: number; total: number; count: number }
 /** all: how many exist. todo: still to find. done: already taken. */

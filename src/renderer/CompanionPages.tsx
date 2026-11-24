@@ -16,7 +16,7 @@ import { PageProgress } from './PageProgress';
 import { JourneyMetrics, JourneyProgress } from './JournalOverview';
 import { PageSkeleton } from './PageSkeleton';
 import { qrPath, qrTarget } from './qr';
-import { regionCounts, type MapBadgeStatus } from './mapCounts';
+import { listedRegion, regionCounts, type MapBadgeStatus } from './mapCounts';
 import { ZoomPan } from './ZoomPan';
 import { onIllustratedMap } from '../core/mapLand';
 import { locatePlacement, type AtlasPlace as PositionPlace, type PlayerFix } from '../core/position';
@@ -603,6 +603,25 @@ const normalizeName = (s: string) => s.normalize('NFD').toLowerCase().replace(/ 
 export const findRegion = (name: string) => Object.keys(LOCAL_NAMES).find(k =>
   normalizeName(k) === normalizeName(name) || normalizeName(LOCAL_NAMES[k]) === normalizeName(name) || englishAliases[k]?.some(a => normalizeName(a) === normalizeName(name)),
 );
+const regionHasFloor = (region: string) => atlas.places.some(p => atlasStages[p.id] === region && p.maps.length > 0);
+/**
+ * Where a collectible is listed. A point on the drawing wins. A point in the blank margin does not
+ * make it that region's collectible: when the checklist names a region with no floor, it is listed there.
+ */
+export function placedRegion(spot: Spot | undefined, fixes: PlayerFix[], markerPlace: string | undefined, chapter?: string): string {
+  const shown = fixes.find(f => shownOnMap(f.placeId, f.mapId, f.at));
+  const named = findRegion(chapter ?? '') ?? '';
+  const projected = spot ? atlasStages[fixes[0]?.placeId] ?? (spot.stage || 'unknown') : '';
+  return listedRegion({
+    shownRegion: shown ? atlasStages[shown.placeId] ?? (spot?.stage || 'unknown') : undefined,
+    projectedRegion: projected || undefined,
+    projectedHasFloor: !!projected && regionHasFloor(projected),
+    checklistRegion: named || undefined,
+    checklistHasFloor: !!named && regionHasFloor(named),
+    markerRegion: markerPlace ? atlasStages[markerPlace] : undefined,
+    placed: !!spot,
+  });
+}
 /** Game order for the region list: the atlas's order first, then any other region with items. */
 /** In-game screenshot of each area for the progress list (picked from the atlas's location shots; no HUD dialogue in the middle, where the row crops to). */
 const areaShots: Record<string, string> = {
@@ -770,10 +789,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
     const spot: Spot | undefined = places.get(item.id) ?? spots?.[item.id];
     const fixes = spot ? locateSpot(spot) : [];
     const marker = markerOf.get(item.id);
-    // Placed items belong to the region their map is in (the ranch and the lake are part of the Hyrule Field scene);
-    // rows with an atlas marker to the marker's region; the rest to the region the checklist names.
-    const area = spot ? atlasStages[fixes[0]?.placeId] ?? (spot.stage || 'unknown')
-      : (marker && atlasStages[marker.place]) || (findRegion(item.chapter ?? item.logic?.region ?? '') ?? '');
+    const area = placedRegion(spot, fixes, marker?.place, item.chapter ?? item.logic?.region);
     return { item, cat, placed: !!spot, era: spot?.era, fixes, area };
   })), [state.categories, places, spots, markerOf]);
   // Completion of every region (all eras), for the world map's list.
@@ -1055,7 +1071,13 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
     id: p.item.id + '@' + p.at.map, filter: p.cat.id, icon: categoryIcons[p.cat.id], kind: t(p.cat.label), name: p.item.name, at: p.at, images: [],
     ...trackedMarkerDetails(p.item),
   }));
-  const pool = [...atlasPins, ...trackedPins].filter(p => filter === 'all' || p.filter === filter);
+  // A region with no floor still lists its collectibles in the marker menu. Atlas rows are already there.
+  const linked = new Set(atlasPins.flatMap(p => p.item ? [p.item.id] : []));
+  const listedPins: Pin[] = currentFloor ? [] : categoryRows.filter(r => !linked.has(r.item.id)).map(r => ({
+    id: r.item.id, filter: r.cat.id, icon: categoryIcons[r.cat.id], kind: t(r.cat.label), name: r.item.name, images: [],
+    ...trackedMarkerDetails(r.item),
+  }));
+  const pool = [...atlasPins, ...trackedPins, ...listedPins].filter(p => filter === 'all' || p.filter === filter);
   const doneCount = pool.filter(m => m.status === 'done').length;
   // The selected marker stays on the map whatever the filters say: a row picked in the panel may be one they hide.
   const markers = pool.filter(m => m.id === active || (!hideDone || m.status !== 'done') &&
@@ -1072,12 +1094,14 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
   // A row picked outside the map: open its floor and its marker, and center the map on it.
   useEffect(() => {
     // A row can have a marker on several floors (child and adult): keep the floor on screen when it has one.
-    const pins = focusItem ? pool.filter(p => p.item?.id === focusItem && p.at) : [];
-    const pin = pins.find(p => p.at!.map === currentFloor?.id) ?? pins[0];
+    const pins = focusItem ? pool.filter(p => p.item?.id === focusItem) : [];
+    const pin = pins.find(p => p.at?.map === currentFloor?.id) ?? pins.find(p => p.at) ?? pins[0];
     if (!pin || pins.some(p => p.id === active)) return;
-    setFloor(pin.at!.map);
+    if (pin.at) {
+      setFloor(pin.at.map);
+      setFocus({ floor: pin.at.map, point: [pin.at.x * 100, pin.at.y * 100] });
+    }
     setActive(pin.id);
-    setFocus({ floor: pin.at!.map, point: [pin.at!.x * 100, pin.at!.y * 100] });
   }, [focusItem]);
   const docked = useMatches(DOCKED_CARD);
   // Beside its marker on a large screen. On phones and touch screens it docks to the map's edge away from the marker,
