@@ -60,7 +60,11 @@ const B64_STRIDE = 16, B64_VALUE = 12, B64_MIN = 1000;
 export interface RecordTable { type: TypeLayout['type']; start: bigint; count: number; index: Map<number, number>; vtable: bigint }
 export interface LiveTables {
   records: RecordTable[];
-  b64: { start: bigint; count: number };
+  /**
+   * unclassified: the class byte (+8) isn't known to mark respawning objects (Rekarina), so no key is treated
+   * as resettable and keys the save has but the read lacks aren't counted against the playthrough.
+   */
+  b64: { start: bigint; count: number; unclassified?: boolean };
   /**
    * The location-list record (optional: only used for the area). base: host address of
    * guest 0 for its element pointer; checked: the elements' self-pointers matched at that
@@ -302,6 +306,8 @@ export interface LiveRead {
   agreement: Agreement[];
   /** 64-bit keys the game clears again later (respawning objects). */
   resettable: Set<bigint>;
+  /** False when the key table can't tell respawning objects apart: `resettable` is then empty, not "none". */
+  resettableKnown: boolean;
   /**
    * Keys set in the reference save that the live table lacks and that the game never clears (Skulltulas, heart
    * pieces). They are kept from the save; when a newer save brings some, the live tables are behind the game.
@@ -401,9 +407,11 @@ export function buildLive(tables: LiveTables, raw: Buffer[], ref: GameDataFile, 
     if (b[o + B64_VALUE] === 1) bool64.add(k);
     // Class byte 0x58 (bit 0x40): flags the game clears again after a while
     // (respawning objects). Skulltulas and heart pieces are 0x18 (permanent).
-    if (b[o + 8] & 0x40) resettable.add(k);
+    if (!tables.b64.unclassified && b[o + 8] & 0x40) resettable.add(k);
   }
-  const missing = [...ref.bool64].filter(k => !bool64.has(k) && !resettable.has(k));
+  // Without the class byte a cleared key may just be a respawning object: the live table is taken as it is,
+  // and the Bool flags alone tell whether it is the same playthrough.
+  const missing = tables.b64.unclassified ? [] : [...ref.bool64].filter(k => !bool64.has(k) && !resettable.has(k));
   agreement.push({ type: 'Bool64bitKey', checked: ref.bool64.size, agree: ref.bool64.size - missing.length });
   // Same rule for Skulltulas and heart pieces: what the save counts is never taken away by a live read.
   for (const k of missing) bool64.add(k);
@@ -412,7 +420,7 @@ export function buildLive(tables: LiveTables, raw: Buffer[], ref: GameDataFile, 
     const prev = ref.entries.get(LOCATION_KEY);
     entries.set(LOCATION_KEY, { hash: LOCATION_KEY, type: 'String64Array', recordOffset: prev?.recordOffset ?? 0, value: locationStrings(loc) } as Entry);
   }
-  return { data: { ...ref, entries, bool64, warnings: [] }, raw, agreement, resettable, missing, missingFlags };
+  return { data: { ...ref, entries, bool64, warnings: [] }, raw, agreement, resettable, resettableKnown: !tables.b64.unclassified, missing, missingFlags };
 }
 
 /**

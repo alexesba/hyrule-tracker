@@ -1,4 +1,4 @@
-// Live source: attaches (read-only) to a running game (Hookshot, Longshot, NX2navi or the
+// Live source: attaches (read-only) to a running game (Hookshot, Longshot, NX2navi, Rekarina or the
 // Fritchii emulator), keeps the progress tables located, and reports when tracked values
 // change. NX2Saria answers through its tracker API instead (gamedata/nx2saria.ts), on any
 // system. Falls back to nothing (the save files) whenever the game isn't running or isn't
@@ -8,7 +8,8 @@ import { locate, readTables, buildLive, fingerprint, matchesReference, sweepRang
 import { MemoryAccessDenied, findProcesses, initMemoryAccess, openProcess, type GameProcess } from './procmem.js';
 import { ptraceScope } from './procmem-linux.js';
 import { ApiSession } from '../gamedata/nx2saria.js';
-import { NATIVE_EXES, EMULATOR_EXES } from '../gamedata/saves.js';
+import { NATIVE_EXES, EMULATOR_EXES, REKARINA_EXE } from '../gamedata/saves.js';
+import { readRekarinaTables, REKARINA_MAIN_BASE, REKARINA_MIN_ADDRESS, type RekarinaTables } from '../gamedata/rekarina.js';
 import type { LiveInfo } from '../shared/types.js';
 import { PlayerReader, type LivePlayer } from '../gamedata/player.js';
 
@@ -19,16 +20,26 @@ import { PlayerReader, type LivePlayer } from '../gamedata/player.js';
  * at a fixed place. The Fritchii
  * emulator (lichii.exe) puts it somewhere new every run, so it's found by sweeping.
  */
-interface GameEntry { image: string; emulator: boolean; /** Runs natively on the host: its tables are anywhere in readable memory, with real host pointers. */ hostPointers?: boolean }
+interface GameEntry {
+  image: string;
+  emulator: boolean;
+  /** Runs natively on the host: its tables are anywhere in readable memory, with real host pointers. */
+  hostPointers?: boolean;
+  /** Rekarina: guest memory at the host addresses themselves, main module at a fixed place (gamedata/rekarina.ts). */
+  rekarina?: boolean;
+}
 /**
  * nxnative (Switch games run natively on a Mac) keeps the game's data in its helper process "dmhost", not in "nxnative".
  * Searched for on macOS only.
  */
 const MAC_NATIVE_EXES = process.platform === 'darwin' ? ['dmhost'] : [];
-const GAMES: GameEntry[] = [...NATIVE_EXES.map(image => ({ image, emulator: false })),
+const GAMES: GameEntry[] = [{ image: REKARINA_EXE, emulator: false, rekarina: true },
+  ...NATIVE_EXES.map(image => ({ image, emulator: false })),
   ...EMULATOR_EXES.map(image => ({ image, emulator: true })),
   ...MAC_NATIVE_EXES.map(image => ({ image, emulator: true, hostPointers: true }))];
 const TICK_MS = 500;
+/** Link's position is read this often once the main module is known (a few small reads), so the pin follows him. */
+const PLAYER_TICK_MS = 50;
 const FIND_EVERY_MS = 3000;
 /**
  * Where the tables were in Hookshot v2.1.0, Longshot v1.0.0, and NX2navi's Triforce v0.4.0 and
@@ -66,11 +77,14 @@ export class LiveSource {
   private tables?: LiveTables;
   private ref?: GameDataFile;
   private timer?: NodeJS.Timeout;
+  private playerTimer?: NodeJS.Timeout;
   private lastFind = 0;
   private lastPrint?: string;
-  private snapshot?: { data: GameDataFile; atMs: number; resettable: Set<bigint> };
+  private snapshot?: { data: GameDataFile; atMs: number; resettable: Set<bigint>; resettableKnown?: boolean };
   private emulator = false;
   private hostPointers = false;
+  private rekarina = false;
+  private rekarinaTables?: RekarinaTables;
   /** Where the sweep is: ranges to search (host [lo, hi)), the current one and the next window's centre. */
   private sweep?: { ranges: [bigint, bigint][]; i: number; at: bigint };
   private sweepPausedUntil = 0;
@@ -101,12 +115,16 @@ export class LiveSource {
     this.memoryAccess = await initMemoryAccess();
     this.set({ status: 'no-game' });
     this.timer = setInterval(() => void this.tick(), TICK_MS);
+    // Searching for the main module stays on the slow tick; here only the cheap reads once it is known.
+    this.playerTimer = setInterval(() => { if (this.mem && this.playerReader?.moduleFound) this.readPlayer(); }, PLAYER_TICK_MS);
     void this.tick();
   }
 
   stop() {
     if (this.timer) clearInterval(this.timer);
+    if (this.playerTimer) clearInterval(this.playerTimer);
     this.timer = undefined;
+    this.playerTimer = undefined;
     this.detach();
     this.set({ status: 'off' });
   }
@@ -150,6 +168,8 @@ export class LiveSource {
     this.sweep = undefined;
     this.keysAtFind = undefined;
     this.flagsAtFind = undefined;
+    this.rekarina = false;
+    this.rekarinaTables = undefined;
     this.stale.clear();
     this.sweepPausedUntil = 0;
     this.playerReader = undefined;
@@ -207,17 +227,33 @@ export class LiveSource {
       }
       this.emulator = !!game.emulator;
       this.hostPointers = !!game.hostPointers;
+      this.rekarina = !!game.rekarina;
       // Link's position: only where guest memory sits at a known base (not in emulators). A game running natively
-      // on the host (nxnative on macOS) has guest address 0 at host address 0.
-      if (!this.emulator || this.hostPointers) { const mem = this.mem; this.playerReader = new PlayerReader(mem, () => mem.regions(), this.hostPointers ? 0n : undefined); }
+      // on the host (nxnative on macOS), like Rekarina, has guest address 0 at host address 0.
+      if (!this.emulator || this.hostPointers) {
+        const mem = this.mem;
+        this.playerReader = new PlayerReader(mem, () => mem.regions(), this.hostPointers || this.rekarina ? 0n : undefined,
+          this.rekarina ? { mainBase: REKARINA_MAIN_BASE, minHeap: REKARINA_MIN_ADDRESS } : {});
+      }
       await this.opts.onGame?.(this.mem.imagePath(), this.mem.appData?.());
     }
     if (!this.mem) return;
-    this.readPlayer();
+    // Until the main module is known (searching for it takes a while); then the player timer reads Link.
+    if (!this.playerReader?.moduleFound) this.readPlayer();
     if (!this.ref) return this.set({ status: 'searching', detail: 'Waiting for a save to compare with.' });
-    if (!this.tables && !this.find()) return;
+    if (this.rekarina) {
+      // Rekarina: the tables come straight from its game data manager, checked on every tick.
+      const found = readRekarinaTables(this.mem, this.ref, this.rekarinaTables);
+      if (!found) {
+        this.rekarinaTables = this.tables = undefined;
+        this.lastPrint = undefined;
+        return this.set({ status: 'waiting', detail: "Couldn't find the progress tables yet. Load your file in the game." });
+      }
+      this.rekarinaTables = found;
+      this.tables = found.tables;
+    } else if (!this.tables && !this.find()) return;
     const raw = readTables(this.mem, this.tables!);
-    if (!raw) { this.tables = undefined; this.lastPrint = undefined; return this.set({ status: 'searching' }); }
+    if (!raw) { this.tables = this.rekarinaTables = undefined; this.lastPrint = undefined; return this.set({ status: 'searching' }); }
     const print = fingerprint(this.tables!, raw, this.watchInts);
     // Nothing tracked changed: skip rebuilding (most ticks).
     if (print === this.lastPrint && this.info.status === 'live') return;
@@ -246,7 +282,7 @@ export class LiveSource {
   }
 
   /** Use a fresh read when it is the same playthrough as the reference save. */
-  private publish(print: string, live: { data: GameDataFile; agreement: Agreement[]; resettable: Set<bigint>; missing?: bigint[]; missingFlags?: number[] }) {
+  private publish(print: string, live: { data: GameDataFile; agreement: Agreement[]; resettable: Set<bigint>; resettableKnown?: boolean; missing?: bigint[]; missingFlags?: number[] }) {
     // A save made after the tables were found has Skulltulas, heart pieces or opened chests these tables never got:
     // they are a copy the game doesn't keep up to date. Drop them and look for the current one; the save covers the meantime.
     const behind = this.tables && this.keysAtFind ? (live.missing ?? []).filter(k => !this.keysAtFind!.has(k)) : [];
@@ -268,7 +304,7 @@ export class LiveSource {
     this.set({ status: 'live' });
     if (print !== this.lastPrint || !wasLive) {
       this.lastPrint = print;
-      this.snapshot = { data: live.data, atMs: Date.now(), resettable: live.resettable };
+      this.snapshot = { data: live.data, atMs: Date.now(), resettable: live.resettable, resettableKnown: live.resettableKnown !== false };
       this.opts.onChange();
     }
   }
@@ -355,11 +391,11 @@ export class LiveSource {
 }
 
 /** The first running game, in the order of GAMES. */
-async function findGame(): Promise<{ pid: number; emulator?: boolean; hostPointers?: boolean } | undefined> {
+async function findGame(): Promise<{ pid: number; emulator?: boolean; hostPointers?: boolean; rekarina?: boolean } | undefined> {
   for (const g of GAMES) {
     const pids = await findProcesses(g.image);
     const pid = pids.length > 1 ? largest(pids) : pids[0];
-    if (pid) return { pid, emulator: g.emulator, hostPointers: g.hostPointers };
+    if (pid) return { pid, emulator: g.emulator, hostPointers: g.hostPointers, rekarina: g.rekarina };
   }
   return undefined;
 }

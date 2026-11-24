@@ -92,7 +92,7 @@ export const NATIVE_EXES = ['Triforce.exe', 'hookshot.exe', 'HeyListen.exe', 'Lo
  */
 export const NX2SARIA_EXES = ['ocarina.exe', 'nx2saria.exe'];
 /** Rekarina's game. Saves only: it keeps guest memory at the same host addresses, not at GUEST_BASE as NATIVE_EXES do. */
-const REKARINA_EXE = 'Rekarina.exe';
+export const REKARINA_EXE = 'Rekarina.exe';
 const GAME_NAMES = /zelda|ocarina|hookshot|heylisten|longshot|triforce|nx2navi|nx2saria|rekarina|relink|fritchii|lichii|eden|orchid|eglantine|pokedinner/i;
 /** A program's name without ".exe" (or a Linux build's ".AppImage" / ".x86_64"), lowercase. */
 export const programName = (file: string) => file.toLowerCase().replace(/\.(exe|appimage|x86_64)$/, '');

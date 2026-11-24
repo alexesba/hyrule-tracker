@@ -7,8 +7,8 @@
 // MIT License, Copyright (c) 2026 antonioalvromero. See docs/atlas-license.txt.
 //
 // Read-only, like the rest of live tracking. Only for programs that map guest memory at a
-// fixed host base (Hookshot, Longshot, NX2navi/Triforce, ReLink); emulators fall back to the
-// position in the save.
+// fixed host base (Hookshot, Longshot, NX2navi/Triforce, ReLink) or, like Rekarina, at the host
+// addresses themselves; emulators fall back to the position in the save.
 import { GUEST_BASE, type Mem } from './live.js';
 import type { PlayerPosition } from '../core/position.js';
 
@@ -79,18 +79,37 @@ export class PlayerReader {
   /** The last search for the main module, for the log. */
   scanInfo = '';
 
+  private readonly fixedMainBase: bigint;
+  private readonly minHeap: bigint;
+
   /**
    * @param mem the game process
    * @param regions its committed memory blocks (host addresses), for finding the main module
    * @param base host address of guest 0
+   * @param layout `mainBase`: where the main module always is (Rekarina), checked by its header instead of
+   *   searched for; `minHeap`: lowest valid heap pointer (Rekarina's heap starts around 4 GB)
    */
-  constructor(private mem: Mem, private regions: () => Region[], readonly base = GUEST_BASE) {}
+  constructor(private mem: Mem, private regions: () => Region[], readonly base = GUEST_BASE, layout: { mainBase?: bigint; minHeap?: bigint } = {}) {
+    this.fixedMainBase = layout.mainBase ?? 0n;
+    this.minHeap = layout.minHeap ?? MIN_HEAP;
+  }
+
+  /** The main module is known: reading Link is cheap from here (no search). */
+  get moduleFound() { return this.mainBase !== 0n; }
 
   private guest(addr: bigint, len: number) { return this.mem.read(this.base + addr, len); }
   private u64(addr: bigint) { const b = this.guest(addr, 8); return b ? b.readBigUInt64LE(0) : 0n; }
 
   /** Link's position and scene now, or null (not in game yet, different game build, or unreadable). */
   read(now = Date.now()): LivePlayer | null {
+    if (!this.mainBase && this.fixedMainBase) {
+      if (!isMainHeader(this.guest(this.fixedMainBase, 8))) {
+        this.scanInfo = `no main module header at 0x${this.fixedMainBase.toString(16)}`;
+        this.stage = 'no-module';
+        return null;
+      }
+      this.mainBase = this.fixedMainBase;
+    }
     if (!this.mainBase) {
       this.mainBase = this.findMainBase(now);
       if (!this.mainBase) { this.stage = this.scan ? 'scanning' : 'no-module'; return null; }
@@ -116,14 +135,14 @@ export class PlayerReader {
   /** The loaded scene: Sub[7] + 0x34, else the parent object + 0x768. Kept while unreadable. */
   private readScene(): string | null {
     const pObj = this.sub36 ? this.u64(this.sub36 + 0x10n) : 0n;
-    if (pObj > MIN_HEAP && pObj !== this.pObj) {
+    if (pObj > this.minHeap && pObj !== this.pObj) {
       this.pObj = pObj;
       const head = this.guest(pObj, 0x60);
       const count = head?.readUInt32LE(0x50) ?? 0, arr = head?.readBigUInt64LE(0x58) ?? 0n;
-      this.sub7 = count > 7 && count <= 128 && arr > MIN_HEAP ? this.u64(arr + 7n * 8n) : 0n;
+      this.sub7 = count > 7 && count <= 128 && arr > this.minHeap ? this.u64(arr + 7n * 8n) : 0n;
     }
-    const scene = (this.sub7 > MIN_HEAP ? sceneFromBuffer(this.guest(this.sub7 + 0x34n, 0x80)) : null) ??
-      (this.pObj > MIN_HEAP ? sceneFromBuffer(this.guest(this.pObj + 0x768n, 0x480)) : null);
+    const scene = (this.sub7 > this.minHeap ? sceneFromBuffer(this.guest(this.sub7 + 0x34n, 0x80)) : null) ??
+      (this.pObj > this.minHeap ? sceneFromBuffer(this.guest(this.pObj + 0x768n, 0x480)) : null);
     if (scene) this.scene = scene;
     return this.scene;
   }
@@ -131,15 +150,15 @@ export class PlayerReader {
   private resolveSub36(): bigint {
     for (const off of SINGLETON_BSS) {
       const singleton = this.u64(this.mainBase + off);
-      if (singleton <= MIN_HEAP) continue;
+      if (singleton <= this.minHeap) continue;
       const pObj = this.u64(singleton + 0x10n);
-      if (pObj <= MIN_HEAP) continue;
+      if (pObj <= this.minHeap) continue;
       const head = this.guest(pObj, 0x60);
       if (!head || head.readBigUInt64LE(0) !== this.mainBase + POBJ_VT) continue;
       const count = head.readUInt32LE(0x50), arr = head.readBigUInt64LE(0x58);
-      if (count <= 36 || count > 128 || arr <= MIN_HEAP) continue;
+      if (count <= 36 || count > 128 || arr <= this.minHeap) continue;
       const sub36 = this.u64(arr + 36n * 8n);
-      if (sub36 > MIN_HEAP) return sub36;
+      if (sub36 > this.minHeap) return sub36;
     }
     return 0n;
   }

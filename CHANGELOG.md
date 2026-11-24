@@ -4,6 +4,14 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [2.0.2] - 2026-11-23
+
+### New
+- **Live tracking in Rekarina.** With Rekarina open on Windows, the tracker reads your progress from the game while you play, so chests, Gold Skulltulas and other items check off without saving, and Link's pin follows him on the map. Thanks to Maicon Odone for working out where Rekarina keeps the progress and Link's position, and for building and testing it in the game.
+
+### Improved
+- **Link's pin moves smoothly.** While reading the game live, Link's position updates 20 times a second instead of twice, in every supported game. Thanks to Maicon Odone.
+
 ## [2.0.1] - 2026-11-23
 
 ### Fixed

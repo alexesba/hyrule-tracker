@@ -440,7 +440,8 @@ export class Controller {
     // (Respawning objects clear their flags again by design; they don't count.)
     const resettable = liveSnap?.resettable;
     const lost = prev ? [...prev.data.bool64].filter(k => !cur.data.bool64.has(k) && !resettable?.has(k)).length : 0;
-    const samePlaythrough = isNewSave && lost <= 3;
+    // Live tables that can't tell respawning objects apart (Rekarina): judge by the flags the last view had set.
+    const samePlaythrough = isNewSave && (liveSnap?.resettableKnown === false && prev ? keptFlags(prev.data, cur.data) >= 0.9 : lost <= 3);
 
     // Live: the current stage straight from the game; otherwise the save's caption.
     const liveStage = liveSnap?.data.entries.get(STAGE_KEY)?.value;
@@ -912,6 +913,17 @@ export class Controller {
 
 
 /** "Market_Child" -> "Market (child)", "HyruleField_Adult" -> "Hyrule Field (adult)" */
+/** Share of the Bool flags set in `before` that are still set in `after` (1 when none were). */
+function keptFlags(before: GameDataFile, after: GameDataFile): number {
+  let set = 0, kept = 0;
+  for (const e of before.entries.values()) {
+    if (e.type !== 'Bool' || e.value !== true) continue;
+    set++;
+    if (after.entries.get(e.hash)?.value === true) kept++;
+  }
+  return set ? kept / set : 1;
+}
+
 export function prettyArea(s: string): string {
   const m = s.match(/^(.*?)(?:_(Adult|Child))?$/)!;
   const base = m[1].replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').trim();
