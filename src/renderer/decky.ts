@@ -8,12 +8,13 @@ function activeDialog() {
   return Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]')).at(-1);
 }
 
-function moveFocus(direction: Direction) {
+/** Moves focus to the nearest control that way. False when there is none: the plugin hands the direction back to Steam. */
+function moveFocus(direction: Direction): boolean {
   const items = Array.from((activeDialog() ?? document).querySelectorAll<HTMLElement>(controls)).filter(el => el.getClientRects().length);
   const active = document.activeElement;
   if (!(active instanceof HTMLElement) || !items.includes(active)) {
     items[0]?.focus();
-    return;
+    return !!items[0];
   }
   const from = active.getBoundingClientRect();
   const horizontal = direction === 'left' || direction === 'right';
@@ -31,6 +32,8 @@ function moveFocus(direction: Direction) {
     score = distance;
   }
   closest?.focus();
+  closest?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  return !!closest;
 }
 
 export function chooseDeckyFolder(): Promise<string | undefined> {
@@ -58,7 +61,8 @@ export function enableDeckyNavigation() {
     const { action } = event.data;
     if (action === 'up' || action === 'down' || action === 'left' || action === 'right') {
       document.documentElement.classList.add('decky-controller-focus');
-      moveFocus(action);
+      // Nothing further that way: in the quick access menu the plugin lets Steam take the next press.
+      window.parent.postMessage({ type: 'hyrule:moved', edge: moveFocus(action) ? null : action }, '*');
     }
     if (action === 'activate' && document.activeElement instanceof HTMLElement) document.activeElement.click();
     if (action === 'back') {

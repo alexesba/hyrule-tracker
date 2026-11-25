@@ -1,5 +1,6 @@
 import asyncio
 import json
+from collections import deque
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -11,6 +12,10 @@ class Plugin:
         self._lock = asyncio.Lock()
         self._process = None
         self._url = None
+        self._drain = None
+
+    def _log_file(self):
+        return Path(decky.DECKY_PLUGIN_LOG_DIR) / "tracker.log"
 
     async def get_tracker(self):
         async with self._lock:
@@ -19,11 +24,10 @@ class Plugin:
 
             root = Path(decky.DECKY_PLUGIN_DIR)
             runtime = Path(decky.DECKY_PLUGIN_RUNTIME_DIR)
-            logs = Path(decky.DECKY_PLUGIN_LOG_DIR)
             runtime.mkdir(parents=True, exist_ok=True)
-            logs.mkdir(parents=True, exist_ok=True)
+            self._log_file().parent.mkdir(parents=True, exist_ok=True)
             version = json.loads((root / "package.json").read_text(encoding="utf-8"))["trackerVersion"]
-            with (logs / "tracker.log").open("ab") as log:
+            with self._log_file().open("ab") as log:
                 self._process = await asyncio.create_subprocess_exec(
                     str(root / "bin" / "node"), str(root / "server.mjs"),
                     str(root), str(runtime), version,
@@ -41,11 +45,37 @@ class Plugin:
             except BaseException:
                 await self._stop()
                 raise
+            # Node writes its stdout to a pipe synchronously on Linux: a pipe nobody reads fills up and stops the
+            # tracker. Everything after the address goes to the log.
+            self._drain = asyncio.create_task(self._copy_output(self._process))
             return {"url": self._url, "home": decky.DECKY_USER_HOME}
+
+    async def get_log(self):
+        """The last lines of the tracker's log, shown when it doesn't open."""
+        try:
+            with self._log_file().open("r", encoding="utf-8", errors="replace") as log:
+                return "".join(deque(log, maxlen=12))
+        except OSError:
+            return ""
+
+    async def _copy_output(self, process):
+        try:
+            with self._log_file().open("ab") as log:
+                while True:
+                    line = await process.stdout.readline()
+                    if not line:
+                        return
+                    log.write(line)
+                    log.flush()
+        except (OSError, asyncio.CancelledError):
+            return
 
     async def _stop(self):
         process, self._process = self._process, None
         self._url = None
+        drain, self._drain = self._drain, None
+        if drain is not None:
+            drain.cancel()
         if process is None or process.returncode is not None:
             return
         try:

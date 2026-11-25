@@ -381,8 +381,8 @@
   .map-hud-how .era-toggle { flex: none; }
   .map-hud-how .era-toggle-label { min-width: 0; }
   .map-hud-how .map-hud-divider { display: none; }
-  .map-hud-modes { display: flex; flex: 1 1 100%; gap: 8px 10px; min-width: 0; }
-  .map-hud-modes .map-switch { flex: 1 1 0; min-width: 0; }
+  .map-hud-modes { display: flex; flex-wrap: wrap; flex: 1 1 100%; gap: 8px 10px; min-width: 0; }
+  .map-hud-modes .map-switch { flex: 1 1 120px; min-width: 0; }
   .map-hud-modes .map-switch span { min-width: 0; line-height: 1.25; }
 }
 /* A wide window whose map is still narrow (scaled display, small window): the bar folds its switches like on a tablet. */

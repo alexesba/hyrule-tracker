@@ -139,6 +139,14 @@ html, body { overscroll-behavior: none; }
   .page-header-actions .language-switch { min-height: 44px; padding: 4px 8px; }
   .todo-link { grid-template-columns: minmax(0, 1fr) auto; row-gap: 3px; }
   .todo-link > span:last-child { grid-column: 2; grid-row: 1 / span 2; }
+}
+/* The narrowest screens (the Steam Deck's quick access menu): the actions take a row under the title, which keeps its words whole. */
+@media (max-width: 360px) {
+  .page-header { grid-template-columns: minmax(0, 1fr); }
+  .page-header h1 { overflow-wrap: normal; }
+  .page-header-actions { justify-content: flex-start; }
+}
+@media (max-width: 640px) {
 
   /* Tab bar */
   .mobile-tabs { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px max(4px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left)); background: #141415; border-top: 1px solid #2a2a2d; z-index: 30; }
