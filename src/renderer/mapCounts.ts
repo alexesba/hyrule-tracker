@@ -1,7 +1,7 @@
 /**
  * Region a collectible is listed under. A point on the drawing wins. A point in the blank margin
  * does not stay with that region: a checklist region with no floor of its own receives it,
- * and otherwise it is left unmapped.
+ * and otherwise it is left unmapped. A row with no point stays with the atlas marker the player linked it to.
  */
 export function listedRegion(opts: {
   shownRegion?: string
@@ -13,6 +13,7 @@ export function listedRegion(opts: {
   placed: boolean
 }): string {
   if (opts.shownRegion) return opts.shownRegion;
+  if (!opts.placed && opts.markerRegion) return opts.markerRegion;
   if (opts.checklistRegion && opts.checklistRegion !== (opts.projectedRegion ?? '') && !opts.checklistHasFloor) return opts.checklistRegion;
   if (opts.placed && opts.projectedHasFloor && opts.checklistRegion === opts.projectedRegion) return 'unknown';
   if (opts.placed) return opts.projectedRegion || 'unknown';

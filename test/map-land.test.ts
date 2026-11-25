@@ -58,4 +58,14 @@ describe('illustrated map', () => {
       placed: true,
     })).toBe('unknown');
   });
+
+  it('keeps a row with no point with the atlas marker it is linked to', () => {
+    expect(listedRegion({
+      checklistRegion: 'LostWood',
+      checklistHasFloor: false,
+      markerRegion: 'KokiriForest',
+      projectedHasFloor: false,
+      placed: false,
+    })).toBe('KokiriForest');
+  });
 });
