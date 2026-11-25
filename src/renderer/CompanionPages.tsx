@@ -1,4 +1,4 @@
-import { Fragment, lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { Fragment, lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import type { Activity, AppState, PlayerState, SaveFolderChoice, TrackedCategory, TrackedItem } from '../shared/types';
 import { LOCAL_NAMES, MASK_SALE_NAMES } from '../core/companion';
 import { WALKTHROUGH_SOURCE_URL } from '../core/walkthrough';
@@ -777,6 +777,14 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   // Phone portrait: the map is too short to carry the panel, so it sits below the map until full screen.
   const narrowMap = useMatches(PANEL_BELOW);
   const panelBelow = narrowMap && !mapOnly;
+  // A map too narrow for both side menus (a scaled desktop, a small window): they start folded and one side opens at a time.
+  // Not remembered, so the choice made on a wide window stays as it was.
+  const crowded = useNarrowerThan(mapView, CROWDED_MAP) && !panelBelow;
+  const [crowdSide, setCrowdSide] = useState<'panel' | 'cats'>();
+  const sideOpen = crowded ? crowdSide === 'panel' : panelOpen;
+  const catsShown = crowded ? crowdSide === 'cats' : catsOpen;
+  const openSide = (open: boolean) => crowded ? setCrowdSide(open ? 'panel' : undefined) : setPanelOpen(open);
+  const openCats = (open: boolean) => crowded ? setCrowdSide(open ? 'cats' : undefined) : setCatsOpen(open);
   const inGame = (player && atlasStages[player.placeId]) || findRegion(state.summary?.area?.replace(/ \(.+\)$/, '') ?? '');
   const selected = follow && inGame ? inGame : picked;
   const inRegion = selected !== '';
@@ -826,7 +834,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
     setFilter('all');
     setEra('all');
     setHideDone(false);
-    setPanelOpen(true);
+    openSide(true);
     setActive(row.item);
     // Only when the requested entry changes; later state refreshes must not pull the map back.
   }, [focus]);
@@ -838,13 +846,13 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const selectItem = (item: TrackedItem) => setActive(item.id === active?.id ? undefined : item);
   const activeItem = local.find(({ item }) => active?.id === item.id)?.item;
   const panelTitle = inRegion ? t('Conclusão da área') : t('Progresso de conclusão');
-  const showPanel = !panelOpen ? <button type="button" className="map-panel-show" aria-expanded="false" onClick={() => setPanelOpen(true)}><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.9 2.2 4.1 6l3.8 3.8" /></svg>{panelTitle}</button> : undefined;
+  const showPanel = !sideOpen ? <button type="button" className="map-panel-show" aria-expanded="false" onClick={() => openSide(true)}><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.9 2.2 4.1 6l3.8 3.8" /></svg>{panelTitle}</button> : undefined;
   const rate = (key: string) => { const r = progress.byKey.get(key); return r ? percent(r.done, r.total) : 0; };
   const listed = progress.regions.filter(r => !hideUnknown || seen.has(r.key));
   const unknownRate = progress.byKey.get('unknown');
-      const sideChrome = panelOpen ? <aside className="map-side" aria-label={panelTitle}>
+      const sideChrome = sideOpen ? <aside className="map-side" aria-label={panelTitle}>
         <div className="map-side-head">
-          <button type="button" className="map-side-collapse" aria-label={t('Recolher painel')} title={t('Recolher painel')} aria-expanded="true" onClick={() => setPanelOpen(false)}><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.1 2.2 7.9 6 4.1 9.8" /></svg></button>
+          <button type="button" className="map-side-collapse" aria-label={t('Recolher painel')} title={t('Recolher painel')} aria-expanded="true" onClick={() => openSide(false)}><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.1 2.2 7.9 6 4.1 9.8" /></svg></button>
           <b>{panelTitle}</b>
         </div>
         {!inRegion ? <div className="map-side-body">
@@ -891,7 +899,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const chosenCat = filter === 'all' ? undefined : tallyCounters(mapRows).find(c => c.cat.id === filter);
   const regionAtlas = inRegion && showLocation && !!place;
   // RegionAtlas draws its own menu. The world map and a region without its own map use this one.
-  const catDrawer = !regionAtlas && (!inRegion || showLocation) && <MapCatDrawer open={catsOpen} onOpen={setCatsOpen} icon={chosenCat && <GameItemIcon id={chosenCat.icon} size={18} />} name={chosenCat && t(chosenCat.cat.label)}>
+  const catDrawer = !regionAtlas && (!inRegion || showLocation) && <MapCatDrawer open={catsShown} onOpen={openCats} icon={chosenCat && <GameItemIcon id={chosenCat.icon} size={18} />} name={chosenCat && t(chosenCat.cat.label)}>
     <div className="era-tabs" role="radiogroup" aria-label={t('Era')}>{eras.map(([id, label]) =>
       <button key={id} type="button" role="radio" aria-checked={era === id} onClick={() => { setEra(id); setActive(undefined); }}>{t(label)}</button>)}</div>
     {statusFilter}
@@ -900,9 +908,9 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   </MapCatDrawer>;
 
 
-  return <div ref={mapView} className={mapOnly ? 'map-view map-only' : 'map-view'}>
+  return <div ref={mapView} className={['map-view', mapOnly && 'map-only', crowded && 'crowded'].filter(Boolean).join(' ')}>
     {player?.source === 'save' && <p className="map-note">{t(SAVE_POSITION_NOTE)}</p>}
-    <div className={panelOpen ? 'map-stage' : 'map-stage no-panel'}>
+    <div className={sideOpen ? 'map-stage' : 'map-stage no-panel'}>
       <section className="map-main">
         {!inRegion ? <ZoomPan key="world" ratio={atlas.map.width / atlas.map.height} className="world-map" overlay={<><MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={regionMenu} how={mapModes} />{!panelBelow && catDrawer}{onMap}</>} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />}>
           <img className="map-art" src={atlas.map.image} alt={t("Mapa de Hyrule")} draggable={false} />
@@ -930,7 +938,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
           })}
           {player && <PlayerPin at={player.world} yaw={player.yaw} live={player.source === 'live'} />}
         </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} onEra={next => { setEra(next); setActive(undefined); }} filter={filter} onFilter={pickFilter} show={show} onShow={pickShow} hideDone={hideDone} player={player} follow={follow} regionMenu={regionMenu} mapModes={mapModes} overlay={onMap} onBack={back} hudOpen={hudOpen} onHud={() => setHudOpen(!hudOpen)} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
-            categoryRows={local} chosenCat={chosenCat} catsOpen={catsOpen} onCats={setCatsOpen} below={panelBelow} focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
+            categoryRows={local} chosenCat={chosenCat} catsOpen={catsShown} onCats={openCats} below={panelBelow} focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
           : <div className="zoom-viewport map-unmapped">
             <MapHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} where={<><MapBack onBack={back} />{regionMenu}</>} how={mapModes} />
             {!panelBelow && catDrawer}
@@ -1021,6 +1029,23 @@ export function useMapOnlyView(view: RefObject<HTMLElement | null>) {
 export const DOCKED_CARD = '(max-width: 640px), (max-height: 500px), (pointer: coarse)';
 /** Phone portrait (the 760px block in companion.css): the progress panel sits below the map instead of on it. */
 const PANEL_BELOW = '(max-width: 760px)';
+/** Map width (CSS px) under which the filter menu and the progress panel together would cover most of the map. */
+const CROWDED_MAP = 1100;
+/** Whether the element is narrower than the width, measured before paint so the menus don't flash open. */
+function useNarrowerThan(ref: RefObject<HTMLElement | null>, width: number) {
+  const [narrow, setNarrow] = useState(false);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => { const w = el.getBoundingClientRect().width; setNarrow(w > 0 && w < width); };
+    update();
+    if (typeof ResizeObserver === 'undefined') return;
+    const watch = new ResizeObserver(update);
+    watch.observe(el);
+    return () => watch.disconnect();
+  }, [ref, width]);
+  return narrow;
+}
 export function useMatches(query: string) {
   const [matches, setMatches] = useState(() => matchMedia(query).matches);
   useEffect(() => {

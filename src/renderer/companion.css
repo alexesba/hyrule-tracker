@@ -385,6 +385,17 @@
   .map-hud-modes .map-switch { flex: 1 1 0; min-width: 0; }
   .map-hud-modes .map-switch span { min-width: 0; line-height: 1.25; }
 }
+/* A wide window whose map is still narrow (scaled display, small window): the bar folds its switches like on a tablet. */
+@media (min-width: 961px) {
+  .map-view.crowded .map-hud-toggle { display: grid; place-items: center; flex: none; width: 36px; height: 36px; padding: 0; border: 1px solid #494038; border-radius: 50%; background: #1a1714; color: var(--hyrule-muted); cursor: pointer; }
+  .map-view.crowded .map-hud-toggle:hover, .map-view.crowded .map-hud-toggle[aria-expanded="true"] { color: var(--hyrule-text); border-color: var(--hyrule-accent); }
+  .map-view.crowded .map-hud.is-collapsed :is(.map-hud-how, .map-floor) { display: none; }
+  .map-view.crowded .map-hud.is-collapsed { flex-wrap: nowrap; }
+  /* The select shows the region name; its caption stays for screen readers so the fold toggle fits on the same row. */
+  .map-view.crowded .map-hud .map-region:not(.map-floor) { flex: 1 1 220px; min-width: 0; }
+  .map-view.crowded .map-hud .map-region:not(.map-floor) select { flex: 1 1 auto; width: auto; min-width: 0; max-width: none; }
+  .map-view.crowded .map-hud-where .map-region:not(.map-floor) > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
 /* Tablet: a slimmer panel leaves the bar room for long region names, and the map gets enough height for the panel to show its counters. */
 @media (min-width: 761px) and (max-width: 960px) and (min-height: 501px) {
   .zoom-viewport { min-height: min(640px, calc(100dvh - 240px)); }
