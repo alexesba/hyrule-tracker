@@ -4,6 +4,21 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [2.0.3] - 2026-11-25
+
+### New
+- **Map without spoilers.** A **No spoilers** switch in the bar on top of the Hyrule map shows only what you have collected: markers, region counts and the area list leave out what is still to find, counts show what you collected instead of totals, and categories you found nothing of stay hidden. Thanks to Josh98VFW for asking for it. [#32](https://github.com/jv-prado/hyrule-tracker/issues/32)
+- **Steam Deck journal in the quick access menu.** The Decky plugin (0.1.0-experimental.4) opens the journal inside the quick access menu, in the phone layout, with **Full screen** for the whole screen. When it doesn't open, it says whether the tracker didn't start or its page didn't load, shows the end of its log, and offers the Steam browser instead. Thanks to eduardorodrigues08 for testing every build and for the idea. [#21](https://github.com/jv-prado/hyrule-tracker/issues/21)
+
+### Improved
+- **NX2Saria's tracker API.** NX2Saria answers live only with `tracker_api = 1` in its `nx2saria.ini`, which is off by default. With the game open and the API off, the tracker now says so and how to turn it on, instead of waiting for the game. A `tracker_api_port` set in the same file is followed. Thanks to Outlander87 for reporting it. [#31](https://github.com/jv-prado/hyrule-tracker/issues/31)
+
+### Fixed
+- **Map readable at 150% display scaling.** On a scaled or small window, the filter menu, the progress panel and the region bar covered most of the map. When the map is narrow, both menus start folded and only one opens at a time, and the bar folds its switches. Thanks to Outlander87 for the screenshots. [#30](https://github.com/jv-prado/hyrule-tracker/issues/30)
+- **Collectibles off a region's drawing.** A collectible whose position misses a region's drawing is no longer counted in that region's lists. Kokiri Forest no longer lists a Lost Woods Gossip Stone and a purple rupee chest, and the Lost Woods lists its Gossip Stone. Thanks to alexesba. [#29](https://github.com/jv-prado/hyrule-tracker/pull/29)
+- **Steam Deck plugin could stop.** The plugin kept the tracker's output unread, which could stop the tracker after a while. [#21](https://github.com/jv-prado/hyrule-tracker/issues/21)
+- **Narrow screens.** On screens 360 px wide or less, page titles keep their words whole and the map's switches wrap into rows.
+
 ## [2.0.2] - 2026-11-23
 
 ### New
