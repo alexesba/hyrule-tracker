@@ -111,6 +111,22 @@ function refusal(e: unknown): NoRead | undefined {
   return e.code === NOT_NOW ? { none: 'wait' } : e.code === UNSUPPORTED ? { none: 'unsupported' } : undefined;
 }
 
+/**
+ * The tracker API's settings in an nx2saria.ini: `tracker_api` (off unless 1) and `tracker_api_port`, both in
+ * [tracker] in NX2Saria's example file but read by key alone here, since a section name is not what turns them on.
+ */
+export function trackerApiSettings(ini: string): { on: boolean; port: number } {
+  let on = false, port = NX2SARIA_PORT;
+  for (const raw of ini.split(/\r?\n/)) {
+    const line = raw.replace(/[#;].*$/, '').trim();
+    const m = /^(tracker_api|tracker_api_port)\s*=\s*(\S+)$/i.exec(line);
+    if (!m) continue;
+    if (m[1].toLowerCase() === 'tracker_api') on = m[2] === '1';
+    else { const n = Number(m[2]); if (Number.isInteger(n) && n >= 1024 && n <= 65535) port = n; }
+  }
+  return { on, port };
+}
+
 /** The game answering is NX2Saria with the game-data method. */
 export function isNx2Saria(s: ApiStatus | undefined): boolean {
   return !!s && s.emulator === 'nx2saria' && s.api_version >= 1 && !!s.methods?.includes('nx2saria.game_data');

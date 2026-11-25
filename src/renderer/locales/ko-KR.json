@@ -1813,5 +1813,7 @@
   "Consultar o guia da IGN": "IGN 공략 보기",
   "Opcional": "선택",
   "{n} passo": "{n}단계",
-  "{n} passos": "{n}단계"
+  "{n} passos": "{n}단계",
+  "NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.": "NX2Saria가 트래커 API가 꺼진 상태로 실행 중입니다. nx2saria.ini에서 tracker_api = 1로 설정하고 게임을 다시 시작하세요.",
+  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria가 실행 중이지만 트래커 API가 포트 {port}에서 응답하지 않습니다. 방금 켰다면 게임을 다시 시작하세요."
 }

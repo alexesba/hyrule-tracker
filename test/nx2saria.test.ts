@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import net from 'node:net';
-import { decodeRecords, decodeKeys, overlay, yawFromRotation, ApiSession, isNx2Saria, type GameDataAnswer } from '../src/gamedata/nx2saria';
+import { decodeRecords, decodeKeys, overlay, yawFromRotation, ApiSession, isNx2Saria, trackerApiSettings, type GameDataAnswer } from '../src/gamedata/nx2saria';
 import { matchesReference, LOCATION_KEY, STAGE_KEY } from '../src/gamedata/live';
 import type { GameDataFile, Entry } from '../src/gamedata/parser';
 
@@ -164,5 +164,19 @@ describe('NX2Saria tracker API: a session', () => {
     server = net.createServer(sock => sock.end('HTTP/1.1 400 Bad Request\r\n\r\n'));
     await new Promise<void>(r => server!.listen(0, '127.0.0.1', r));
     expect(await ApiSession.open((server.address() as net.AddressInfo).port)).toBeUndefined();
+  });
+});
+
+describe('nx2saria.ini tracker settings', () => {
+  it('is off with the example file, where both settings are commented out', () => {
+    expect(trackerApiSettings('[tracker]\n# tracker_api = 0\n# tracker_api_port = 6545\n')).toEqual({ on: false, port: 6545 });
+  });
+
+  it('reads tracker_api = 1 and a moved port, with Windows line ends and a comment after the value', () => {
+    expect(trackerApiSettings('[tracker]\r\ntracker_api = 1 ; on\r\ntracker_api_port=7001\r\n')).toEqual({ on: true, port: 7001 });
+  });
+
+  it('keeps the default port when the one given is out of range', () => {
+    expect(trackerApiSettings('tracker_api = 1\ntracker_api_port = 80\n')).toEqual({ on: true, port: 6545 });
   });
 });

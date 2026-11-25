@@ -1813,5 +1813,7 @@
   "Consultar o guia da IGN": "Bekijk de IGN-gids",
   "Opcional": "Optioneel",
   "{n} passo": "{n} stap",
-  "{n} passos": "{n} stappen"
+  "{n} passos": "{n} stappen",
+  "NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.": "NX2Saria draait met de tracker-API uit. Zet tracker_api = 1 in nx2saria.ini en start het spel opnieuw.",
+  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria draait, maar de tracker-API antwoordt niet op poort {port}. Heb je hem net aangezet, start het spel dan opnieuw."
 }

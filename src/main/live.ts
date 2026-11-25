@@ -7,7 +7,9 @@ import type { GameDataFile } from '../gamedata/parser.js';
 import { locate, readTables, buildLive, fingerprint, matchesReference, sweepRanges, readableRanges, LiveTables, Agreement } from '../gamedata/live.js';
 import { MemoryAccessDenied, findProcesses, initMemoryAccess, openProcess, type GameProcess } from './procmem.js';
 import { ptraceScope } from './procmem-linux.js';
-import { ApiSession } from '../gamedata/nx2saria.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import { ApiSession, NX2SARIA_PORT, trackerApiSettings } from '../gamedata/nx2saria.js';
 import { NATIVE_EXES, EMULATOR_EXES, REKARINA_EXE } from '../gamedata/saves.js';
 import { readRekarinaTables, REKARINA_MAIN_BASE, REKARINA_MIN_ADDRESS, type RekarinaTables } from '../gamedata/rekarina.js';
 import type { LiveInfo } from '../shared/types.js';
@@ -37,6 +39,8 @@ const GAMES: GameEntry[] = [{ image: REKARINA_EXE, emulator: false, rekarina: tr
   ...NATIVE_EXES.map(image => ({ image, emulator: false })),
   ...EMULATOR_EXES.map(image => ({ image, emulator: true })),
   ...MAC_NATIVE_EXES.map(image => ({ image, emulator: true, hostPointers: true }))];
+/** NX2Saria's game as its launcher builds it (the installed launcher itself is NX2Saria.exe). */
+const NX2SARIA_GAME_EXE = 'ocarina.exe';
 const TICK_MS = 500;
 /** Link's position is read this often once the main module is known (a few small reads), so the pin follows him. */
 const PLAYER_TICK_MS = 50;
@@ -100,6 +104,8 @@ export class LiveSource {
   private playerStage?: string;
   /** NX2Saria's tracker API, while it answers (instead of reading a process). */
   private api?: ApiSession;
+  /** The port NX2Saria's API listens on: its nx2saria.ini can move it from the default. */
+  private apiPort = NX2SARIA_PORT;
   /** Reading another process's memory works on this system (Windows). */
   private memoryAccess = false;
   /** Ticks in a row the API gave no data while live: a few are a save being written or loaded. */
@@ -199,7 +205,7 @@ export class LiveSource {
       this.lastFind = Date.now();
       // NX2Saria answers for itself and needs no memory reading: asked beside the process search, preferred.
       // A failed process search (tasklist) must neither leak the API connection nor keep NX2Saria from being read.
-      const [api, found] = await Promise.all([ApiSession.open(),
+      const [api, found] = await Promise.all([ApiSession.open(this.apiPort),
         this.memoryAccess ? findGame().then(game => ({ game }), (error: unknown) => ({ error })) : undefined]);
       if (!this.timer) { api?.close(); return; }
       if (api) {
@@ -209,6 +215,10 @@ export class LiveSource {
         if (!this.timer || this.api !== api) return;
         return this.apiStep();
       }
+      // NX2Saria running without its API answering: say how to turn it on instead of waiting for a game that is open.
+      const saria = await this.nx2sariaWithoutApi();
+      if (!this.timer) return;
+      if (saria) return this.set(saria);
       if (!this.memoryAccess) return this.set({ status: 'unavailable', detail: 'Reading game memory is not available on this system.' });
       if (found && 'error' in found) throw found.error;
       const game = found?.game;
@@ -258,6 +268,22 @@ export class LiveSource {
     // Nothing tracked changed: skip rebuilding (most ticks).
     if (print === this.lastPrint && this.info.status === 'live') return;
     this.publish(print, buildLive(this.tables!, raw, this.ref, this.permanentFlags));
+  }
+
+  /**
+   * NX2Saria's game is running but its API did not answer. Its nx2saria.ini (beside the game, or one folder up) says
+   * whether the API is off or on another port; a new port is tried on the next search. Undefined when it isn't running.
+   */
+  private async nx2sariaWithoutApi(): Promise<LiveInfo | undefined> {
+    const pid = (await findProcesses(NX2SARIA_GAME_EXE).catch(() => []))[0];
+    if (!pid) return undefined;
+    const settings = this.memoryAccess ? nx2sariaSettings(pid) : undefined;
+    if (settings?.on && settings.port !== this.apiPort) {
+      this.apiPort = settings.port;
+      this.lastFind = 0;
+    }
+    if (settings?.on) return { status: 'unavailable', detail: "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.", detailValues: { port: settings.port } };
+    return { status: 'unavailable', detail: 'NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.' };
   }
 
   /** NX2Saria: Link's place and the game data, from its tracker API. A failed call drops the connection. */
@@ -396,6 +422,18 @@ async function findGame(): Promise<{ pid: number; emulator?: boolean; hostPointe
     const pids = await findProcesses(g.image);
     const pid = pids.length > 1 ? largest(pids) : pids[0];
     if (pid) return { pid, emulator: g.emulator, hostPointers: g.hostPointers, rekarina: g.rekarina };
+  }
+  return undefined;
+}
+
+/** The tracker API settings in the nx2saria.ini of the running game, when its exe's folder (or the one above) has one. */
+function nx2sariaSettings(pid: number): ReturnType<typeof trackerApiSettings> | undefined {
+  let exe: string | undefined;
+  let p: GameProcess | undefined;
+  try { p = openProcess(pid); exe = p.imagePath(); } catch { return undefined; } finally { p?.close(); }
+  if (!exe) return undefined;
+  for (const dir of [path.dirname(exe), path.dirname(path.dirname(exe))]) {
+    try { return trackerApiSettings(fs.readFileSync(path.join(dir, 'nx2saria.ini'), 'utf8')); } catch { /* not here */ }
   }
   return undefined;
 }

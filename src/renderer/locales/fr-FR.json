@@ -1813,5 +1813,7 @@
   "Consultar o guia da IGN": "Consulter le guide d’IGN",
   "Opcional": "Facultatif",
   "{n} passo": "{n} étape",
-  "{n} passos": "{n} étapes"
+  "{n} passos": "{n} étapes",
+  "NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.": "NX2Saria est lancé avec son API de tracker désactivée. Mettez tracker_api = 1 dans nx2saria.ini et relancez le jeu.",
+  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria est lancé, mais son API de tracker ne répond pas sur le port {port}. Si vous venez de l'activer, relancez le jeu."
 }

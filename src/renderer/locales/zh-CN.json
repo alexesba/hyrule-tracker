@@ -1813,5 +1813,7 @@
   "Consultar o guia da IGN": "查看 IGN 攻略",
   "Opcional": "可选",
   "{n} passo": "{n} 步",
-  "{n} passos": "{n} 步"
+  "{n} passos": "{n} 步",
+  "NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.": "NX2Saria 正在运行，但追踪器 API 已关闭。请在 nx2saria.ini 中设置 tracker_api = 1，然后重启游戏。",
+  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria 正在运行，但追踪器 API 在端口 {port} 上没有响应。如果刚刚开启，请重启游戏。"
 }
