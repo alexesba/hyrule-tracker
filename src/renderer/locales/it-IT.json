@@ -1815,5 +1815,8 @@
   "{n} passo": "{n} passo",
   "{n} passos": "{n} passi",
   "NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.": "NX2Saria è in esecuzione con l'API del tracker disattivata. Imposta tracker_api = 1 in nx2saria.ini e riavvia il gioco.",
-  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria è in esecuzione, ma l'API del tracker non risponde sulla porta {port}. Se l'hai appena attivata, riavvia il gioco."
+  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria è in esecuzione, ma l'API del tracker non risponde sulla porta {port}. Se l'hai appena attivata, riavvia il gioco.",
+  "Sem spoilers": "Senza spoiler",
+  "Mostra só o que você já coletou, sem contar o que falta.": "Mostra solo ciò che hai già raccolto, senza contare ciò che manca.",
+  "Coletados por região": "Raccolti per regione"
 }

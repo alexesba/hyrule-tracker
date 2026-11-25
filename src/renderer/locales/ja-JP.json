@@ -1815,5 +1815,8 @@
   "{n} passo": "{n}ステップ",
   "{n} passos": "{n}ステップ",
   "NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.": "NX2Saria はトラッカー API がオフのまま起動しています。nx2saria.ini で tracker_api = 1 を設定し、ゲームを再起動してください。",
-  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria は起動していますが、トラッカー API がポート {port} で応答しません。オンにしたばかりなら、ゲームを再起動してください。"
+  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria は起動していますが、トラッカー API がポート {port} で応答しません。オンにしたばかりなら、ゲームを再起動してください。",
+  "Sem spoilers": "ネタバレなし",
+  "Mostra só o que você já coletou, sem contar o que falta.": "集めたものだけを表示し、残りの数は表示しません。",
+  "Coletados por região": "地域ごとの収集数"
 }

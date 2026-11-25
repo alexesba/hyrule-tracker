@@ -1815,5 +1815,8 @@
   "{n} passo": "{n} шаг",
   "{n} passos": "Шагов: {n}",
   "NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.": "NX2Saria запущена с выключенным API трекера. Укажите tracker_api = 1 в nx2saria.ini и перезапустите игру.",
-  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria запущена, но API трекера не отвечает на порту {port}. Если вы только что его включили, перезапустите игру."
+  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria запущена, но API трекера не отвечает на порту {port}. Если вы только что его включили, перезапустите игру.",
+  "Sem spoilers": "Без спойлеров",
+  "Mostra só o que você já coletou, sem contar o que falta.": "Показывает только то, что вы уже собрали, не считая оставшегося.",
+  "Coletados por região": "Собрано по регионам"
 }

@@ -1007,3 +1007,6 @@ Opcional||Optional|Opcional
 {n} passos||{n} steps|{n} pasos
 NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.|O NX2Saria está aberto com a API de tracker desligada. Coloque tracker_api = 1 no nx2saria.ini e reinicie o jogo.|NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.|NX2Saria está abierto con la API de tracker desactivada. Pon tracker_api = 1 en nx2saria.ini y reinicia el juego.
 NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.|O NX2Saria está aberto, mas a API de tracker não responde na porta {port}. Se você acabou de ligá-la, reinicie o jogo.|NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.|NX2Saria está abierto, pero su API de tracker no responde en el puerto {port}. Si acabas de activarla, reinicia el juego.
+Sem spoilers||No spoilers|Sin spoilers
+Mostra só o que você já coletou, sem contar o que falta.||Shows only what you have collected, without counting what is left.|Muestra solo lo que ya recogiste, sin contar lo que falta.
+Coletados por região||Collected by region|Recogidos por región

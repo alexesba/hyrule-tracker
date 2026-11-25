@@ -1815,5 +1815,8 @@
   "{n} passo": "{n} 步",
   "{n} passos": "{n} 步",
   "NX2Saria is running with its tracker API off. Set tracker_api = 1 in nx2saria.ini and restart the game.": "NX2Saria 正在執行，但追蹤器 API 已關閉。請在 nx2saria.ini 中設定 tracker_api = 1，然後重新啟動遊戲。",
-  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria 正在執行，但追蹤器 API 在連接埠 {port} 上沒有回應。如果剛剛開啟，請重新啟動遊戲。"
+  "NX2Saria is running, but its tracker API doesn't answer on port {port}. If you just turned it on, restart the game.": "NX2Saria 正在執行，但追蹤器 API 在連接埠 {port} 上沒有回應。如果剛剛開啟，請重新啟動遊戲。",
+  "Sem spoilers": "無劇透",
+  "Mostra só o que você já coletou, sem contar o que falta.": "只顯示已收集的內容，不統計剩餘部分。",
+  "Coletados por região": "依地區統計已收集"
 }

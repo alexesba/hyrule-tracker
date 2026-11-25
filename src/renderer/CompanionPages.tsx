@@ -1,4 +1,4 @@
-import { Fragment, lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { createContext, Fragment, lazy, Suspense, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import type { Activity, AppState, PlayerState, SaveFolderChoice, TrackedCategory, TrackedItem } from '../shared/types';
 import { LOCAL_NAMES, MASK_SALE_NAMES } from '../core/companion';
 import { WALKTHROUGH_SOURCE_URL } from '../core/walkthrough';
@@ -674,13 +674,27 @@ const inEra = (r: MapRow, era: Era) => {
  * The map's two scores: entries that count toward 100% (the same ones the Overview counts, those with a place)
  * and the extras the map also tracks (chests, grottos, Gossip Stones…), which don't.
  */
+/**
+ * The map without spoilers: only what the player has collected, and no totals that tell how much is left.
+ * The percentages and "x/y" counts become the count collected.
+ */
+const NoSpoilers = createContext(false);
+
 function SplitScore({ rows, overall }: { rows: MapRow[]; overall?: { done: number; total: number } }) {
+  const noSpoilers = useContext(NoSpoilers);
   const tally = (list: MapRow[]) => ({ done: list.filter(r => r.item.done).length, total: list.length });
   const parts = [
     // On the Hyrule map the 100% line is the whole checklist (the Overview's number), not just what has a place.
     { key: 'main', label: 'Conta para o 100%', note: undefined, ...(overall ?? tally(rows.filter(r => r.cat.countsToward100))) },
     { key: 'extra', label: 'Extras do mapa', note: 'Não contam para o 100%', ...tally(rows.filter(r => !r.cat.countsToward100)) },
   ].filter(p => p.total);
+  if (noSpoilers) return <div className="split-score">{parts.filter(p => p.key === 'main' || p.done).map(p => (
+    <div key={p.key} className={`split-row ${p.key}`}>
+      <span className="split-label">{t(p.label)}</span>
+      <b>{number(p.done)}</b>
+      <small className="split-meta">{t('Coletados')}{p.note && <> · {t(p.note)}</>}</small>
+    </div>
+  ))}</div>;
   return <div className="split-score">{parts.map(p => (
     <div key={p.key} className={`split-row ${p.key}`}>
       <span className="split-label">{t(p.label)}</span>
@@ -713,19 +727,22 @@ type CategoryCounter = ReturnType<typeof tallyCounters>[number];
 
 /** The area panel's category list. A click filters; the next click on the same row clears it. */
 function CategoryCounters({ rows, filter, chosen, onFilter }: { rows: MapRow[]; filter: string; chosen?: CategoryCounter; onFilter: (id: string) => void }) {
-  const counters = tallyCounters(rows);
+  const noSpoilers = useContext(NoSpoilers);
+  // Without spoilers a category the player has found nothing of stays unnamed: its name says it is here.
+  const counters = tallyCounters(rows).filter(c => !noSpoilers || c.done > 0 || c.cat.id === chosen?.cat.id);
   // The filter follows the player between regions. A region without that category still lists it, at 0/0, so it can be cleared here.
   if (chosen && !counters.some(c => c.cat.id === chosen.cat.id)) counters.push({ ...chosen, done: 0, total: 0 });
   if (!counters.length) return null;
+  const count = (done: number, total: number) => noSpoilers ? number(done) : `${number(done)}/${number(total)}`;
   const doneAll = counters.reduce((n, c) => n + c.done, 0);
   const totalAll = counters.reduce((n, c) => n + c.total, 0);
   return <div className="side-counters">
     <button type="button" aria-pressed={filter === 'all'} onClick={() => onFilter('all')}>
-      <span className="counter-icon"><Icon name="map" size={18} /></span><span>{t('Todos os itens')}</span><b>{number(doneAll)}/{number(totalAll)}</b>
+      <span className="counter-icon"><Icon name="map" size={18} /></span><span>{t('Todos os itens')}</span><b>{count(doneAll, totalAll)}</b>
     </button>
     {counters.map(c =>
     <button key={c.cat.id} type="button" aria-pressed={filter === c.cat.id} title={t('Filtrar a lista por esta categoria')} onClick={() => onFilter(filter === c.cat.id ? 'all' : c.cat.id)}>
-      <span className="counter-icon"><GameItemIcon id={c.icon} size={18} /></span><span>{t(c.cat.label)}</span><b>{number(c.done)}/{number(c.total)}</b>
+      <span className="counter-icon"><GameItemIcon id={c.icon} size={18} /></span><span>{t(c.cat.label)}</span><b>{count(c.done, c.total)}</b>
     </button>)}</div>;
 }
 
@@ -750,6 +767,8 @@ export function MapCatDrawer({ open, onOpen, icon, name, children }: { open: boo
 
 /** All / still to find / already taken, the same control a region map uses for its markers. */
 export function StatusFilter({ show, onShow, total, left }: { show: MapBadgeStatus; onShow: (id: MapBadgeStatus) => void; total: number; left: number }) {
+  // Without spoilers the map shows only what was collected, and these counts would tell what is left.
+  if (useContext(NoSpoilers)) return null;
   return <div className="marker-filter" role="radiogroup" aria-label={t('Mostrar no mapa')}>
     {([['all', 'Todos', total], ['todo', 'Faltam', left], ['done', 'Coletados', total - left]] as const).map(([id, label, n]) =>
       <button key={id} type="button" role="radio" aria-checked={show === id} className={`filter-${id}`} onClick={() => onShow(id)}><span>{t(label)}</span><b>{number(n)}</b></button>)}
@@ -762,7 +781,10 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const [picked, setPicked] = useState('');
   const [era, setEra] = useState<Era>('all');
   const [filter, setFilter] = useState('all');
-  const [show, setShow] = useStored<MapBadgeStatus>('map.show', 'all');
+  const [showPicked, setShow] = useStored<MapBadgeStatus>('map.show', 'all');
+  const [noSpoilers, setNoSpoilers] = useStored('map.noSpoilers', false);
+  // Without spoilers the map draws and counts only what was collected.
+  const show: MapBadgeStatus = noSpoilers ? 'done' : showPicked;
   const [hideDone, setHideDone] = useState(false);
   const [hideUnknown, setHideUnknown] = useStored('map.hideUnknown', false);
   // On by default: the map opens where Link is and keeps up with him.
@@ -814,7 +836,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   }, [rows]);
 
   const local = rows.filter(r => r.area === selected && inEra(r, era));
-  const visible = local.filter(r => (!hideDone || !r.item.done) && (filter === 'all' || filter === r.cat.id));
+  const visible = local.filter(r => (noSpoilers ? r.item.done : !hideDone || !r.item.done) && (filter === 'all' || filter === r.cat.id));
   const showLocation = !hideUnknown || seen.has(selected);
   const place = atlas.places.find(p => atlasStages[p.id] === selected);
   // Rows with an atlas marker are drawn by that marker (with its photos), not a second time.
@@ -858,15 +880,15 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
         {!inRegion ? <div className="map-side-body">
           <div className="side-score"><span className="side-region">{t('Hyrule')}</span></div>
           <SplitScore rows={rows.filter(r => LOCAL_NAMES[r.area])} overall={state.summary ? { done: state.summary.doneA, total: state.summary.totalA } : undefined} />
-          <p className="side-sub">{t('Taxa de conclusão por região')}</p>
+          <p className="side-sub">{t(noSpoilers ? 'Coletados por região' : 'Taxa de conclusão por região')}</p>
           <div className="region-rates">
             {listed.map(r => <button key={r.key} type="button" className="region-rate" style={areaShot(r.key) ? { backgroundImage: `linear-gradient(90deg, #14121100 0%, #141211a0 52%, #141211 88%), url("${areaShot(r.key)}")` } : undefined} onClick={() => open(r.key)}>
-              <span className="rate-name">{t(LOCAL_NAMES[r.key])}</span><b>{rate(r.key)}%</b>
-              <span className="rate-track"><i style={{ width: `${rate(r.key)}%` }} /></span>
+              <span className="rate-name">{t(LOCAL_NAMES[r.key])}</span><b>{noSpoilers ? number(r.done) : `${rate(r.key)}%`}</b>
+              {!noSpoilers && <span className="rate-track"><i style={{ width: `${rate(r.key)}%` }} /></span>}
             </button>)}
             {!hideUnknown && unknownRate && <button type="button" className="region-rate" onClick={() => open('unknown')}>
-              <span className="rate-name">{t('Baús sem posição mapeada')}</span><b>{unknownRate.done}/{unknownRate.total}</b>
-              <span className="rate-track"><i style={{ width: `${percent(unknownRate.done, unknownRate.total)}%` }} /></span>
+              <span className="rate-name">{t('Baús sem posição mapeada')}</span><b>{noSpoilers ? number(unknownRate.done) : `${unknownRate.done}/${unknownRate.total}`}</b>
+              {!noSpoilers && <span className="rate-track"><i style={{ width: `${percent(unknownRate.done, unknownRate.total)}%` }} /></span>}
             </button>}
           </div>
         </div> : <div className="map-side-body">
@@ -874,7 +896,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
           {showLocation && <SplitScore rows={local} />}
           {!showLocation ? <p className="quiet">{t("Visite a região para ver os itens.")}</p> : <>
             <div className="side-list-head"><h3>{t('Coletáveis')}</h3><small>{visible.length}</small>
-              <label><input type="checkbox" checked={hideDone} onChange={e => setHideDone(e.target.checked)} />{t("Só pendentes")}</label></div>
+              {!noSpoilers && <label><input type="checkbox" checked={hideDone} onChange={e => setHideDone(e.target.checked)} />{t("Só pendentes")}</label>}</div>
             {visible.length ? <div className="result-list">{visible.map(({ item, cat }) => <Fragment key={item.id}><button aria-expanded={item.id === active?.id} aria-pressed={item.id === active?.id} onClick={() => selectItem(item)}><span className={item.done ? 'story-dot done' : 'story-dot'} /><span><ObjectiveName done={item.done}>{t(item.name)}</ObjectiveName><small>{t(cat.label)} · {item.done ? t('Coletado') : item.state === 'unknown' || item.state === 'unmapped' ? t('Situação não mapeada') : t('Pendente')}</small></span></button>
               {item.id === activeItem?.id && <div className="result-detail"><p>{activeItem.where ? t(activeItem.where) : t(cat.label)}</p>
                 <div className="result-actions">
@@ -894,6 +916,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   const mapModes = <div className="map-hud-modes">
     <label className="map-switch"><input type="checkbox" checked={hideUnknown} onChange={e => setHideUnknown(e.target.checked)} /><span>{t("Ocultar regiões não vistas")}</span></label>
     <label className="map-switch"><input type="checkbox" checked={follow} onChange={e => { setFollow(e.target.checked); setActive(undefined); }} /><span>{t("Seguir Link")}</span></label>
+    <label className="map-switch" title={t('Mostra só o que você já coletou, sem contar o que falta.')}><input type="checkbox" checked={noSpoilers} onChange={e => { setNoSpoilers(e.target.checked); setActive(undefined); }} /><span>{t("Sem spoilers")}</span></label>
   </div>;
   // Looked up over every region, so a category this region lacks still has its name and icon.
   const chosenCat = filter === 'all' ? undefined : tallyCounters(mapRows).find(c => c.cat.id === filter);
@@ -908,7 +931,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
   </MapCatDrawer>;
 
 
-  return <div ref={mapView} className={['map-view', mapOnly && 'map-only', crowded && 'crowded'].filter(Boolean).join(' ')}>
+  return <NoSpoilers.Provider value={noSpoilers}><div ref={mapView} className={['map-view', mapOnly && 'map-only', crowded && 'crowded'].filter(Boolean).join(' ')}>
     {player?.source === 'save' && <p className="map-note">{t(SAVE_POSITION_NOTE)}</p>}
     <div className={sideOpen ? 'map-stage' : 'map-stage no-panel'}>
       <section className="map-main">
@@ -949,7 +972,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
         {panelBelow && sideChrome}
       </section>
     </div>
-  </div>;
+  </div></NoSpoilers.Provider>;
 }
 
 /** Leaves a region for the world map. The label names where it goes, so it reads as a way back and not as a map icon. */
