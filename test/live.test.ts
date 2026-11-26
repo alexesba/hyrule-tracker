@@ -306,6 +306,41 @@ describe('live memory tables', () => {
     expect(areaFrom('Market_Child', undefined)).toBe('Market_Child');
   });
 
+  it('keeps a table when a hole shares its 64 KB piece', () => {
+    const { mem, tables } = build();
+    const ref = reference();
+    // The blank page in front of the bool map shares that map's 64 KB piece.
+    const hole = 0;
+    expect(tables.BoolMap).toBeGreaterThanOrEqual(0x1000);
+    expect(tables.BoolMap).toBeLessThan(0x10000);
+    const overlaps = (off: number, len: number) => off < hole + 0x1000 && off + len > hole;
+    const sizes: number[] = [];
+    const m: Mem = { read: (addr, len) => {
+      sizes.push(len);
+      const off = Number(addr - BASE);
+      if (off < 0 || off + len > mem.length || overlaps(off, len)) return null;
+      return Buffer.from(mem.subarray(off, off + len));
+    } };
+    const t = locate(m, ref, BASE + 0x200000n, 2 << 20);
+    expect(t?.records.map(r => r.type)).toEqual(['Bool', 'Int', 'Enum']);
+    expect(sizes).toContain(4096);
+  });
+
+  it('leaves a 64 KB read that succeeds as one read', () => {
+    const { mem } = build();
+    const ref = reference();
+    const sizes: number[] = [];
+    const m: Mem = { read: (addr, len) => {
+      sizes.push(len);
+      const off = Number(addr - BASE);
+      if (off < 0 || off + len > mem.length) return null;
+      return Buffer.from(mem.subarray(off, off + len));
+    } };
+    expect(locate(m, ref, BASE + 0x200000n, 2 << 20)).toBeTruthy();
+    expect(sizes.filter(n => n === 4096)).toEqual([]);
+    expect(sizes.filter(n => n === 65536).length).toBeGreaterThan(0);
+  });
+
   it('notices when the tables move or are freed', () => {
     const { mem, m, tables } = build();
     const ref = reference();
