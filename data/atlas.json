@@ -37,8 +37,21 @@
         "x": 0.6947,
         "y": 0.6392
       },
-      "startMap": null,
-      "maps": []
+      "startMap": "principal",
+      "maps": [
+        {
+          "id": "principal",
+          "label": "Main",
+          "image": "images/atlas/5bbc3168e1747ca1.svg",
+          "aspect": 0.8269,
+          "vb": {
+            "vx": 0,
+            "vy": 0,
+            "vw": 860,
+            "vh": 1040
+          }
+        }
+      ]
     },
     {
       "id": "prado",
@@ -1173,7 +1186,7 @@
       "id": "perdido-heart-01",
       "place": "perdido",
       "cat": "heart",
-      "at": null,
+      "at": { "map": "principal", "x": 0.2523, "y": 0.4923 },
       "name": "Saria's Song for the Skull Kid",
       "age": "child",
       "night": false,
@@ -1190,7 +1203,7 @@
       "id": "perdido-heart-02",
       "place": "perdido",
       "cat": "heart",
-      "at": null,
+      "at": { "map": "principal", "x": 0.705, "y": 0.5538 },
       "name": "Memory game with the Ocarina",
       "age": "child",
       "night": false,
@@ -1207,7 +1220,7 @@
       "id": "perdido-gs-01",
       "place": "perdido",
       "cat": "gs",
-      "at": null,
+      "at": { "map": "principal", "x": 0.5302, "y": 0.2721 },
       "name": "Bugs in the soft soil by the bridge",
       "age": "child",
       "night": false,
@@ -1225,7 +1238,7 @@
       "id": "perdido-gs-02",
       "place": "perdido",
       "cat": "gs",
-      "at": null,
+      "at": { "map": "principal", "x": 0.2233, "y": 0.6582 },
       "name": "Bugs in the soft soil of the lone-tree clearing",
       "age": "child",
       "night": false,
@@ -1243,7 +1256,7 @@
       "id": "perdido-gs-03",
       "place": "perdido",
       "cat": "gs",
-      "at": null,
+      "at": { "map": "principal", "x": 0.4991, "y": 0.2379 },
       "name": "Ledge by the Forest Stage",
       "age": "adult",
       "night": true,
@@ -1261,7 +1274,7 @@
       "id": "perdido-bean-01",
       "place": "perdido",
       "cat": "bean",
-      "at": null,
+      "at": { "map": "principal", "x": 0.5116, "y": 0.2721 },
       "name": "Soft soil by the bridge",
       "age": "both",
       "night": false,
@@ -1277,7 +1290,7 @@
       "id": "perdido-bean-02",
       "place": "perdido",
       "cat": "bean",
-      "at": null,
+      "at": { "map": "principal", "x": 0.2417, "y": 0.6582 },
       "name": "Soft soil by the two Scrubs",
       "age": "both",
       "night": false,

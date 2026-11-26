@@ -267,7 +267,8 @@
   "stage": "KokiriForest",
   "x": -118.4,
   "y": 114.5,
-  "z": -16.3
+  "z": -16.3,
+  "pin": { "x": 0.2266, "y": 0.889 }
  },
  "gossip_stones.SACRED_FOREST_MEADOW_01": {
   "stage": "SacredForestMeadow",
@@ -370,5 +371,26 @@
   "x": -24,
   "y": 104.9,
   "z": 19.6
+ },
+ "minigames.theater_skull": {
+  "stage": "LostWood",
+  "x": 3.8,
+  "y": 99.3,
+  "z": -47.5,
+  "pin": { "x": 0.5023, "y": 0.2885 }
+ },
+ "minigames.theater_truth": {
+  "stage": "LostWood",
+  "x": 3.8,
+  "y": 99.3,
+  "z": -47.5,
+  "pin": { "x": 0.5233, "y": 0.2923 }
+ },
+ "minigames.lost_woods_target": {
+  "stage": "LostWood",
+  "x": 28.01,
+  "y": 100.39,
+  "z": 0.08,
+  "pin": { "x": 0.6313, "y": 0.5098 }
  }
 }

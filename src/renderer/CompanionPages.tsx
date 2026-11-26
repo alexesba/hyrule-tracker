@@ -586,10 +586,27 @@ export const atEdge = (at: { x: number; y: number }) => at.x <= 0.021 || at.x >=
 /** A pin is drawn when it is on the picture: not clamped to the border, and not in the blank margin around the drawing. */
 export const shownOnMap = (placeId: string, mapId: string | null, at: { x: number; y: number } | null) =>
   !!mapId && !!at && !atEdge(at) && onIllustratedMap(placeId, mapId, at);
-export interface Spot { stage?: string; era?: 'child' | 'adult'; x?: number; y?: number; z?: number }
+export interface Spot { stage?: string; era?: 'child' | 'adult'; x?: number; y?: number; z?: number; pin?: { x: number; y: number } }
 /** Where a placed collectible falls on the atlas (one fix per map it shows on). */
-export const locateSpot = (spot: Spot): PlayerFix[] => spot.stage && spot.x != null && spot.y != null && spot.z != null
-  ? locatePlacement(spot.stage, spot.era, { x: spot.x, y: spot.y, z: spot.z }, atlasPlaces) : [];
+export const locateSpot = (spot: Spot): PlayerFix[] => {
+  if (spot.pin) {
+    const place = atlasPlaces.find(p => p.id === 'perdido');
+    if (place) {
+      const at = spot.pin;
+      const spread = 0.035;
+      const clamp = (n: number) => Math.min(0.98, Math.max(0.02, n));
+      return [{
+        placeId: 'perdido', mapId: 'principal', at, yaw: 0, age: spot.era ?? null,
+        world: {
+          x: Number(clamp(place.pin.x + (at.x - 0.5) * spread).toFixed(4)),
+          y: Number(clamp(place.pin.y + (at.y - 0.5) * spread).toFixed(4)),
+        },
+      }];
+    }
+  }
+  return spot.stage && spot.x != null && spot.y != null && spot.z != null
+    ? locatePlacement(spot.stage, spot.era, { x: spot.x, y: spot.y, z: spot.z }, atlasPlaces) : [];
+};
 export const MAP_CATEGORIES = new Set(['heart_pieces', 'heart_containers', 'gold_skulltulas', 'chests', 'great_fairies', 'bottles', 'fairy_thoughts', 'scarecrow_spots', 'grottos', 'minigames', 'side_events', 'bean_spots', 'big_poe_spots', 'gossip_stones', 'silver_rupees', 'cow_rewards']);
 /** Game icon of each category in the area panel. */
 export const categoryIcons: Record<string, string> = {
@@ -607,6 +624,8 @@ const regionHasFloor = (region: string) => atlas.places.some(p => atlasStages[p.
 /**
  * Where a collectible is listed. A point on the drawing wins. A point in the blank margin does not
  * make it that region's collectible: when the checklist names a region with no floor, it is listed there.
+ * Lost Woods keeps its own actors until a coordinate lands on a tunnel, and it keeps the ones
+ * that sit off Kokiri Forest and Zora River.
  */
 export function placedRegion(spot: Spot | undefined, fixes: PlayerFix[], markerPlace: string | undefined, chapter?: string): string {
   const shown = fixes.find(f => shownOnMap(f.placeId, f.mapId, f.at));
@@ -618,6 +637,7 @@ export function placedRegion(spot: Spot | undefined, fixes: PlayerFix[], markerP
     projectedHasFloor: !!projected && regionHasFloor(projected),
     checklistRegion: named || undefined,
     checklistHasFloor: !!named && regionHasFloor(named),
+    checklistClaimsMiss: named === 'LostWood' && !shown,
     markerRegion: markerPlace ? atlasStages[markerPlace] : undefined,
     placed: !!spot,
   });

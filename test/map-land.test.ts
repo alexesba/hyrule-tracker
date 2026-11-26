@@ -23,7 +23,23 @@ describe('illustrated map', () => {
   });
 
   it('leaves a floor with no mask alone', () => {
-    expect(onIllustratedMap('perdido', 'principal', { x: 0.5, y: 0.5 })).toBe(true);
+    expect(onIllustratedMap('desierto', 'principal', { x: 0.5, y: 0.5 })).toBe(true);
+  });
+
+  it('keeps the Lost Woods tunnels and leaves the parchment margin empty', () => {
+    expect(onIllustratedMap('perdido', 'principal', { x: 0.1723, y: 0.7473 })).toBe(true);
+    expect(onIllustratedMap('perdido', 'principal', { x: 0.02, y: 0.02 })).toBe(false);
+  });
+
+  it('keeps a Lost Woods actor on the Lost Woods list until its coordinate hits a tunnel', () => {
+    expect(listedRegion({
+      projectedRegion: 'LostWood',
+      projectedHasFloor: true,
+      checklistRegion: 'LostWood',
+      checklistHasFloor: true,
+      checklistClaimsMiss: true,
+      placed: true,
+    })).toBe('LostWood');
   });
 
   it('lists a Lost Woods gossip stone with the Lost Woods when its point misses another map', () => {
@@ -45,6 +61,14 @@ describe('illustrated map', () => {
     };
     expect(region('gossip_stones.LOST_WOOD_02', 'LostWood', false)).toBe('LostWood');
     expect(region('gossip_stones.LOST_WOOD_01', 'LostWood', false)).toBe('LostWood');
+    expect(listedRegion({
+      projectedRegion: 'KokiriForest',
+      projectedHasFloor: true,
+      checklistRegion: 'LostWood',
+      checklistHasFloor: true,
+      checklistClaimsMiss: true,
+      placed: true,
+    })).toBe('LostWood');
     expect(region('gossip_stones.KOKIRI_FOREST_01', 'KokiriForest', true)).toBe('KokiriForest');
     expect(region('gossip_stones.KOKIRI_FOREST_02', 'KokiriForest', true)).toBe('SacredForestMeadow');
   });

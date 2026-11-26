@@ -14,6 +14,8 @@ export interface ChestPlacement {
   y?: number;
   z?: number;
   item?: string;
+  /** Drawn here on the Lost Woods floor when the world coordinate lands in the wrong room. */
+  pin?: { x: number; y: number };
 }
 export interface CompanionData {
   enemyCounters: number[];

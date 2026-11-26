@@ -81,13 +81,14 @@ const SCENE_TO_PLACE: Record<
       cz: 250.37,
     },
   },
+  // Local floor, not an atlas capture. This offset puts the Skull Kid clearing in the lower-right room.
   LostWood: {
     placeId: 'perdido',
-    capture: { camX: 6.0, camY: 200.0, camZ: -1.0, height: 400.0 },
+    capture: { camX: 6.0, camY: 200.0, camZ: -1.0, height: 400.0, scaleX: 3.875, cx: 434.37, scaleZ: 3.363636, cz: 529.89 },
   },
   LostWoods: {
     placeId: 'perdido',
-    capture: { camX: 6.0, camY: 200.0, camZ: -1.0, height: 400.0 },
+    capture: { camX: 6.0, camY: 200.0, camZ: -1.0, height: 400.0, scaleX: 3.875, cx: 434.37, scaleZ: 3.363636, cz: 529.89 },
   },
   SacredForestMeadow: {
     placeId: 'prado',
@@ -743,6 +744,46 @@ function projectToWorldMap(place: AtlasPlace, f: Fraction | null): Fraction {
   };
 }
 
+interface LostBand {
+  x0: number; x1: number; z0: number; z1: number
+  sx0: number; sx1: number; sy0: number; sy1: number
+}
+
+// Walked clearings on the Lost Woods floor. World x grows east, world z grows south.
+// Each band maps that rectangle onto the drawn room so Link moves across it.
+const LOST_WOODS_BANDS: LostBand[] = [
+  { x0: -43.8, x1: -19.2, z0: -12.2, z1: 11.5, sx0: 139, sx1: 301, sy0: 447, sy1: 614 },
+  { x0: -43.0, x1: -31.0, z0: 11.5, z1: 25.5, sx0: 168, sx1: 220, sy0: 614, sy1: 655 },
+  { x0: -43.5, x1: -30.2, z0: 25.5, z1: 42, sx0: 155, sx1: 246, sy0: 655, sy1: 735 },
+  { x0: -44.2, x1: -33.8, z0: 42, z1: 62, sx0: 143, sx1: 210, sy0: 735, sy1: 860 },
+  { x0: -49.2, x1: -33.7, z0: 62, z1: 76, sx0: 106, sx1: 210, sy0: 860, sy1: 960 },
+  { x0: -5.2, x1: 5.2, z0: -5.2, z1: 5.2, sx0: 350, sx1: 458, sy0: 485, sy1: 593 },
+  { x0: 18.7, x1: 29.6, z0: -30.2, z1: -18.2, sx0: 488, sx1: 556, sy0: 358, sy1: 448 },
+  { x0: 22.8, x1: 25.2, z0: -18.1, z1: -4.5, sx0: 502, sx1: 534, sy0: 450, sy1: 515 }, // tunnel south from the Goron clearing
+  { x0: 29.7, x1: 43.4, z0: -26.0, z1: -22.0, sx0: 556, sx1: 640, sy0: 392, sy1: 424 }, // tunnel from the Goron entrance toward Zora
+  { x0: 42.9, x1: 53.1, z0: -53.2, z1: -43.0, sx0: 613, sx1: 696, sy0: 236, sy1: 312 },
+  { x0: 46.2, x1: 49.8, z0: -64.6, z1: -53.3, sx0: 630, sx1: 666, sy0: 182, sy1: 234 }, // shaft down to the landing
+  { x0: 46.2, x1: 49.8, z0: -42.9, z1: -29.4, sx0: 630, sx1: 668, sy0: 314, sy1: 368 }, // shaft down to the grass
+  { x0: 1.5, x1: 31.0, z0: -55.0, z1: -38.7, sx0: 395, sx1: 570, sy0: 235, sy1: 330 },
+  { x0: 31.1, x1: 42.8, z0: -49.2, z1: -46.2, sx0: 572, sx1: 630, sy0: 270, sy1: 282 }, // tunnel from the square to the Forest Stage
+  { x0: 42.7, x1: 54.6, z0: -78.4, z1: -64.7, sx0: 618, sx1: 690, sy0: 96, sy1: 180 },
+  { x0: 18.6, x1: 29.1, z0: -77.3, z1: -67.0, sx0: 490, sx1: 556, sy0: 118, sy1: 176 }, // grotto room
+  { x0: 29.2, x1: 42.6, z0: -73.2, z1: -70.6, sx0: 556, sx1: 618, sy0: 142, sy1: 154 }, // corridor into the grotto room
+];
+
+function lostWoodsWalk(x: number, z: number): Fraction | null {
+  for (const b of LOST_WOODS_BANDS) {
+    if (x < b.x0 || x > b.x1 || z < b.z0 || z > b.z1) continue;
+    const tx = (x - b.x0) / (b.x1 - b.x0);
+    const tz = (z - b.z0) / (b.z1 - b.z0);
+    return {
+      x: Number(((b.sx0 + tx * (b.sx1 - b.sx0)) / 860).toFixed(4)),
+      y: Number(((b.sy0 + tz * (b.sy1 - b.sy0)) / 1040).toFixed(4)),
+    };
+  }
+  return null;
+}
+
 /** Scene name (save or live) + position → where to draw Link on the atlas, or null if the scene isn't mapped. */
 export function locatePlayer(rawScene: string | null | undefined, pos: PlayerPosition, places: AtlasPlace[], ageHint?: 'child' | 'adult' | null): PlayerFix | null {
   const norm = normalizeSceneName(rawScene);
@@ -754,7 +795,50 @@ export function locatePlayer(rawScene: string | null | undefined, pos: PlayerPos
   if (!place) return null;
   const age = norm.ageHint ?? ageHint ?? info.defaultAge ?? null;
   const mapId = determineMapId(place, age, pos.y);
-  const at = projectToPlaceMap(sceneKey, place, mapId, pos.x, pos.z);
+  let at = projectToPlaceMap(sceneKey, place, mapId, pos.x, pos.z);
+  const walked = place.id === 'perdido' ? lostWoodsWalk(pos.x, pos.z) : null;
+  if (walked) at = walked;
+  if (place.id === 'perdido' && at) {
+    // These mouths are drawn away from where the world point projects.
+    // Inside a walked clearing the band already tracks Link, so a mouth only wins up close.
+    const mouths = [
+      { x: 26, z: -28.4, r: 18, at: { x: 0.607, y: 0.3577 } },
+      { x: 28.6, z: -24.04, r: 5, at: { x: 0.6318, y: 0.3937 } },
+      { x: 24.05, z: -19.69, r: 5, at: { x: 0.6055, y: 0.4203 } },
+      { x: 4.71, z: 0.32, r: 5, at: { x: 0.5263, y: 0.5105 } },
+      { x: 28.01, z: 0.08, r: 6, at: { x: 0.6313, y: 0.5098 } },
+      { x: 47.88, z: -29.35, r: 6, at: { x: 0.7581, y: 0.3519 } },
+      { x: 48.01, z: -43.72, r: 7, at: { x: 0.7558, y: 0.2997 } },
+      { x: 42.89, z: -48.07, r: 5, at: { x: 0.7349, y: 0.2635 } },
+      { x: 28.95, z: -47.97, r: 6, at: { x: 0.6628, y: 0.2663 } },
+      { x: 2.85, z: -47.58, r: 8, at: { x: 0.4744, y: 0.2875 } },
+      { x: 11.05, z: -52.27, r: 5, at: { x: 0.5116, y: 0.2721 } },
+      { x: 13.84, z: -54.51, r: 4, at: { x: 0.4991, y: 0.2379 } },
+      { x: 47.93, z: -52.93, r: 6, at: { x: 0.7593, y: 0.2269 } },
+      { x: 47.67, z: -66.82, r: 6, at: { x: 0.7601, y: 0.17 } },
+      { x: 42.5, z: -71.86, r: 6, at: { x: 0.7193, y: 0.139 } },
+      { x: 28.6, z: -71.8, r: 6, at: { x: 0.6489, y: 0.1425 } },
+      { x: 19.69, z: -77.03, r: 6, at: { x: 0.5823, y: 0.115 } },
+      { x: 48.9, z: -23.93, r: 5, at: { x: 0.7884, y: 0.375 } },
+      { x: 66.42, z: -25.46, r: 12, at: { x: 0.8452, y: 0.379 } },
+      { x: -0.04, z: 4.92, r: 5, at: { x: 0.4488, y: 0.5673 } },
+      { x: -5.36, z: -0.32, r: 5, at: { x: 0.4093, y: 0.5163 } },
+      { x: -18.96, z: -0.09, r: 6, at: { x: 0.3384, y: 0.5212 } },
+      { x: -33.57, z: -3.07, r: 6, at: { x: 0.2523, y: 0.5077 } },
+      { x: -36.14, z: 11.32, r: 8, at: { x: 0.2285, y: 0.5904 } },
+      { x: -33.52, z: 30.95, r: 10, at: { x: 0.2417, y: 0.6582 } },
+      { x: -35.95, z: 71.04, r: 18, at: { x: 0.2266, y: 0.889 } },
+      { x: -48.83, z: 71.71, r: 6, at: { x: 0.1321, y: 0.9024 } },
+    ];
+    let best = mouths[0];
+    let bestD = Infinity;
+    const close = walked ? 3 : Infinity;
+    for (const mouth of mouths) {
+      const d = (pos.x - mouth.x) ** 2 + (pos.z - mouth.z) ** 2;
+      if (d <= mouth.r ** 2 && d <= close ** 2 && d < bestD) { best = mouth; bestD = d; }
+    }
+    if (bestD < Infinity) at = best.at;
+  }
   return { placeId: place.id, mapId, at, world: projectToWorldMap(place, at), yaw: ((pos.yaw % 360) + 360) % 360, age };
 }
 
