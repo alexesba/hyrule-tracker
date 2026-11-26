@@ -1280,27 +1280,35 @@
     "mini_bosses.gerudo_guards_carpenter_cells": {
       "label": "Gerudo guards (carpenter cells)",
       "detect": {
-        "all": [
+        "any": [
           {
-            "name": "DefeatedEnemyNum.Enemy_MiddleBoss_GerudoThief",
-            "gte": 1
+            "all": [
+              { "name": "DefeatedEnemyNum.Enemy_MiddleBoss_GerudoThief", "gte": 1 },
+              { "name": "DefeatedEnemyNum.Enemy_MiddleBoss_GerudoThief_02", "gte": 1 },
+              { "name": "DefeatedEnemyNum.Enemy_MiddleBoss_GerudoThief_03", "gte": 1 },
+              { "name": "DefeatedEnemyNum.Enemy_MiddleBoss_GerudoThief_04", "gte": 1 }
+            ]
           },
           {
-            "name": "DefeatedEnemyNum.Enemy_MiddleBoss_GerudoThief_02",
-            "gte": 1
+            "all": [
+              { "name": "GerudoFortress_DestroyGerudoThief_Npc_Hylia_013_Adult" },
+              { "name": "GerudoFortress_DestroyGerudoThief_Npc_Hylia_014_Adult" },
+              { "name": "GerudoFortress_DestroyGerudoThief_Npc_Hylia_015_Adult" },
+              { "name": "GerudoFortress_DestroyGerudoThief_Npc_Hylia_016_Adult" }
+            ]
           },
           {
-            "name": "DefeatedEnemyNum.Enemy_MiddleBoss_GerudoThief_03",
-            "gte": 1
-          },
-          {
-            "name": "DefeatedEnemyNum.Enemy_MiddleBoss_GerudoThief_04",
-            "gte": 1
+            "all": [
+              { "name": "GerudoFortress_IsAfterHelpCarpenter_Npc_Hylia_013_Adult" },
+              { "name": "GerudoFortress_IsAfterHelpCarpenter_Npc_Hylia_014_Adult" },
+              { "name": "GerudoFortress_IsAfterHelpCarpenter_Npc_Hylia_015_Adult" },
+              { "name": "GerudoFortress_IsAfterHelpCarpenter_Npc_Hylia_016_Adult" }
+            ]
           }
         ]
       },
       "confidence": "likely",
-      "evidence": "All four carpenter-cell guard counters"
+      "evidence": "All four carpenter-cell guard counters, or the fortress flags for each cell's guard beaten or carpenter freed"
     },
     "mini_bosses.iron_knuckle": {
       "label": "Iron Knuckle",

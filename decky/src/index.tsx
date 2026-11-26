@@ -47,9 +47,14 @@ function useTracker(frame: React.RefObject<HTMLIFrameElement | null>, onBack: ()
     return () => { current = false; };
   }, [attempt]);
 
+  // Whether the iframe got any page at all: tells a blocked address from a page whose script didn't answer.
+  const frameLoaded = useRef(false);
   useEffect(() => {
     if (stage !== 'loading') return;
-    const timer = setTimeout(() => fail('loading'), LOAD_MS);
+    frameLoaded.current = false;
+    const timer = setTimeout(() => fail('loading', frameLoaded.current
+      ? text('A página abriu, mas não respondeu.', 'The page opened but did not answer.')
+      : text('O menu do Steam não abriu a página.', 'The Steam menu did not open the page.')), LOAD_MS);
     return () => clearTimeout(timer);
   }, [stage, attempt]);
 
@@ -111,7 +116,7 @@ function useTracker(frame: React.RefObject<HTMLIFrameElement | null>, onBack: ()
     setAttempt(n => n + 1);
   }
 
-  return { tracker, stage, failure, direction, press, retry };
+  return { tracker, stage, failure, direction, press, retry, onFrameLoad: () => { frameLoaded.current = true; } };
 }
 
 function openInBrowser(url: string | undefined) {
@@ -136,9 +141,9 @@ function Status({ stage, failure, url, onRetry }: { stage: Stage; failure?: Fail
   </>;
 }
 
-function Frame({ url, ready, frame, style }: { url?: string; ready: boolean; frame: React.RefObject<HTMLIFrameElement | null>; style: CSSProperties }) {
+function Frame({ url, ready, frame, style, onLoad }: { url?: string; ready: boolean; frame: React.RefObject<HTMLIFrameElement | null>; style: CSSProperties; onLoad: () => void }) {
   if (!url) return null;
-  return <iframe ref={frame} src={url} title="Hyrule Tracker" allowFullScreen
+  return <iframe ref={frame} src={url} title="Hyrule Tracker" allowFullScreen onLoad={onLoad}
     style={{ display: 'block', width: '100%', border: 0, visibility: ready ? 'visible' : 'hidden', ...style }} />;
 }
 
@@ -159,7 +164,7 @@ function QuickPanel() {
     <Focusable noFocusRing onGamepadFocus={() => setFocused(true)} onGamepadBlur={() => setFocused(false)}
       onGamepadDirection={e => t.direction(e, true)} onOKButton={e => t.press(e, 'activate')}
       style={{ margin: '0 -16px', borderRadius: 4, outline: focused && ready ? '2px solid #8bddac' : 'none', height: ready ? undefined : 0, overflow: 'hidden' }}>
-      <Frame url={t.tracker?.url} ready={ready} frame={frame} style={{ height: 'min(620px, calc(100vh - 210px))' }} />
+      <Frame url={t.tracker?.url} ready={ready} frame={frame} onLoad={t.onFrameLoad} style={{ height: 'min(620px, calc(100vh - 210px))' }} />
     </Focusable>
   </>;
 }
@@ -172,7 +177,7 @@ function TrackerPage() {
   return <Focusable preferredFocus noFocusRing onGamepadDirection={e => t.direction(e, false)}
     onOKButton={e => t.press(e, 'activate')} onCancelButton={e => t.press(e, 'back')}
     style={{ position: 'absolute', inset: 0, background: '#151515', display: 'grid', alignItems: 'center' }}>
-    <Frame url={t.tracker?.url} ready={ready} frame={frame} style={{ position: 'absolute', inset: 0, height: '100%' }} />
+    <Frame url={t.tracker?.url} ready={ready} frame={frame} onLoad={t.onFrameLoad} style={{ position: 'absolute', inset: 0, height: '100%' }} />
     {!ready && <PanelSection title="Hyrule Tracker">
       <Status stage={t.stage} failure={t.failure} url={t.tracker?.url} onRetry={t.retry} />
       <PanelSectionRow><ButtonItem layout="below" onClick={() => Navigation.NavigateBack()}>{text('Voltar', 'Back')}</ButtonItem></PanelSectionRow>

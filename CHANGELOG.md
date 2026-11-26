@@ -4,6 +4,19 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [2.0.4] - 2026-11-26
+
+### New
+- **Mini-map in the overlay for Breath of the Wild and Tears of the Kingdom.** The overlay has a **Map** mode: the game map around Link, with what is still left nearby. It stays on top of the game, so a second screen is no longer needed. Link's position comes from the last save, the only one these games give. Thanks to mencrap for asking for it. [#37](https://github.com/jv-prado/hyrule-tracker/issues/37)
+- **Lost Woods floor.** The Lost Woods has its own map, from Ocarina Atlas, with its collectibles, grottos, chest, Gossip Stone and minigames on their spots, and Link following the paths he walks. Thanks to alexesba. [#33](https://github.com/jv-prado/hyrule-tracker/pull/33)
+
+### Fixed
+- **Tracker freezing for seconds at a time.** Searching the game's memory for your progress ran in the same thread as the windows and could freeze them for several seconds. It now runs on its own, and the windows stay responsive while it searches. Thanks to TheAznPanda for the investigation, and to bluedart and liveat40watt for reporting it. [#34](https://github.com/jv-prado/hyrule-tracker/issues/34) [#35](https://github.com/jv-prado/hyrule-tracker/issues/35)
+- **Live tracking on Triforce not connecting.** A progress table beside unreadable memory was skipped along with it, so live tracking kept searching. The readable part is now kept. Thanks to TheAznPanda for finding it and to alexesba for the fix. [#34](https://github.com/jv-prado/hyrule-tracker/issues/34) [#38](https://github.com/jv-prado/hyrule-tracker/pull/38)
+- **Map stuttering with live tracking.** The map redrew every marker each time Link moved. Now only his arrow moves, and the map redraws when he changes region or floor. Thanks to AxlBasilioa for the analysis. [#39](https://github.com/jv-prado/hyrule-tracker/issues/39)
+- **Gerudo guards not marked.** The carpenter-cell guards are also detected from the fortress's own flags for each cell, not only from the defeat counters, which could miss them in a finished game. Thanks to unleed-l for reporting it. [#36](https://github.com/jv-prado/hyrule-tracker/issues/36)
+- **Steam Deck plugin diagnostics.** When the journal doesn't open, the plugin (0.1.0-experimental.5) says whether the Steam menu opened the page at all, and its log lists what the page asked the tracker for. Thanks to eduardorodrigues08 for testing. [#21](https://github.com/jv-prado/hyrule-tracker/issues/21)
+
 ## [2.0.3] - 2026-11-25
 
 ### New

@@ -7,6 +7,7 @@ const common = { bundle: true, platform: 'node', format: 'cjs', target: 'node22'
 const builds = [
   { ...common, entryPoints: ['src/main/main.ts'], outfile: 'dist-electron/main.cjs' },
   { ...common, entryPoints: ['src/preload/preload.ts'], outfile: 'dist-electron/preload.cjs' },
+  { ...common, entryPoints: ['src/main/live-worker.ts'], outfile: 'dist-electron/live-worker.cjs' },
 ];
 
 if (process.argv.includes('--watch')) {

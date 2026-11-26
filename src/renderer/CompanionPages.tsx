@@ -106,7 +106,7 @@ function connectionStatus(state: AppState | null): { label: string; detail?: str
 }
 
 /** Live tracking at a glance (always on): waiting for the game, looking for Link, or following him. */
-function liveTracking(state: AppState, player: PlayerState | undefined): { tone: 'off' | 'wait' | 'on'; label: string; detail?: string } {
+function liveTracking(state: AppState, player: Pick<PlayerState, 'source'> | undefined): { tone: 'off' | 'wait' | 'on'; label: string; detail?: string } {
   const live = state.live;
   if (player?.source === 'live') return { tone: 'on', label: 'Rastreio ao vivo', detail: t('Link no mapa em tempo real') };
   if (live.status === 'unavailable') return { tone: 'off', label: 'Rastreio ao vivo indisponível', detail: live.detail ? tv(live.detail, live.detailValues) : undefined };
@@ -115,7 +115,7 @@ function liveTracking(state: AppState, player: PlayerState | undefined): { tone:
 }
 
 function LiveIndicator({ state }: { state: AppState }) {
-  const player = usePlayer(state);
+  const player = usePlayerPlace(state);
   const s = liveTracking(state, player);
   return <div className={`sidebar-live ${s.tone}`} role="status" title={s.detail}>
     <span className="live-dot" aria-hidden="true" />
@@ -562,6 +562,34 @@ function usePlayer(state: AppState): PlayerState | undefined {
   return player;
 }
 
+/** Where Link is, without his coordinates: the region, its floor and the source. */
+type PlayerPlace = Pick<PlayerState, 'placeId' | 'mapId' | 'source'>;
+const placeOf = (p: PlayerState | null | undefined): PlayerPlace | undefined => p ? { placeId: p.placeId, mapId: p.mapId, source: p.source } : undefined;
+const samePlace = (a: PlayerPlace | undefined, b: PlayerPlace | undefined) =>
+  a === b || (!!a && !!b && a.placeId === b.placeId && a.mapId === b.mapId && a.source === b.source);
+/**
+ * Link's place, changing only when he changes region, floor or source. Live positions come up to 20 times a second:
+ * the map and its markers follow this, and only the pin (LivePlayerPin) follows every step.
+ */
+function usePlayerPlace(state: AppState): PlayerPlace | undefined {
+  const [place, setPlace] = useState(() => placeOf(state.player));
+  useEffect(() => {
+    const keep = (p: PlayerState | null | undefined) => setPlace(prev => samePlace(prev, placeOf(p)) ? prev : placeOf(p));
+    keep(state.player);
+    return api.onPlayer(p => keep(p));
+  }, [state.player]);
+  return place;
+}
+
+/** Link's arrow on the world map (no floor) or on one floor of a region, following every live step. */
+function LivePlayerPin({ state, placeId, mapId }: { state: AppState; placeId?: string; mapId?: string }) {
+  const player = usePlayer(state);
+  if (!player) return null;
+  if (placeId === undefined) return <PlayerPin at={player.world} yaw={player.yaw} live={player.source === 'live'} />;
+  if (player.placeId !== placeId || player.mapId !== mapId || !player.at) return null;
+  return <PlayerPin at={player.at} yaw={player.yaw} live={player.source === 'live'} />;
+}
+
 /** Shown on the map while Link's arrow comes from the save, not from the running game. */
 const SAVE_POSITION_NOTE = 'Nos recomps, a posição do Link é ao vivo. Nos emuladores, só atualiza quando você salva.';
 
@@ -796,7 +824,7 @@ export function StatusFilter({ show, onShow, total, left }: { show: MapBadgeStat
 }
 
 export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState; focus?: string; onShowInChecklist?: (id: string) => void }) {
-  const player = usePlayer(state);
+  const player = usePlayerPlace(state);
   // The region opened by hand ('' = the world map).
   const [picked, setPicked] = useState('');
   const [era, setEra] = useState<Era>('all');
@@ -979,7 +1007,7 @@ export function HyruleMap({ state, focus, onShowInChecklist }: { state: AppState
               })}</span>}
             </button>;
           })}
-          {player && <PlayerPin at={player.world} yaw={player.yaw} live={player.source === 'live'} />}
+          <LivePlayerPin state={state} />
         </ZoomPan> : showLocation && place ? <RegionAtlas key={selected} place={place} state={state} era={era} onEra={next => { setEra(next); setActive(undefined); }} filter={filter} onFilter={pickFilter} show={show} onShow={pickShow} hideDone={hideDone} player={player} follow={follow} regionMenu={regionMenu} mapModes={mapModes} overlay={onMap} onBack={back} hudOpen={hudOpen} onHud={() => setHudOpen(!hudOpen)} controls={<MapScreenButton on={mapOnly} toggle={toggleMapOnly} />} tracked={tracked}
             categoryRows={local} chosenCat={chosenCat} catsOpen={catsShown} onCats={openCats} below={panelBelow} focusItem={activeItem?.id} onPickItem={item => setActive(item)} onShowInChecklist={onShowInChecklist} />
           : <div className="zoom-viewport map-unmapped">
@@ -1106,7 +1134,7 @@ type AtlasPlace = (typeof atlas.places)[number];
 interface Pin extends MarkerDetailsData { id: string; filter?: string; at?: { map: string; x: number; y: number } }
 
 function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow, hideDone, player, follow, regionMenu, mapModes, overlay, onBack, hudOpen, onHud, controls, tracked, categoryRows, chosenCat: chosen, catsOpen, onCats, below, focusItem, onPickItem, onShowInChecklist }: {
-  place: AtlasPlace; state: AppState; era: Era; onEra: (era: Era) => void; filter: string; onFilter: (id: string) => void; show: MapBadgeStatus; onShow: (id: MapBadgeStatus) => void; hideDone: boolean; player?: PlayerState; follow: boolean; regionMenu?: ReactNode; mapModes?: ReactNode; overlay?: ReactNode; onBack?: () => void; hudOpen: boolean; onHud: () => void; controls?: ReactNode; tracked: TrackedPin[];
+  place: AtlasPlace; state: AppState; era: Era; onEra: (era: Era) => void; filter: string; onFilter: (id: string) => void; show: MapBadgeStatus; onShow: (id: MapBadgeStatus) => void; hideDone: boolean; player?: PlayerPlace; follow: boolean; regionMenu?: ReactNode; mapModes?: ReactNode; overlay?: ReactNode; onBack?: () => void; hudOpen: boolean; onHud: () => void; controls?: ReactNode; tracked: TrackedPin[];
   categoryRows: MapRow[]; chosenCat?: CategoryCounter; catsOpen: boolean; onCats: (open: boolean) => void; below?: boolean;
   /** Checklist row picked outside the map (side list, "View on map"): its marker gets selected. */
   focusItem?: string; onPickItem?: (item: TrackedItem) => void; onShowInChecklist?: (id: string) => void;
@@ -1217,7 +1245,7 @@ function RegionAtlas({ place, state, era, onEra, filter, onFilter, show, onShow,
             </span>}
           </button>;
         })}
-        {here?.at && here.mapId === currentFloor.id && <PlayerPin at={here.at} yaw={here.yaw} live={here.source === 'live'} />}
+        <LivePlayerPin state={state} placeId={place.id} mapId={currentFloor.id} />
         {!docked && card}
       </div>
     </ZoomPan> : <div className="zoom-viewport map-unmapped">

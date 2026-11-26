@@ -1,6 +1,6 @@
 {
   "name": "hyrule-tracker",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "private": true,
   "description": "Ocarina of Time remake companion for Windows and Linux.",
   "author": "João Victor Prado",
@@ -92,6 +92,7 @@
     },
     "asar": true,
     "asarUnpack": [
+      "dist-electron/live-worker.cjs",
       "node_modules/koffi/**",
       "node_modules/@koromix/koffi-*/**"
     ],

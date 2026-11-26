@@ -17,6 +17,8 @@ const server = await startLanServer({
   host: '127.0.0.1',
   port: 0,
   basePath,
+  // stdout goes to the plugin's tracker.log after the address line: what the Steam menu asked for, and got.
+  onRequest: line => console.log(new Date().toISOString(), line),
   rpc: {
     ...trackerRpc(controller),
     findSaveFolders: () => controller.findSaveFolders(),

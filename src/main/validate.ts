@@ -6,7 +6,7 @@ export const LOCALES = ['pt-BR', 'en-US', 'es-ES', 'fr-FR', 'de-DE', 'it-IT', 'n
 export type MainLocale = (typeof LOCALES)[number];
 export const isLocale = (x: unknown): x is MainLocale => typeof x === 'string' && (LOCALES as readonly string[]).includes(x);
 
-export const OVERLAY_MODES: readonly OverlayMode[] = ['counters', 'remaining', 'available'];
+export const OVERLAY_MODES: readonly OverlayMode[] = ['counters', 'remaining', 'available', 'map'];
 
 /** A plain {} object (not null, an array, a class instance...). */
 export function isPlainObject(x: unknown): x is Record<string, unknown> {

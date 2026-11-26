@@ -271,7 +271,8 @@ export interface IdentifyRequest {
   at?: string;
 }
 
-export type OverlayMode = 'counters' | 'remaining' | 'available';
+/** 'map': a mini-map around Link, for Breath of the Wild and Tears of the Kingdom (Ocarina shows the counters). */
+export type OverlayMode = 'counters' | 'remaining' | 'available' | 'map';
 
 export interface OverlayState {
   visible: boolean;

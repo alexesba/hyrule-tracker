@@ -161,6 +161,15 @@ body.overlay-body { background: transparent; overflow: hidden; }
 .ov-num { font-variant-numeric: tabular-nums; font-weight: 700; }
 .ov-area { color: #9fb6d9; font-size: 13px; margin-bottom: 4px; }
 .ov-msg { padding: 12px; color: #ccc; }
+/* Mini-map (Breath of the Wild / Tears of the Kingdom): the game map around Link fills the rest of the overlay. */
+.ov-mini { position: relative; flex: 1; min-height: 80px; margin: 6px 8px 8px; overflow: hidden; border-radius: 8px; background: #1b1f1a; }
+.ov-mini-origin { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+.ov-mini-origin img { position: absolute; width: 256px; height: 256px; max-width: none; pointer-events: none; }
+.ov-mini-pin { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; display: grid; place-items: center; filter: drop-shadow(0 1px 2px #000c); }
+.ov-mini-pin .totk-category-icon { width: 18px; height: 18px; }
+/* Same red as Link's pin on the Ocarina maps. */
+.ov-mini-link { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #e0352b; border: 2px solid #fff; box-sizing: border-box; box-shadow: 0 0 0 6px #e0352b40, 0 1px 3px #000a; }
+.ov-mini-empty { padding: 12px; }
 .ov-toast { margin: 4px 10px 8px; padding: 6px 10px; background: #23314d; border: 1px solid #3b74c6; border-radius: 8px; font-weight: 600; font-size: 14px; }
 
 /* settings popover in the main window */

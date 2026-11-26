@@ -1,6 +1,8 @@
 import { nearbyObjectives, worldTotals } from '../core/totk-journal';
-import { isWorldLocation, worldLayers, type WorldCategory, type WorldItem } from '../core/totk-world';
+import { isWorldLocation, worldLayers, type WorldCategory, type WorldItem, type WorldLayer } from '../core/totk-world';
 import type { IslandPoint, IslandText } from '../core/totk-island';
+import { totkTilePixels, totkTileSpan, totkTiles } from '../core/totk-map-tiles';
+import { totkTileUrl } from './TotkMapArt';
 import type { AppState } from '../shared/types';
 import { TotkCategoryIcon } from './TotkCategoryIcon';
 import { journalMessage, journalName, journalText, number, type Locale } from './i18n';
@@ -48,7 +50,8 @@ export function TotkOverlay({ state, locale }: { state: AppState; locale: Locale
       <span title={text(['Sementes Korok', 'Korok Seeds'])}><TotkCategoryIcon category="korok" /> {number(seeds)}</span>
       <span className="ov-pct">{percent}%</span>
     </div>
-    {mode === 'counters' ? <div className="ov-list">{counters.map(counter => {
+    {mode === 'map' ? <MiniMap player={player} items={worldItems.filter(item => !isWorldLocation(item) && !done(item))} text={text} />
+      : mode === 'counters' ? <div className="ov-list">{counters.map(counter => {
       const { category, label } = game === 'botw' && counter.category === 'lightroot' ? { category: 'memory' as const, label: undefined } : counter;
       const total = totals[category] ?? 0;
       return <div key={category} className={`ov-row ${value(category) === total ? 'full' : ''}`}>
@@ -62,6 +65,37 @@ export function TotkOverlay({ state, locale }: { state: AppState; locale: Locale
       items={here ? worldItems.filter(item => item.region === here.id && item.layer === player.layer && !isWorldLocation(item) && !done(item)) : []}
       empty={here ? ['Nada faltando aqui 🎉', 'Nothing left here 🎉'] : ['Salve no jogo para saber onde Link está.', 'Save in the game to know where Link is.']} />}
   </>;
+}
+
+/** Map tiles this detailed: one 256 px tile covers 512 world units, so the overlay shows about a region around Link. */
+const MINI_LEVEL = 5;
+
+/**
+ * The game map around Link, with what is still left nearby. It follows the position of the last save,
+ * the only one these games give.
+ */
+function MiniMap({ player, items, text }: { player?: { at: IslandPoint; layer: WorldLayer }; items: WorldItem[]; text: (label: IslandText) => string }) {
+  const { game } = useWorldJournal();
+  if (!player) return <div className="ov-row muted ov-mini-empty">{text(['Salve no jogo para saber onde Link está.', 'Save in the game to know where Link is.'])}</div>;
+  const [x, z] = player.at;
+  const span = totkTileSpan(MINI_LEVEL);
+  const reach = span * 2;
+  const tiles = totkTiles({ west: x - reach, east: x + reach, north: z - reach, south: z + reach }, MINI_LEVEL);
+  const px = (units: number) => units / span * totkTilePixels;
+  const near = items.filter(item => item.at && item.layer === player.layer &&
+    Math.abs(item.at[0] - x) < reach && Math.abs(item.at[1] - z) < reach);
+  return <div className="ov-mini" role="img" aria-label={text(['Posição do último save', 'Position from the last save'])}>
+    <div className="ov-mini-origin">
+      {tiles.map(tile => <img key={tile.x + '/' + tile.y} alt="" draggable={false} decoding="async"
+        referrerPolicy="no-referrer" src={totkTileUrl(game, player.layer, MINI_LEVEL, tile)}
+        style={{ left: px(tile.west - x), top: px(tile.north - z) }} />)}
+      {near.map(item => <span key={item.id} className="ov-mini-pin" title={journalName(game, item.name)}
+        style={{ left: px(item.at![0] - x), top: px(item.at![1] - z) }}>
+        <TotkCategoryIcon category={item.category} seeds={item.seeds} />
+      </span>)}
+      <span className="ov-mini-link" />
+    </div>
+  </div>;
 }
 
 function Rows({ text, items, head, empty }: { text: (label: IslandText) => string; items: WorldItem[]; head?: string; empty: IslandText }) {

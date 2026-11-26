@@ -28,6 +28,8 @@ class Plugin:
             self._log_file().parent.mkdir(parents=True, exist_ok=True)
             version = json.loads((root / "package.json").read_text(encoding="utf-8"))["trackerVersion"]
             with self._log_file().open("ab") as log:
+                log.write(f"Starting Hyrule Tracker {version}\n".encode())
+                log.flush()
                 self._process = await asyncio.create_subprocess_exec(
                     str(root / "bin" / "node"), str(root / "server.mjs"),
                     str(root), str(runtime), version,
@@ -42,6 +44,8 @@ class Plugin:
                 if parsed.scheme != "http" or parsed.hostname != "127.0.0.1" or not parsed.port:
                     raise RuntimeError("Unexpected tracker address")
                 self._url = url
+                with self._log_file().open("ab") as log:
+                    log.write(f"Tracker listening on port {parsed.port}\n".encode())
             except BaseException:
                 await self._stop()
                 raise

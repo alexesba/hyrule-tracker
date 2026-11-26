@@ -10,7 +10,7 @@ const sourceLayers: Record<WorldLayer, string> = { surface: 'Ground', sky: 'Sky'
 export type ArtStatus = 'loading' | 'ready' | 'unavailable';
 type Tile = ReturnType<typeof totkTiles>[number];
 
-function tileUrl(game: WorldGame, layer: WorldLayer, level: number, tile: Tile) {
+export function totkTileUrl(game: WorldGame, layer: WorldLayer, level: number, tile: Tile) {
   const address = 'maptex/' + level + '/' + tile.x + '/' + tile.y;
   const source = journals[game].mapSource + 'game_files/';
   return game === 'botw' ? source + address + '.png' : source + 'map/' + sourceLayers[layer] + '/' + address + '.webp';
@@ -18,7 +18,7 @@ function tileUrl(game: WorldGame, layer: WorldLayer, level: number, tile: Tile) 
 
 export function totkMapPreview(layer: WorldLayer, [x, z]: IslandPoint, level = 3, game: WorldGame = 'totk') {
   const [tile] = totkTiles({ west: x, east: x + 1, north: z, south: z + 1 }, level);
-  return tile && tileUrl(game, layer, level, tile);
+  return tile && totkTileUrl(game, layer, level, tile);
 }
 
 /**
@@ -34,7 +34,7 @@ export function TotkMapCrop({ layer, at: [x, z], level = 4, anchor = 0.68, class
   return <span className={'totk-map-crop ' + className} aria-hidden="true">
     <span className="totk-map-crop-origin" style={{ left: anchor * 100 + '%' }}>
       {tiles.map(tile => <img key={tile.x + '/' + tile.y} alt="" draggable={false} decoding="async" loading="lazy"
-        referrerPolicy="no-referrer" src={tileUrl(game, layer, level, tile)}
+        referrerPolicy="no-referrer" src={totkTileUrl(game, layer, level, tile)}
         style={{ left: (tile.west - x) / span * totkTilePixels, top: (tile.north - z) / span * totkTilePixels }} />)}
     </span>
   </span>;
@@ -46,7 +46,7 @@ function tileImage(game: WorldGame, layer: WorldLayer, bounds: TotkMapBounds, le
   const height = bounds.south - bounds.north;
   return <img key={level + '/' + tile.x + '/' + tile.y} alt="" draggable={false} decoding="async"
     referrerPolicy="no-referrer"
-    src={tileUrl(game, layer, level, tile)}
+    src={totkTileUrl(game, layer, level, tile)}
     style={{
       left: (tile.west - bounds.west) / width * 100 + '%',
       top: (tile.north - bounds.north) / height * 100 + '%',

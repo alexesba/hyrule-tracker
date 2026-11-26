@@ -75,6 +75,18 @@ describe('live memory tables', () => {
     expect(live.data.bool64).toEqual(ref.bool64);
   });
 
+  it('keeps the readable pages of a chunk that holds an unreadable page, in an unaligned window', () => {
+    const { m: whole, tables } = build();
+    // One 4 KiB page right after the 64-bit-key table can't be read; any read touching it fails as a whole.
+    const bad = BASE + BigInt((tables.b64 + nB64 * 16 + 0xfff) & ~0xfff);
+    const m: Mem = { read: (addr, len) => (addr < bad + 0x1000n && addr + BigInt(len) > bad ? null : whole.read(addr, len)) };
+    // Hints are 8-byte aligned but not page aligned (e.g. 0x1010_99f4_f418).
+    const t = locate(m, reference(), BASE + 0x200000n + 0x418n, 2 << 20)!;
+    expect(t).toBeTruthy();
+    expect(Number(t.b64.start - BASE)).toBe(tables.b64);
+    expect(t.b64.count).toBe(nB64);
+  });
+
   it('picks up changes made in game, and ignores respawning objects for the playthrough check', () => {
     const { mem, m, tables } = build();
     const ref = reference();

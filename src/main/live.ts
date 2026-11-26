@@ -2,13 +2,15 @@
 // Fritchii emulator), keeps the progress tables located, and reports when tracked values
 // change. NX2Saria answers through its tracker API instead (gamedata/nx2saria.ts), on any
 // system. Falls back to nothing (the save files) whenever the game isn't running or isn't
-// in the same playthrough.
+// in the same playthrough. The reading runs in a worker thread (live-worker.ts); LiveSource is its
+// stand-in in the main process.
 import type { GameDataFile } from '../gamedata/parser.js';
 import { locate, readTables, buildLive, fingerprint, matchesReference, sweepRanges, readableRanges, LiveTables, Agreement } from '../gamedata/live.js';
 import { MemoryAccessDenied, findProcesses, initMemoryAccess, openProcess, type GameProcess } from './procmem.js';
 import { ptraceScope } from './procmem-linux.js';
 import fs from 'node:fs';
 import path from 'node:path';
+import { Worker } from 'node:worker_threads';
 import { ApiSession, NX2SARIA_PORT, trackerApiSettings } from '../gamedata/nx2saria.js';
 import { NATIVE_EXES, EMULATOR_EXES, REKARINA_EXE } from '../gamedata/saves.js';
 import { readRekarinaTables, REKARINA_MAIN_BASE, REKARINA_MIN_ADDRESS, type RekarinaTables } from '../gamedata/rekarina.js';
@@ -75,7 +77,145 @@ export interface LiveOptions {
   onPlayerStage?(line: string): void;
 }
 
+/** Every message the live worker sends to the main process. */
+export type FromWorker =
+  | { t: 'state'; info: LiveInfo; snapshot: ReturnType<LiveReader['current']>; changed: boolean }
+  | { t: 'player'; player: ReturnType<LiveReader['player']> }
+  | { t: 'hint'; hex: string }
+  | { t: 'game'; id: number; exe?: string; appData?: string; saveDir?: string }
+  | { t: 'error'; message: string }
+  | { t: 'stage'; line: string }
+  | { t: 'refreshed'; id: number };
+/** Every message the main process sends to the live worker. */
+export type ToWorker =
+  | { t: 'ref'; ref: GameDataFile | undefined }
+  | { t: 'refresh'; id: number }
+  | { t: 'gameDone'; id: number }
+  | { t: 'stop' };
+export interface WorkerInit { hints: string[]; watchInts: number[]; permanentFlags: number[] }
+
+/** A worker that died is started again after this long. */
+const RESTART_MS = 3000;
+
+/**
+ * The live source as the main process sees it. The reading itself (LiveReader) runs in a worker thread
+ * (live-worker.ts): a search reads up to 128 MB of the game's memory at a time and would freeze the windows.
+ */
 export class LiveSource {
+  info: LiveInfo = { status: 'off' };
+  /** Set before start(): the worker gets them when it starts. */
+  watchInts = new Set<number>();
+  permanentFlags = new Set<number>();
+  private worker?: Worker;
+  private stopped = true;
+  private ref?: GameDataFile;
+  private snapshot: ReturnType<LiveReader['current']>;
+  private playerNow: ReturnType<LiveReader['player']>;
+  private nextId = 0;
+  private refreshes = new Map<number, () => void>();
+  private restartTimer?: NodeJS.Timeout;
+
+  constructor(private opts: LiveOptions) {}
+
+  async start() {
+    this.stopped = false;
+    this.spawn();
+  }
+
+  stop() {
+    this.stopped = true;
+    clearTimeout(this.restartTimer);
+    const w = this.worker;
+    this.worker = undefined;
+    // The worker closes the game's handle and exits; one stuck in a long read is ended anyway.
+    if (w) { w.postMessage({ t: 'stop' } satisfies ToWorker); setTimeout(() => void w.terminate(), 2000).unref(); }
+    this.settleRefreshes();
+    this.snapshot = undefined;
+    this.playerNow = undefined;
+    this.setInfo({ status: 'off' });
+  }
+
+  setReference(ref: GameDataFile | undefined) {
+    if (this.ref === ref) return;
+    this.ref = ref;
+    if (!ref) this.snapshot = undefined;
+    this.post({ t: 'ref', ref });
+  }
+
+  player() { return this.playerNow; }
+
+  current() { return this.info.status === 'live' ? this.snapshot : undefined; }
+
+  refreshNow(): Promise<void> | undefined {
+    if (!this.worker) return undefined;
+    const id = ++this.nextId;
+    return new Promise(resolve => { this.refreshes.set(id, resolve); this.post({ t: 'refresh', id }); });
+  }
+
+  private spawn() {
+    const init: WorkerInit = { hints: this.opts.hints, watchInts: [...this.watchInts], permanentFlags: [...this.permanentFlags] };
+    // Bundled next to main.cjs; a worker can't load its script from inside app.asar, so the build unpacks it.
+    const file = path.join(__dirname, 'live-worker.cjs').replace(/app\.asar([\\/])/, 'app.asar.unpacked$1');
+    const w = new Worker(file, { workerData: init });
+    this.worker = w;
+    if (this.ref) this.post({ t: 'ref', ref: this.ref });
+    w.on('message', (m: FromWorker) => { if (this.worker === w) this.onMessage(m); });
+    w.on('error', e => this.died(w, e));
+    w.on('exit', code => this.died(w, new Error(`The live reader stopped (exit code ${code}).`)));
+  }
+
+  /** The worker crashed: say so, drop what it had read, and start a new one in a moment. */
+  private died(w: Worker, e: Error) {
+    if (this.worker !== w) return;
+    this.worker = undefined;
+    this.settleRefreshes();
+    this.snapshot = undefined;
+    if (this.playerNow) { this.playerNow = undefined; this.opts.onPlayer?.(); }
+    this.opts.onError?.(e);
+    const error = e.message;
+    this.setInfo({ status: 'no-game', detail: "Couldn't connect to the game: {error}", detailValues: { error } });
+    if (!this.stopped) this.restartTimer = setTimeout(() => { if (!this.stopped && !this.worker) this.spawn(); }, RESTART_MS);
+  }
+
+  private onMessage(m: FromWorker) {
+    switch (m.t) {
+      case 'state':
+        this.snapshot = m.snapshot;
+        this.setInfo(m.info);
+        if (m.changed) this.opts.onChange();
+        return;
+      case 'player': this.playerNow = m.player; this.opts.onPlayer?.(); return;
+      case 'hint': this.opts.hints = [m.hex, ...this.opts.hints.filter(h => h !== m.hex)].slice(0, 4); this.opts.onHint(m.hex); return;
+      case 'error': this.opts.onError?.(new Error(m.message)); return;
+      case 'stage': this.opts.onPlayerStage?.(m.line); return;
+      case 'refreshed': this.refreshes.get(m.id)?.(); this.refreshes.delete(m.id); return;
+      case 'game': {
+        const done = () => this.post({ t: 'gameDone', id: m.id });
+        // The reader waits for this answer: it must come even when following the game fails.
+        void (this.opts.onGame?.(m.exe, m.appData, m.saveDir) ?? Promise.resolve())
+          .catch(e => this.opts.onError?.(e)).finally(done);
+        return;
+      }
+    }
+  }
+
+  private setInfo(info: LiveInfo) {
+    const changed = info.status !== this.info.status || info.detail !== this.info.detail ||
+      JSON.stringify(info.detailValues) !== JSON.stringify(this.info.detailValues);
+    this.info = info;
+    if (changed) this.opts.onStatus();
+  }
+
+  private post(m: ToWorker) { this.worker?.postMessage(m); }
+
+  private settleRefreshes() {
+    for (const resolve of this.refreshes.values()) resolve();
+    this.refreshes.clear();
+  }
+}
+
+/** Finds the game, keeps its progress tables located and reads them. Runs in the live worker (live-worker.ts). */
+export class LiveReader {
   info: LiveInfo = { status: 'off' };
   private mem?: GameProcess;
   private tables?: LiveTables;

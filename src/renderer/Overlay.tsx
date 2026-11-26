@@ -43,23 +43,27 @@ export function Overlay() {
   if (!state) return null;
   const o = state.overlay;
   const live = state.live;
+  const world = !!game && game !== 'oot';
+  // The mini-map is drawn from the world games' map tiles; Ocarina falls back to the counters.
+  const mode = o.mode === 'map' && !world ? 'counters' : o.mode;
 
   return (
     <div lang={locale} className={`ov ${o.locked ? 'locked' : 'unlocked'}`}>
       {!o.locked && (
         <div className="ov-controls">
           <span className="ov-drag" title={t("Drag to move")}>{t("⠿ drag")}</span>
-          <select value={o.mode} onChange={e => void api.setOverlay({ mode: e.target.value as OverlayMode })}>
+          <select value={mode} onChange={e => void api.setOverlay({ mode: e.target.value as OverlayMode })}>
             <option value="counters">{t("Counters")}</option>
             <option value="remaining">{t("Remaining here")}</option>
             <option value="available">{t("Can get now")}</option>
+            {world && <option value="map">{t("Mapa")}</option>}
           </select>
           <input type="range" min={0.2} max={1} step={0.05} value={o.opacity} title={t("Opacity")}
             onChange={e => void api.setOverlay({ opacity: Number(e.target.value) })} />
           <button onClick={() => void api.toggleOverlayLock()} title={`Lock (${state.hotkeys.lockOverlay})`}>{t("Lock")}</button>
         </div>
       )}
-      {game && game !== 'oot' ? <WorldJournalContext.Provider value={journals[game]}>
+      {world ? <WorldJournalContext.Provider value={journals[game]}>
         <TotkOverlay state={state} locale={locale} />
       </WorldJournalContext.Provider> : state.status !== 'ok' || !s ? (
         <div className="ov-msg">{state.message ? tv(state.message, state.messageValues) : t('Waiting for a save…')}</div>
@@ -78,7 +82,7 @@ export function Overlay() {
           </div>
           {s.claimable.length > 0 && <div className="ov-claim">{t("Claim:")}{' '}{s.claimable.map(c => t(c.reward)).join(', ')}</div>}
           {state.identify.length > 0 && <div className="ov-claim">? {state.identify.length}{t("to identify: open the tracker")}</div>}
-          {o.mode === 'counters' ? <Counters cats={state.categories} /> : o.mode === 'available' ? <Available state={state} /> : <Remaining state={state} />}
+          {mode === 'counters' ? <Counters cats={state.categories} /> : mode === 'available' ? <Available state={state} /> : <Remaining state={state} />}
         </>
       )}
       {state.toasts.slice(-2).map(toast => <div key={toast.id} className="ov-toast">{message(toast.text, toast.values)}</div>)}

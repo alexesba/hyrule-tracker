@@ -21,6 +21,8 @@ export interface LanOptions {
   basePath?: string;
   /** What remote pages may call, by method name. Anything else is refused. */
   rpc: Record<string, RpcHandler>;
+  /** Told each finished request (method, path without the base path, status), for a log. */
+  onRequest?: (line: string) => void;
 }
 
 export interface LanServer {
@@ -166,6 +168,9 @@ export function startLanServer(opts: LanOptions): Promise<LanServer> {
   }
 
   const server = http.createServer((req, res) => {
+    // The base path is the page's secret: the log gets the path after it.
+    let logged = '?';
+    if (opts.onRequest) res.once('finish', () => opts.onRequest!(`${req.method} ${logged} ${res.statusCode}${res.statusCode === 421 ? ` (host ${req.headers.host})` : ''}`));
     if (!allowedHost(req.headers.host)) return send(res, 421, 'Misdirected request');
     let pathname: string;
     try { pathname = new URL(req.url ?? '/', 'http://x').pathname; } catch { return send(res, 400, 'Bad request'); }
@@ -173,6 +178,7 @@ export function startLanServer(opts: LanOptions): Promise<LanServer> {
       if (!pathname.startsWith(opts.basePath)) return send(res, 404, 'Not found');
       pathname = pathname.slice(opts.basePath.length - 1);
     }
+    logged = pathname;
     if (pathname === '/api/rpc') return req.method === 'POST' ? void rpc(req, res) : send(res, 405, 'Method not allowed');
     if (pathname === '/api/events') return req.method === 'GET' ? events(req, res) : send(res, 405, 'Method not allowed');
     file(req, res, pathname);
