@@ -282,17 +282,38 @@ export function areaFrom(stage: string, list: unknown): string {
   return inner.length ? `${stage}/${inner[inner.length - 1]}` : stage;
 }
 
+const CHUNK = 64 << 10;
+const PAGE = 4 << 10;
+
 function readWindow(mem: Mem, lo: bigint, len: number): Buffer | null {
-  // A read that crosses a hole in the heap fails as a whole. Longshot's heap is full of
-  // those holes, so a 4 MB read of the progress tables comes back empty. 64 KB stays inside one block.
-  const CH = 64 << 10;
+  // A read that crosses a hole fails as a whole. On Longshot a 4 MB read crosses a hole
+  // in the heap and comes back empty, so the progress tables were missed while Link's
+  // position still moved. 64 KB stays inside one of those blocks. On Triforce a hole can
+  // sit inside that 64 KB, beside a real record, so a failed piece is read again as 4 KB
+  // pages and only the hole is dropped.
   const out = Buffer.alloc(len);
   let any = false;
-  for (let o = 0; o < len; o += CH) {
-    const b = mem.read(lo + BigInt(o), Math.min(CH, len - o));
-    if (b) { b.copy(out, o); any = true; }
+  for (let o = 0; o < len; o += CHUNK) {
+    if (copySpan(mem, lo + BigInt(o), Math.min(CHUNK, len - o), out, o)) any = true;
   }
   return any ? out : null;
+}
+
+function copySpan(mem: Mem, addr: bigint, len: number, out: Buffer, offset: number): boolean {
+  const got = mem.read(addr, len);
+  if (got) { got.copy(out, offset); return true; }
+  if (len <= PAGE) return false;
+  let any = false;
+  let done = 0;
+  while (done < len) {
+    const at = addr + BigInt(done);
+    const into = Number(at & BigInt(PAGE - 1));
+    const n = Math.min(into === 0 ? PAGE : PAGE - into, len - done);
+    const page = mem.read(at, n);
+    if (page) { page.copy(out, offset + done); any = true; }
+    done += n;
+  }
+  return any;
 }
 
 function sameValue(live: number | boolean | string | bigint, saved: unknown): boolean {
