@@ -9,6 +9,9 @@ Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 ### New
 - **Breath of the Wild in Savage Wind: Link moves on the map as you play.** While Savage Wind runs, Link's position on the map and in the overlay's Map mode follows him live instead of waiting for the next save. The tracker only reads the game, once a second. Savage Wind's saves are also found on their own, in the save profile in use. Not checked yet inside shrines and Divine Beasts. Thanks to mencrap for asking for it. [#37](https://github.com/jv-prado/hyrule-tracker/issues/37)
 
+### Fixed
+- **"Save format pending verification" on Breath of the Wild 1.9.0 saves.** Saves from game version 1.9.0, the one Savage Wind runs, are now a known format. Thanks to mencrap for the save. [#37](https://github.com/jv-prado/hyrule-tracker/issues/37)
+
 ## [2.0.5] - 2026-11-27
 
 ### Fixed

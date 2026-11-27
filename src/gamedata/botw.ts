@@ -4,7 +4,8 @@ import { crc32 } from './crc32.js';
 
 const positionKey = crc32('PlayerSavePos');
 const mapKey = crc32('PlayerSavePosMapType');
-const knownVersions = new Set([0x24e2, 0x24ee, 0x2588, 0x29c0, 0x2a46, 0x3ef8, 0x3ef9, 0x471a, 0x471b, 0x471e]);
+// 0x4730: game version 1.9.0 (Savage Wind's saves, issue #37).
+const knownVersions = new Set([0x24e2, 0x24ee, 0x2588, 0x29c0, 0x2a46, 0x3ef8, 0x3ef9, 0x471a, 0x471b, 0x471e, 0x4730]);
 const objectives = botwItems.map(item => ({
   id: item.id,
   done: typeof item.key === 'string' ? crc32(item.key) : undefined,
