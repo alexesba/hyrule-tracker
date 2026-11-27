@@ -19,7 +19,8 @@
     "dist:linux": "node scripts/dist-linux.mjs",
     "dist:linux:publish": "node scripts/dist-linux.mjs --publish",
     "dist:decky": "node scripts/dist-decky.mjs",
-    "dist:mac": "sh scripts/build-mac.sh"
+    "dist:mac": "sh scripts/build-mac.sh",
+    "release": "node scripts/release.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.19.2",

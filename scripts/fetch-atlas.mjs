@@ -64,12 +64,15 @@ await Promise.all(Array.from({ length: 12 }, async () => {
     if (!/^\/content\/(maps|media)\/[a-z0-9-]+\.(webp|svg)$/i.test(file)) throw Error('Unexpected asset path ' + file);
     const contents = Buffer.from(await (await load('public' + file)).arrayBuffer());
     if (file.endsWith('.svg')) {
-      const svg = contents.toString('utf8');
+      const svg = contents.toString('utf8').replace(/^<\?xml[^>]*\?>\s*/, '');
       if (!svg.startsWith('<svg') || /<script|<foreignObject|\son[a-z]+=|href="(https?:|\/\/)/i.test(svg)) throw Error('Unsupported SVG ' + file);
-    } else if (contents.toString('ascii', 0, 4) !== 'RIFF' || contents.toString('ascii', 8, 12) !== 'WEBP') {
+      await fs.writeFile(path.join(output, path.posix.basename(file)), restyle(svg));
+      continue;
+    }
+    if (contents.toString('ascii', 0, 4) !== 'RIFF' || contents.toString('ascii', 8, 12) !== 'WEBP') {
       throw Error('Unsupported image ' + file);
     }
-    await fs.writeFile(path.join(output, path.posix.basename(file)), file.endsWith('.svg') ? restyle(contents.toString('utf8')) : contents);
+    await fs.writeFile(path.join(output, path.posix.basename(file)), contents);
   }
 }));
 const map = { image: relative(source.map.image), width: source.map.width, height: source.map.height };

@@ -53,7 +53,7 @@ for (const rel of missing) {
   if (!contents) { failed.push(rel); continue; }
   let body = contents;
   if (name.endsWith('.svg')) {
-    const svg = contents.toString('utf8');
+    const svg = contents.toString('utf8').replace(/^<\?xml[^>]*\?>\s*/, '');
     if (!svg.startsWith('<svg') || /<script|<foreignObject|\son[a-z]+=|href="(https?:|\/\/)/i.test(svg)) throw new Error('Unsupported SVG ' + name);
     body = Buffer.from(restyle(svg));
   } else if (contents.toString('ascii', 0, 4) !== 'RIFF' || contents.toString('ascii', 8, 12) !== 'WEBP') {

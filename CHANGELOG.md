@@ -4,6 +4,11 @@ Player-facing changes in each Hyrule Tracker version. Every published version ne
 `scripts/ensure-release.mjs` uses it as the GitHub release text, and the in-app updater shows it before the player decides to update.
 Format: `New`, `Improved`, `Fixed`, `Removed`, `Known` (open issue).
 
+## [2.0.5] - 2026-11-27
+
+### Fixed
+- **Lost Woods floor without its map.** Version 2.0.4 listed the Lost Woods floor but shipped without its drawing. The drawing is now in the app, and every build checks that each map it names is there. Thanks to alexesba. [#40](https://github.com/jv-prado/hyrule-tracker/pull/40)
+
 ## [2.0.4] - 2026-11-26
 
 ### New

@@ -49,6 +49,7 @@ try {
     bundle: true, format: 'esm', platform: 'node', target: 'node22', external: ['koffi'],
   });
   const ui = path.join(bundle, 'ui');
+  run(process.execPath, [path.join(root, 'scripts/ensure-atlas-images.mjs')]);
   run(process.execPath, [path.join(root, 'node_modules/vite/bin/vite.js'), 'build', '--outDir', ui]);
   for (const folder of ['atlas', 'items', 'reference']) {
     if (!existsSync(path.join(ui, 'images', folder))) throw new Error(`Missing ${folder} images. See README.md for the image setup.`);
