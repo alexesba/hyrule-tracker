@@ -12,7 +12,7 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "dev": "node scripts/dev.mjs",
-    "build": "vite build && node scripts/build-electron.mjs",
+    "build": "node scripts/ensure-atlas-images.mjs && vite build && node scripts/build-electron.mjs",
     "start": "npm run build && node scripts/start.mjs",
     "dist": "npm run build && electron-builder --win nsis",
     "dist:publish": "node scripts/ensure-release.mjs && npm run build && electron-builder --win nsis --publish always",
