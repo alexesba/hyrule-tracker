@@ -10,6 +10,8 @@ import { botwItems } from '../core/botw-world.js';
 import { readBotwProgress } from '../gamedata/botw.js';
 import type { TotkIslandState } from '../shared/types.js';
 import type { SettingsStore } from './settings.js';
+import { findProcesses, initMemoryAccess, openProcess, type GameProcess } from './procmem.js';
+import { readLivePlayer, SAVAGEWIND_EXE, savagewindDataRoots, savagewindSaveFolder } from './savagewind.js';
 
 interface Slot {
   name: string;
@@ -103,7 +105,15 @@ export class TotkTracker {
   /** The Switch emulators' folders were searched for a save already (done once, when no folder is chosen). */
   private lookedForEmulators = false;
   private signature?: string;
+  /** What the save says. What's published adds Link's live position on top (Savage Wind). */
   private state: TotkIslandState = { status: 'unlinked', slots: [], marks: {}, manual: [] };
+  private published?: string;
+  private liveTimer?: ReturnType<typeof setInterval>;
+  private liveGame?: GameProcess;
+  private livePlayer?: WorldProgress['player'];
+  private following = false;
+  /** When to look for the game's process again (tasklist is too slow to run every second). */
+  private nextLookup = 0;
 
   constructor(private settings: SettingsStore, private publish: (state: TotkIslandState) => void,
     private game: 'totk' | 'botw' = 'totk') {}
@@ -112,11 +122,18 @@ export class TotkTracker {
     void this.refresh();
     this.timer = setInterval(() => { if (!this.busy) void this.refresh(); }, 2000);
     this.timer.unref();
+    if (this.game === 'botw') {
+      this.liveTimer = setInterval(() => void this.followLink(), 1000);
+      this.liveTimer.unref();
+    }
   }
 
   stop() {
     ++this.revision;
     clearInterval(this.timer);
+    clearInterval(this.liveTimer);
+    this.liveGame?.close();
+    this.liveGame = undefined;
   }
 
   private get preferences() { return this.settings.data[this.game]; }
@@ -144,9 +161,48 @@ export class TotkTracker {
   }
 
   private update(state: TotkIslandState) {
-    if (JSON.stringify(state) === JSON.stringify(this.state)) return;
     this.state = state;
-    this.publish(state);
+    this.emit();
+  }
+
+  private emit() {
+    const live = this.livePlayer && this.state.world;
+    const out = live ? { ...this.state, world: { ...this.state.world!, player: this.livePlayer } } : this.state;
+    const signature = JSON.stringify(out);
+    if (signature === this.published) return;
+    this.published = signature;
+    this.publish(out);
+  }
+
+  private setLive(player: WorldProgress['player']) {
+    if (JSON.stringify(player) === JSON.stringify(this.livePlayer)) return;
+    this.livePlayer = player;
+    this.emit();
+  }
+
+  /** Breath of the Wild in Savage Wind: Link's position from the running game, every second. */
+  private async followLink() {
+    if (this.following) return;
+    this.following = true;
+    try {
+      if (this.liveGame && !this.liveGame.alive()) { this.liveGame.close(); this.liveGame = undefined; }
+      if (!this.liveGame) {
+        if (Date.now() < this.nextLookup) return this.setLive(undefined);
+        this.nextLookup = Date.now() + 5000;
+        if (!await initMemoryAccess()) return this.setLive(undefined);
+        const [pid] = await findProcesses(SAVAGEWIND_EXE).catch(() => [] as number[]);
+        if (!pid) return this.setLive(undefined);
+        this.liveGame = openProcess(pid);
+        // On Windows its saves are next to its exe; use them when no folder is chosen yet.
+        const exe = this.liveGame.imagePath();
+        if (exe && !this.preferences?.folder) void this.attach(savagewindSaveFolder(path.dirname(exe)));
+      }
+      this.setLive(readLivePlayer(this.liveGame));
+    } catch {
+      this.liveGame?.close();
+      this.liveGame = undefined;
+      this.setLive(undefined);
+    } finally { this.following = false; }
   }
 
   async attach(selected: string): Promise<boolean> {
@@ -199,8 +255,10 @@ export class TotkTracker {
       // No folder chosen yet: use the save of a Switch emulator (Eden, yuzu…) if there is one. Once per run.
       if (!this.lookedForEmulators) {
         this.lookedForEmulators = true;
-        const [found] = emulatorSaveFolders(this.game);
-        if (found && await this.attach(found)) return;
+        const savagewind = this.game === 'botw' ? savagewindDataRoots().map(savagewindSaveFolder) : [];
+        for (const found of [...savagewind, ...emulatorSaveFolders(this.game)].slice(0, 1 + savagewind.length)) {
+          if (await this.attach(found)) return;
+        }
       }
       this.update({ ...this.state, manual: this.manual(undefined) });
       return;

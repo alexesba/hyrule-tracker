@@ -118,7 +118,7 @@ The journal and map-discovery counters cover the tracker's catalog. The official
 
 ## Breath of the Wild
 
-Select **Breath of the Wild** from **Switch game**. In the desktop app, connect the folder containing `game_data.sav` or the numbered save folders. A save in Eden, yuzu, suyu, Sudachi or Citron is found on its own (title folder `01007EF00011E000`). The journal reads Nintendo Switch and Wii U/Cemu saves. Its progress, selected slot, manual checks and daily log are stored separately from the other games.
+Select **Breath of the Wild** from **Switch game**. In the desktop app, connect the folder containing `game_data.sav` or the numbered save folders. A save in Eden, yuzu, suyu, Sudachi or Citron is found on its own (title folder `01007EF00011E000`), and so is one in [Savage Wind](https://github.com/Revivedx/SavageWindRecomp) (`save\save_0` next to `savagewind.exe`, or `~/.local/share/savagewind/save/save_0` on Linux, in the save profile in use). The journal reads Nintendo Switch and Wii U/Cemu saves. Its progress, selected slot, manual checks and daily log are stored separately from the other games.
 
 The journal includes the in-game map of Hyrule, 120 base-game shrines, 16 DLC shrines, 900 Koroks, 15 Sheikah Towers and 18 memories. The walkthrough covers the Great Plateau, the four Divine Beasts, Hyrule Castle and the DLC routes. The checklist has filters for base-game, DLC and Zelda Notes content. The tracker updates objectives with known save flags automatically. Other activities can be checked by hand.
 
@@ -133,7 +133,7 @@ The interface, world catalog and authored guides use the same 12 languages as th
 - ⚡ **NX2Saria** answers live reading itself, on Windows and Linux: turn on its tracker API (`tracker_api = 1` under `[tracker]` in `nx2saria.ini`) and the tracker reads the running game through `127.0.0.1:6545`, read-only, without reading the game's memory. Its saves are found in `<game folder>/profile/save`.
 - 🗂️ **Rekarina** (Windows) is followed through its saves only, in `<game folder>\profile\save`; the launcher's game folder is `<Rekarina folder>\game`. Live reading doesn't work with it yet: it keeps the game at other addresses in memory than the recomps the tracker reads.
 - 🗂️ Saves from other environments can be selected manually if they expose the same format.
-- 🧭 **Breath of the Wild and Tears of the Kingdom** read Nintendo Switch saves (and Wii U/Cemu saves for Breath of the Wild). Saves in **Eden, yuzu, suyu, Sudachi and Citron** are found automatically; for Ryujinx or other folders, use **Choose folder**. These two games follow your saves: Link's position is the one from the last save.
+- 🧭 **Breath of the Wild and Tears of the Kingdom** read Nintendo Switch saves (and Wii U/Cemu saves for Breath of the Wild). Saves in **Eden, yuzu, suyu, Sudachi and Citron** are found automatically; for Ryujinx or other folders, use **Choose folder**. These two games follow your saves: Link's position is the one from the last save. The exception is **Breath of the Wild in Savage Wind** (game version 1.9.0): while it runs, Link's position on the map and in the overlay follows him live, read-only, once a second. Inside shrines and Divine Beasts it hasn't been checked yet.
 - ❌ Nintendo 64, Ocarina of Time 3D and original-game port saves use different formats and are **not** supported.
 
 <details>
